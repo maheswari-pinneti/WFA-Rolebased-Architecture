@@ -30,18 +30,22 @@ import { DeptHeadDashboard } from '../../features/team-manager/pages/DeptHeadDas
 import { ManagerDashboard } from '../../features/team-manager/pages/ManagerDashboard';
 import { TeamAnalytics } from '../../features/team-manager/pages/TeamAnalytics';
 import { TeamReports } from '../../features/team-manager/pages/TeamReports';
+import { ApprovalsPage } from '../../features/team-manager/pages/ApprovalsPage';
 import { AnalystDashboard } from '../../features/analytics/pages/AnalystDashboard';
 
-// Operational Team Lead Dashboard
+// Operational Team Lead Dashboard & Pages
 import { TeamLeadDashboard } from '../../features/team-lead/pages/TeamLeadDashboard';
+import { TeamMembersPage } from '../../features/team-lead/pages/TeamMembersPage';
+import { TaskTrackingPage } from '../../features/team-lead/pages/TaskTrackingPage';
 import { Productivity } from '../../features/team-lead/pages/Productivity';
 
-// Employee & Viewer Dashboards
+// Employee & Viewer Dashboards & Pages
 import { EmployeeDashboard } from '../../features/employee/pages/EmployeeDashboard';
 import { ViewerDashboard } from '../../features/employee/pages/ViewerDashboard';
 import { Profile } from '../../features/employee/pages/Profile';
 import { MyAttendance } from '../../features/employee/pages/MyAttendance';
 import { MyPerformance } from '../../features/employee/pages/MyPerformance';
+import { EmployeeRequestsPage } from '../../features/employee/pages/EmployeeRequestsPage';
 
 const DefaultHomeRedirect: React.FC = () => {
   const { role } = useAuth();
@@ -259,6 +263,14 @@ export const AppRoutes: React.FC = () => {
                   }
                 />
                 <Route
+                  path="/manager/approvals"
+                  element={
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.BUSINESS_MANAGER]}>
+                      <ApprovalsPage />
+                    </RoleGuard>
+                  }
+                />
+                <Route
                   path="/manager/reports"
                   element={
                     <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER, Role.ANALYST]}>
@@ -267,10 +279,26 @@ export const AppRoutes: React.FC = () => {
                   }
                 />
                 <Route
+                  path="/team-lead/members"
+                  element={
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.TEAM_LEAD]}>
+                      <TeamMembersPage />
+                    </RoleGuard>
+                  }
+                />
+                <Route
                   path="/team-lead/productivity"
                   element={
                     <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.TEAM_LEAD]}>
                       <Productivity />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/team-lead/tasks"
+                  element={
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.TEAM_LEAD]}>
+                      <TaskTrackingPage />
                     </RoleGuard>
                   }
                 />
@@ -300,6 +328,14 @@ export const AppRoutes: React.FC = () => {
                   element={
                     <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.EMPLOYEE, Role.VIEWER]}>
                       <MyPerformance />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/employee/requests"
+                  element={
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.EMPLOYEE]}>
+                      <EmployeeRequestsPage />
                     </RoleGuard>
                   }
                 />
