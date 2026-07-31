@@ -1,20 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
-import { EmployeeTable } from '../../../components/tables/EmployeeTable';
-import { AttritionDonut } from '../../analytics/charts/AttritionDonut';
+import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
+import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
+
+// 6 Interactive Charts
+import { WorkforceTrendLine } from '../../analytics/charts/WorkforceTrendLine';
+import { DepartmentOverviewBar } from '../../analytics/charts/DepartmentOverviewBar';
+import { AttendanceAnalyticsArea } from '../../analytics/charts/AttendanceAnalyticsArea';
+import { EmployeeDistributionPie } from '../../analytics/charts/EmployeeDistributionPie';
+import { PerformanceRadar } from '../../analytics/charts/PerformanceRadar';
 import { SalaryAnalyticsBar } from '../../analytics/charts/SalaryAnalyticsBar';
-import { UserCheck, Users, Briefcase, FileText, Plus, CheckCircle2, ArrowRight, Clock } from 'lucide-react';
+
+import { UserCheck, Users, Briefcase, FileText, Plus, Clock, HeartHandshake, Star, AlertTriangle, DollarSign, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const HRDashboard: React.FC = () => {
-  const recruitmentCandidates = [
-    { name: 'Michael Faraday', role: 'Staff Frontend Engineer', stage: 'Technical Interview', status: 'SCHEDULED' },
-    { name: 'Ada Lovelace', role: 'Principal Systems Architect', stage: 'Final Leadership Round', status: 'IN_REVIEW' },
-    { name: 'Alan Turing', role: 'Senior AI Specialist', stage: 'Offer Stage', status: 'PENDING' },
-  ];
+  const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
+
+  const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
+    setDrillDownData({
+      title,
+      metricValue: value,
+      subtitle,
+      category: 'HR Operations Scope',
+      details,
+    });
+  };
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]} requiredPermission={Permission.EMPLOYEE_READ}>
@@ -45,57 +59,155 @@ export const HRDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* HR Metric Cards */}
+        {/* Advanced Filter Bar */}
+        <AdvancedFilterBar onFilterChange={() => {}} />
+
+        {/* 8 Reusable HR KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <KPICard title="Total Headcount" value="1,248 Employees" change={8.4} trend="up" subtitle="Global workforce" icon={<Users size={20} />} accentColor="purple" />
-          <KPICard title="Open Candidate Pipeline" value="18 Active" change={4.2} trend="up" subtitle="3 Offers pending" icon={<Briefcase size={20} />} accentColor="blue" />
-          <KPICard title="Shift Attendance Rate" value="98.2%" change={1.2} trend="up" subtitle="Monthly average" icon={<Clock size={20} />} accentColor="emerald" />
-          <KPICard title="Leave & PTO Queue" value="14 Pending" change={-2.4} trend="down" subtitle="Requires HR review" icon={<FileText size={20} />} accentColor="amber" />
+          <KPICard
+            title="Total Headcount"
+            value="1,248 Staff"
+            change={8.4}
+            trend="up"
+            subtitle="Global workforce"
+            icon={<Users size={20} />}
+            accentColor="purple"
+            onClick={() => openDrillDown('Total Headcount Breakdown', '1,248 Staff', 'Full workforce employment contracts', [
+              { label: 'Full-Time Permanent', value: 1140 },
+              { label: 'Contractors', value: 78 },
+              { label: 'Interns & Fellows', value: 30 },
+            ])}
+          />
+          <KPICard
+            title="Recruitment Pipeline"
+            value="18 Active"
+            change={4.2}
+            trend="up"
+            subtitle="3 Offers pending"
+            icon={<Briefcase size={20} />}
+            accentColor="blue"
+            onClick={() => openDrillDown('Talent Acquisition Pipeline', '18 Active Candidates', 'Open requisitions and interview stages', [
+              { label: 'Screening Stage', value: 6 },
+              { label: 'Technical Rounds', value: 9 },
+              { label: 'Offers Released', value: 3 },
+            ])}
+          />
+          <KPICard
+            title="Shift Attendance"
+            value="98.2%"
+            change={1.2}
+            trend="up"
+            subtitle="Monthly average"
+            icon={<Clock size={20} />}
+            accentColor="emerald"
+            onClick={() => openDrillDown('Workforce Attendance Rate', '98.2%', 'Overall shift presence & clock-in compliance', [
+              { label: 'On-Time Clock Ins', value: '96.8%' },
+              { label: 'Late Clock Ins', value: '1.4%' },
+              { label: 'Unexcused Absences', value: '0.2%' },
+            ])}
+          />
+          <KPICard
+            title="Leave Requests"
+            value="14 Pending"
+            change={-2.4}
+            trend="down"
+            subtitle="Requires HR review"
+            icon={<FileText size={20} />}
+            accentColor="amber"
+            onClick={() => openDrillDown('Pending Leave & PTO Requests', '14 Pending', 'Employee vacation and medical leave queue', [
+              { label: 'Vacation Leave', value: 8 },
+              { label: 'Sick / Medical', value: 4 },
+              { label: 'Parental Leave', value: 2 },
+            ])}
+          />
+          <KPICard
+            title="Payroll Budget"
+            value="$4.82M / mo"
+            change={2.0}
+            trend="up"
+            subtitle="Monthly salary cost"
+            icon={<DollarSign size={20} />}
+            accentColor="emerald"
+            onClick={() => openDrillDown('Monthly Payroll Budget', '$4,820,000', 'Total compensation and benefits allocation', [
+              { label: 'Base Salaries', value: '$3,950,000' },
+              { label: 'Health Benefits', value: '$520,000' },
+              { label: 'Bonuses & Incentives', value: '$350,000' },
+            ])}
+          />
+          <KPICard
+            title="eNPS Satisfaction"
+            value="95.2 Score"
+            change={3.0}
+            trend="up"
+            subtitle="Satisfaction benchmark"
+            icon={<HeartHandshake size={20} />}
+            accentColor="cyan"
+            onClick={() => openDrillDown('Employee Engagement Score', '95.2 eNPS', 'Quarterly employee survey satisfaction', [
+              { label: 'Promoters', value: '88%' },
+              { label: 'Passives', value: '9%' },
+              { label: 'Detractors', value: '3%' },
+            ])}
+          />
+          <KPICard
+            title="Performance Review"
+            value="4.8 / 5.0"
+            change={0.4}
+            trend="up"
+            subtitle="Q2 Review score"
+            icon={<Star size={20} />}
+            accentColor="amber"
+            onClick={() => openDrillDown('Q2 Performance Evaluation', '4.8 / 5.0 Avg', 'Organization performance ratings', [
+              { label: 'Exceeds Target', value: '42%' },
+              { label: 'Meets Target', value: '54%' },
+              { label: 'Needs Improvement', value: '4%' },
+            ])}
+          />
+          <KPICard
+            title="Attrition Risk"
+            value="1.2% Low"
+            change={-0.8}
+            trend="down"
+            subtitle="Top retention rate"
+            icon={<AlertTriangle size={20} />}
+            accentColor="rose"
+            onClick={() => openDrillDown('Workforce Attrition Risk', '1.2% Low', 'Predictive attrition & turnover analysis', [
+              { label: 'Voluntary Turnover', value: '0.9%' },
+              { label: 'Involuntary Turnover', value: '0.3%' },
+            ])}
+          />
         </div>
 
-        {/* HR-Specific Section 1: Active Candidate Pipeline & Attrition Donut */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-                <Briefcase size={18} className="text-purple-400" /> Active Talent Acquisition Pipeline
-              </h3>
-              <Link to="/hr/recruitment" className="text-xs font-bold text-blue-400 hover:underline flex items-center gap-1">
-                View Desk <ArrowRight size={12} />
-              </Link>
-            </div>
-
-            <div className="space-y-2.5">
-              {recruitmentCandidates.map((c, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between text-xs">
-                  <div>
-                    <p className="font-bold text-sm text-[var(--text-primary)]">{c.name}</p>
-                    <p className="text-xs text-slate-400">{c.role} • <span className="text-purple-400 font-medium">{c.stage}</span></p>
-                  </div>
-                  <span className="badge badge-success text-[10px]">{c.status}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Users size={18} className="text-emerald-400" /> Retention Rate & Attrition Analysis
-            </h3>
-            <AttritionDonut />
-          </div>
-        </div>
-
-        {/* HR-Specific Section 2: Salary & Compensation Analytics */}
-        <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-          <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-            <FileText size={18} className="text-amber-400" /> Department Salary & Compensation Analytics
+        {/* 6 Distinct Interactive Charts Grid */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-black tracking-tight text-[var(--text-primary)] flex items-center gap-2">
+            <Activity size={20} className="text-purple-400" /> HR Operations & Workforce Lifecycle Analytics (6 Chart Dimensions)
           </h3>
-          <SalaryAnalyticsBar />
+
+          {/* Row 1: Line Chart & Bar Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <WorkforceTrendLine />
+            <DepartmentOverviewBar />
+          </div>
+
+          {/* Row 2: Area Chart & Pie Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AttendanceAnalyticsArea />
+            <EmployeeDistributionPie />
+          </div>
+
+          {/* Row 3: Radar Chart & Salary Bar Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PerformanceRadar />
+            <SalaryAnalyticsBar />
+          </div>
         </div>
 
-        {/* HR-Specific Section 3: Employee Directory Table */}
-        <EmployeeTable />
+        {/* Drill-Down Modal */}
+        <DrillDownModal
+          isOpen={drillDownData !== null}
+          onClose={() => setDrillDownData(null)}
+          data={drillDownData}
+        />
       </div>
     </RoleGuard>
   );
