@@ -1,0 +1,57 @@
+[
+  {
+    "id": "usr-admin-01",
+    "name": "Sarah Connor",
+    "email": "admin@company.com",
+    "role": "ADMIN",
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+    "department": "Executive",
+    "title": "Chief Systems Architect",
+    "status": "ACTIVE",
+    "permissions": ["users:read", "users:create", "users:update", "users:delete", "roles:manage", "system:config", "employee:read", "employee:manage", "employee:self", "attendance:clock", "attendance:read_self", "attendance:read_team", "attendance:manage", "analytics:view_all", "analytics:view_team", "reports:export", "performance:read_self", "performance:read_team", "performance:manage"]
+  },
+  {
+    "id": "usr-hr-01",
+    "name": "Elena Rostova",
+    "email": "hr@company.com",
+    "role": "HR",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+    "department": "Human Resources",
+    "title": "VP of HR Operations",
+    "status": "ACTIVE",
+    "permissions": ["users:read", "employee:read", "employee:manage", "employee:self", "attendance:clock", "attendance:read_self", "attendance:read_team", "attendance:manage", "analytics:view_all", "analytics:view_team", "reports:export", "performance:read_self", "performance:read_team"]
+  },
+  {
+    "id": "usr-mgr-01",
+    "name": "David Sterling",
+    "email": "manager@company.com",
+    "role": "TEAM_MANAGER",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    "department": "Engineering",
+    "title": "Director of Engineering",
+    "status": "ACTIVE",
+    "permissions": ["employee:read", "employee:self", "attendance:clock", "attendance:read_self", "attendance:read_team", "analytics:view_team", "reports:export", "performance:read_self", "performance:read_team", "performance:manage"]
+  },
+  {
+    "id": "usr-lead-01",
+    "name": "Marcus Vance",
+    "email": "lead@company.com",
+    "role": "TEAM_LEAD",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+    "department": "Engineering",
+    "title": "Senior Staff Lead",
+    "status": "ACTIVE",
+    "permissions": ["employee:read", "employee:self", "attendance:clock", "attendance:read_self", "attendance:read_team", "analytics:view_team", "performance:read_self", "performance:read_team"]
+  },
+  {
+    "id": "usr-emp-01",
+    "name": "Alex Mercer",
+    "email": "employee@company.com",
+    "role": "EMPLOYEE",
+    "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
+    "department": "Engineering",
+    "title": "Full Stack Developer",
+    "status": "ACTIVE",
+    "permissions": ["employee:self", "attendance:clock", "attendance:read_self", "performance:read_self"]
+  }
+]
