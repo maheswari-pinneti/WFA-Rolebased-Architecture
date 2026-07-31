@@ -20,9 +20,16 @@ import {
   Activity,
   LogOut,
   ChevronDown,
+  ChevronRight,
   Sparkles,
   CheckCircle2,
-  History
+  History,
+  Filter,
+  Layers,
+  Building2,
+  ShieldCheck,
+  Briefcase,
+  ChevronLeft
 } from 'lucide-react';
 
 interface EnterpriseHeaderProps {
@@ -30,16 +37,32 @@ interface EnterpriseHeaderProps {
 }
 
 export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSidebar }) => {
-  const { user, logout, switchRole, role } = useAuth();
+  const { user, logout, switchRole, role, permissions } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
+  // Search & Drill-Down Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [searchCategory, setSearchCategory] = useState<'all' | 'employees' | 'departments' | 'reports' | 'security'>('all');
+
+  // Dropdown States
   const [activeDropdown, setActiveDropdown] = useState<'profile' | 'role' | 'notif' | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Drill-Down Scope State
+  const [drillDownView, setDrillDownView] = useState<'roles' | 'departments' | 'permissions'>('roles');
+  const [selectedDept, setSelectedDept] = useState<string>('Global Operations');
+  const [showPermissionsPreview, setShowPermissionsPreview] = useState(false);
+
   const availableRoles = Object.values(Role);
+  const departmentsList = [
+    { id: 'eng', name: 'Engineering & Technology', code: 'ENG', head: 'David Sterling' },
+    { id: 'hr', name: 'Human Resources & Talent', code: 'HR', head: 'Elena Rostova' },
+    { id: 'prod', name: 'Product & UX Design', code: 'DES', head: 'Sarah Connor' },
+    { id: 'ops', name: 'Global Operations', code: 'OPS', head: 'Marcus Vance' },
+    { id: 'sales', name: 'Enterprise Sales', code: 'SALES', head: 'Alex Mercer' },
+  ];
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -54,6 +77,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
   const toggleDropdown = (name: 'profile' | 'role' | 'notif') => {
     setActiveDropdown((prev) => (prev === name ? null : name));
+    setDrillDownView('roles');
   };
 
   const handleRefresh = () => {
@@ -74,7 +98,12 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     }
   };
 
-  const recentSearches = ['Engineering Headcount Q2', 'Q3 Performance Reviews', 'Sarah Jenkins Attendance'];
+  const recentSearches = [
+    { query: 'Engineering Headcount Q2', category: 'reports' },
+    { query: 'Q3 Performance Reviews', category: 'employees' },
+    { query: 'Sarah Jenkins Attendance', category: 'employees' },
+    { query: 'Security Policy Audit Log', category: 'security' },
+  ];
 
   return (
     <header className="h-[72px] px-6 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between gap-6 shadow-sm">
@@ -92,18 +121,18 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         <div className="flex items-center gap-3">
           <StacklyLogo size={32} showText={false} />
           <div className="flex flex-col justify-center">
-            <h1 className="text-[24px] font-bold tracking-tight text-[var(--text-primary)] leading-tight font-sans">
+            <h1 className="text-[22px] md:text-[24px] font-bold tracking-tight text-[var(--text-primary)] leading-tight font-sans">
               Workforce Analytics
             </h1>
-            <p className="text-[13px] font-medium text-slate-400 leading-none mt-0.5 hidden sm:block">
+            <p className="text-[12px] font-medium text-slate-400 leading-none mt-0.5 hidden sm:block">
               Enterprise Workforce Intelligence Platform
             </p>
           </div>
         </div>
       </div>
 
-      {/* Center Section: Global Search Bar */}
-      <div className="hidden lg:flex items-center max-w-[380px] w-full relative">
+      {/* Center Section: Global Search Bar with Drill-Down Categories */}
+      <div className="hidden lg:flex items-center max-w-[420px] w-full relative">
         <div className="relative w-full">
           <Search size={20} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           <input
@@ -112,20 +141,23 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             onFocus={() => setSearchFocused(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="Global Search"
-            placeholder="Search employees, departments, reports..."
-            className="w-full pl-10 pr-20 py-2 text-sm rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-[#2563EB] shadow-inner transition-colors"
+            placeholder={`Search in ${searchCategory === 'all' ? 'entire platform' : searchCategory}...`}
+            className="w-full pl-10 pr-24 py-2 text-sm rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-[#2563EB] shadow-inner transition-colors"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-slate-800/40 px-2 py-0.5 rounded border border-slate-700/50 pointer-events-none">
-            Ctrl + K
-          </kbd>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <kbd className="text-[10px] font-mono font-bold text-slate-400 bg-slate-800/40 px-1.5 py-0.5 rounded border border-slate-700/50 pointer-events-none hidden xl:inline-block">
+              Ctrl + K
+            </kbd>
+          </div>
         </div>
 
-        {/* Auto-suggestions & Recent Searches Dropdown */}
+        {/* Search Drill-Down Dropdown */}
         {searchFocused && (
           <div className="absolute left-0 right-0 top-full mt-2 glass-panel p-4 shadow-2xl z-50 bg-[var(--bg-secondary)] border-[var(--border-color)] rounded-2xl space-y-3">
-            <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
+            {/* Category Drill-Down Pills */}
+            <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2.5">
               <span className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
-                <History size={16} strokeWidth={2} /> Recent Searches
+                <Filter size={14} strokeWidth={2} /> Category Scope
               </span>
               <button
                 onClick={() => setSearchFocused(false)}
@@ -134,25 +166,53 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                 Close
               </button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {recentSearches.map((s) => (
+
+            <div className="flex flex-wrap gap-1.5">
+              {(['all', 'employees', 'departments', 'reports', 'security'] as const).map((cat) => (
                 <button
-                  key={s}
-                  onClick={() => {
-                    setSearchQuery(s);
-                    setSearchFocused(false);
-                  }}
-                  className="px-2.5 py-1 text-xs rounded-lg bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] text-slate-300 font-medium"
+                  key={cat}
+                  onClick={() => setSearchCategory(cat)}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-bold capitalize transition-colors ${
+                    searchCategory === cat
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-[var(--bg-tertiary)] text-slate-400 hover:text-slate-200'
+                  }`}
                 >
-                  {s}
+                  {cat}
                 </button>
               ))}
+            </div>
+
+            {/* Recent Searches */}
+            <div className="pt-2 border-t border-[var(--border-color)]">
+              <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 mb-2">
+                <History size={14} strokeWidth={2} /> Recent Queries
+              </span>
+              <div className="space-y-1">
+                {recentSearches
+                  .filter((item) => searchCategory === 'all' || item.category === searchCategory)
+                  .map((s, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setSearchQuery(s.query);
+                        setSearchFocused(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 rounded-lg bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] text-xs text-slate-300 font-medium flex items-center justify-between transition-colors"
+                    >
+                      <span>{s.query}</span>
+                      <span className="text-[10px] font-mono uppercase bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">
+                        {s.category}
+                      </span>
+                    </button>
+                  ))}
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Right Section: Standardized Lucide Icons (20px) */}
+      {/* Right Section: Lucide Icons, Scope Drill-Down Selector & Profile */}
       <div className="flex items-center gap-3 shrink-0">
         {/* Dashboard Refresh Button */}
         <button
@@ -217,45 +277,117 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           {theme === 'dark' ? <Sun size={20} strokeWidth={2} className="text-[#F59E0B]" /> : <Moon size={20} strokeWidth={2} className="text-[#2563EB]" />}
         </button>
 
-        {/* Help Center */}
-        <button
-          aria-label="Open Help Center"
-          className="hidden sm:flex p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-slate-100 transition-all hover:scale-105"
-          title="Help Center"
-        >
-          <HelpCircle size={20} strokeWidth={2} />
-        </button>
-
-        {/* Security Role Switcher Dropdown */}
+        {/* Security Scope & Department Drill-Down Dropdown Selector */}
         <div className="relative hidden md:block">
           <button
             onClick={() => toggleDropdown('role')}
             aria-label="Switch Security Role Scope"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold hover:border-[#2563EB] transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold hover:border-[#2563EB] transition-colors"
           >
             <span className={`badge ${getRoleBadgeClass(role)}`}>
               {ROLE_LABELS[role]}
             </span>
+            <span className="text-[11px] text-slate-400 hidden xl:inline-block">• {selectedDept}</span>
             <ChevronDown size={14} strokeWidth={2} className="text-slate-400" />
           </button>
 
+          {/* Drill-Down Scope Menu */}
           {activeDropdown === 'role' && (
-            <div className="absolute right-0 mt-2 w-64 glass-panel py-2 shadow-2xl z-50 bg-[var(--bg-secondary)] border-[var(--border-color)] rounded-2xl">
-              <div className="px-3.5 py-1.5 border-b border-[var(--border-color)] mb-1">
-                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Switch Security Scope</p>
+            <div className="absolute right-0 mt-2 w-72 glass-panel p-3 shadow-2xl z-50 bg-[var(--bg-secondary)] border-[var(--border-color)] rounded-2xl space-y-3">
+              {/* Drill-Down Navigation Tabs */}
+              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
+                <div className="flex items-center gap-1 text-[11px] font-bold">
+                  {drillDownView !== 'roles' && (
+                    <button
+                      onClick={() => setDrillDownView('roles')}
+                      className="p-1 rounded hover:bg-[var(--bg-hover)] text-blue-400"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+                  )}
+                  <span className="text-slate-400 uppercase tracking-wider">
+                    {drillDownView === 'roles' ? 'Security Scope' : drillDownView === 'departments' ? 'Department Scope' : 'Active Permissions'}
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setDrillDownView('roles')}
+                    className={`px-2 py-0.5 text-[10px] font-bold rounded ${drillDownView === 'roles' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+                  >
+                    Roles
+                  </button>
+                  <button
+                    onClick={() => setDrillDownView('departments')}
+                    className={`px-2 py-0.5 text-[10px] font-bold rounded ${drillDownView === 'departments' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+                  >
+                    Depts
+                  </button>
+                </div>
               </div>
-              {availableRoles.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => handleRoleChange(r)}
-                  className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between hover:bg-[var(--bg-hover)] transition-colors ${
-                    role === r ? 'font-black text-[#2563EB] bg-blue-500/10' : 'text-[var(--text-primary)]'
-                  }`}
-                >
-                  <span>{ROLE_LABELS[r]}</span>
-                  {role === r && <CheckCircle2 size={16} strokeWidth={2} className="text-[#2563EB]" />}
-                </button>
-              ))}
+
+              {/* View 1: Role Switcher Level */}
+              {drillDownView === 'roles' && (
+                <div className="space-y-1 max-h-64 overflow-y-auto">
+                  {availableRoles.map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => handleRoleChange(r)}
+                      className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center justify-between transition-colors ${
+                        role === r ? 'font-black text-[#2563EB] bg-blue-500/10 border border-blue-500/20' : 'text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={16} className={role === r ? 'text-blue-500' : 'text-slate-400'} />
+                        <span>{ROLE_LABELS[r]}</span>
+                      </div>
+                      {role === r ? (
+                        <CheckCircle2 size={16} strokeWidth={2} className="text-[#2563EB]" />
+                      ) : (
+                        <ChevronRight size={14} className="text-slate-500" />
+                      )}
+                    </button>
+                  ))}
+
+                  <div className="pt-2 border-t border-[var(--border-color)]">
+                    <button
+                      onClick={() => setDrillDownView('departments')}
+                      className="w-full px-3 py-2 text-xs text-slate-300 font-bold bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] rounded-xl flex items-center justify-between transition-colors"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Building2 size={14} className="text-purple-400" /> Drill Down Department
+                      </span>
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* View 2: Department Drill-Down Level */}
+              {drillDownView === 'departments' && (
+                <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                  <p className="text-[10px] font-bold text-slate-400 px-1 mb-1 uppercase">Select Organizational Scope:</p>
+                  {departmentsList.map((dept) => (
+                    <button
+                      key={dept.id}
+                      onClick={() => {
+                        setSelectedDept(dept.name);
+                        setActiveDropdown(null);
+                      }}
+                      className={`w-full text-left p-2.5 rounded-xl border text-xs transition-colors flex items-center justify-between ${
+                        selectedDept === dept.name
+                          ? 'bg-purple-500/10 border-purple-500/30 text-purple-300 font-bold'
+                          : 'bg-[var(--bg-tertiary)] border-[var(--border-color)] text-slate-300 hover:bg-[var(--bg-hover)]'
+                      }`}
+                    >
+                      <div>
+                        <p className="font-semibold">{dept.name}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Head: {dept.head}</p>
+                      </div>
+                      <span className="badge badge-info text-[9px]">{dept.code}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -280,37 +412,55 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             </button>
 
             {activeDropdown === 'profile' && (
-              <div className="absolute right-0 mt-2 w-56 glass-panel py-2 shadow-2xl z-50 bg-[var(--bg-secondary)] border-[var(--border-color)] text-xs rounded-2xl">
+              <div className="absolute right-0 mt-2 w-64 glass-panel py-2 shadow-2xl z-50 bg-[var(--bg-secondary)] border-[var(--border-color)] text-xs rounded-2xl">
+                {/* User Info Header */}
                 <div className="px-4 py-3 border-b border-[var(--border-color)]">
                   <p className="font-bold text-sm text-[var(--text-primary)]">{user.name}</p>
                   <p className="text-[11px] text-slate-400">{user.email}</p>
-                  <p className="text-[10px] font-bold text-blue-400 mt-1 uppercase">{ROLE_LABELS[role]}</p>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className={`badge ${getRoleBadgeClass(role)}`}>{ROLE_LABELS[role]}</span>
+                    <button
+                      onClick={() => setShowPermissionsPreview(!showPermissionsPreview)}
+                      className="text-[10px] font-bold text-blue-400 hover:underline flex items-center gap-1"
+                    >
+                      <Layers size={12} /> {showPermissionsPreview ? 'Hide Flags' : 'Drill Down Permissions'}
+                    </button>
+                  </div>
                 </div>
 
+                {/* Drill-Down Permissions Matrix Accordion */}
+                {showPermissionsPreview && (
+                  <div className="p-3 bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[10px] space-y-1.5 max-h-36 overflow-y-auto">
+                    <p className="font-extrabold text-slate-400 uppercase tracking-wider">Active Permissions ({permissions.length})</p>
+                    <div className="flex flex-wrap gap-1">
+                      {permissions.map((p, idx) => (
+                        <span key={idx} className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-mono">
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Navigation Items */}
                 <div className="py-1.5 space-y-0.5 font-medium">
                   <button
                     onClick={() => { navigate('/employee/profile'); setActiveDropdown(null); }}
                     className="w-full text-left px-4 py-2 hover:bg-[var(--bg-hover)] flex items-center gap-2.5 text-[var(--text-primary)]"
                   >
-                    <UserIcon size={20} strokeWidth={2} className="text-[#2563EB]" /> View Profile
+                    <UserIcon size={18} strokeWidth={2} className="text-[#2563EB]" /> View Profile
                   </button>
                   <button
                     onClick={() => { navigate('/admin/settings'); setActiveDropdown(null); }}
                     className="w-full text-left px-4 py-2 hover:bg-[var(--bg-hover)] flex items-center gap-2.5 text-[var(--text-primary)]"
                   >
-                    <Settings size={20} strokeWidth={2} className="text-[#4F46E5]" /> My Settings
+                    <Settings size={18} strokeWidth={2} className="text-[#4F46E5]" /> My Settings
                   </button>
                   <button
                     onClick={() => { navigate('/admin/roles'); setActiveDropdown(null); }}
                     className="w-full text-left px-4 py-2 hover:bg-[var(--bg-hover)] flex items-center gap-2.5 text-[var(--text-primary)]"
                   >
-                    <Shield size={20} strokeWidth={2} className="text-[#F59E0B]" /> Security
-                  </button>
-                  <button
-                    onClick={() => { navigate('/admin/reports'); setActiveDropdown(null); }}
-                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-hover)] flex items-center gap-2.5 text-[var(--text-primary)]"
-                  >
-                    <Activity size={20} strokeWidth={2} className="text-[#22C55E]" /> Activity Log
+                    <Shield size={18} strokeWidth={2} className="text-[#F59E0B]" /> Security Policy
                   </button>
                 </div>
 
@@ -322,7 +472,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-rose-500/10 text-rose-400 flex items-center gap-2.5 font-bold"
                   >
-                    <LogOut size={20} strokeWidth={2} /> Logout
+                    <LogOut size={18} strokeWidth={2} /> Logout
                   </button>
                 </div>
               </div>
