@@ -42,13 +42,12 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   const { role } = useAuth();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
   const [supportModalOpen, setSupportModalOpen] = useState(false);
 
   // Exact Access Modules per Role from 5-Role RBAC Model
   const roleNavigationMap: Record<Role, NavigationItem[]> = {
     [Role.ADMIN]: [
-      { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={22} strokeWidth={2} className="text-blue-500" /> },
+      { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={22} strokeWidth={2} className="text-blue-400" /> },
       { label: 'User Management', path: '/admin/users', icon: <Users size={22} strokeWidth={2} className="text-cyan-400" /> },
       { label: 'Role Management', path: '/admin/roles', icon: <ShieldCheck size={22} strokeWidth={2} className="text-purple-400" /> },
       { label: 'Permissions', path: '/admin/permissions', icon: <Lock size={22} strokeWidth={2} className="text-indigo-400" /> },
@@ -106,20 +105,20 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   return (
     <div data-role={role} className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
       {/* Fixed Enterprise Header */}
-      <EnterpriseHeader onToggleSidebar={() => setCollapsed(!collapsed)} />
+      <EnterpriseHeader onToggleSidebar={() => setMobileOpen(!mobileOpen)} />
 
       {/* Real-time Status Information Bar */}
       <InformationBar />
 
       {/* Main Body */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Dynamic Left Sidebar */}
+        {/* Sleek Icon-Only Left Sidebar */}
         <aside
-          className={`bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col shrink-0 fixed md:static inset-y-[102px] left-0 z-30 transition-all duration-200 ${
-            collapsed ? 'w-[64px]' : 'w-[230px]'
-          } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+          className={`bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col items-center shrink-0 fixed md:static inset-y-[102px] left-0 z-30 transition-all duration-200 w-[68px] ${
+            mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          }`}
         >
-          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          <nav className="flex-1 overflow-y-auto p-2.5 space-y-2 w-full flex flex-col items-center">
             {currentNav.map((item) => {
               const active = location.pathname === item.path;
 
@@ -128,30 +127,36 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileOpen(false)}
-                  className={`nav-link ${active ? 'nav-link-active' : ''}`}
-                  title={collapsed ? item.label : undefined}
+                  title={item.label}
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-200 group relative ${
+                    active
+                      ? 'bg-blue-600/25 border border-blue-500/50 shadow-md scale-105'
+                      : 'hover:bg-slate-800/80 hover:scale-105 border border-transparent'
+                  }`}
                 >
                   <span className="shrink-0">{item.icon}</span>
-                  {!collapsed && <span className="font-medium text-xs tracking-tight">{item.label}</span>}
+
+                  {/* Tooltip on hover */}
+                  <span className="absolute left-14 px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-900 text-slate-100 border border-slate-700 shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                    {item.label}
+                  </span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Company Help & Support Sidebar Option */}
-          <div className="p-3 border-t border-[var(--border-color)] space-y-2">
+          {/* Company Help & Support Icon Only */}
+          <div className="p-2.5 border-t border-[var(--border-color)] w-full flex flex-col items-center gap-2">
             <button
               onClick={() => setSupportModalOpen(true)}
-              className="nav-link w-full text-left text-blue-500 hover:bg-blue-500/10 transition-colors"
-              title={collapsed ? 'Company Help & Support' : undefined}
+              title="Company Help & Support"
+              className="w-11 h-11 rounded-2xl flex items-center justify-center bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 transition-all group relative"
             >
-              <LifeBuoy size={22} strokeWidth={2} className="text-blue-500 shrink-0" />
-              {!collapsed && <span className="font-semibold text-xs">Help & Support</span>}
+              <LifeBuoy size={22} strokeWidth={2} />
+              <span className="absolute left-14 px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-900 text-slate-100 border border-slate-700 shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                Help & Support
+              </span>
             </button>
-
-            <div className="text-[10px] text-slate-400 text-center font-mono pt-1">
-              {!collapsed ? 'Workforce Analytics v3.0' : 'v3.0'}
-            </div>
           </div>
         </aside>
 
