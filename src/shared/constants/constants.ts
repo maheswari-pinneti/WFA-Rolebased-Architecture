@@ -6,11 +6,13 @@ export const STORAGE_KEYS = {
   THEME_MODE: 'stackly_theme_mode'
 };
 
-export const DEPARTMENTS = [
-  'Engineering',
-  'Human Resources',
-  'Product Management',
-  'Sales & Marketing',
-  'Customer Success',
-  'Finance & Operations'
-];
+export const API_ENDPOINTS = {
+  LOGIN: '/auth/login',
+  LOGOUT: '/auth/logout',
+  REFRESH_TOKEN: '/auth/refresh',
+  CURRENT_USER: '/auth/me',
+  EMPLOYEES: '/employees',
+  DEPARTMENTS: '/departments',
+  ROLES: '/roles',
+  REPORTS: '/reports'
+};

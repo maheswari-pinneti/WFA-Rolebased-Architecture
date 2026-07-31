@@ -1,25 +1,27 @@
 import { useAuth } from '../../auth/hooks/useAuth';
 import { Permission } from '../../security/permissions/permissions';
+import { PERMISSION_MATRIX } from '../../security/policies/permissionMatrix';
 import { Role } from '../../security/roles/roles';
-import { hasPermission, hasRole } from '../../security/policies/permissionMatrix';
 
 export const usePermission = () => {
-  const { role, permissions } = useAuth();
+  const { role } = useAuth();
 
-  const canAccess = (permission: Permission): boolean => {
-    if (permissions && permissions.length > 0) {
-      return permissions.includes(permission);
-    }
-    return hasPermission(role, permission);
+  const hasPermission = (permission: Permission): boolean => {
+    if (!role) return false;
+    const permissions = PERMISSION_MATRIX[role as Role] || [];
+    return permissions.includes(permission);
   };
 
-  const isRoleAllowed = (allowedRoles: Role[]): boolean => {
-    return hasRole(role, allowedRoles);
+  const hasRole = (allowedRoles: Role[]): boolean => {
+    if (!role) return false;
+    return allowedRoles.includes(role as Role);
   };
 
   return {
-    canAccess,
-    isRoleAllowed,
-    userRole: role,
+    hasPermission,
+    canAccess: hasPermission,
+    hasRole,
+    isRoleAllowed: hasRole,
+    currentRole: role
   };
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, RefreshCw, Users, Activity, Calendar } from 'lucide-react';
+import { Clock, RefreshCw, Calendar, Activity } from 'lucide-react';
 
 export const InformationBar: React.FC = () => {
   const [now, setNow] = useState(new Date());
@@ -28,35 +28,30 @@ export const InformationBar: React.FC = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] px-4 md:px-6 py-1 flex items-center justify-between gap-2 text-[11px] font-medium text-slate-400">
-      {/* Date & Time */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1 text-slate-300">
-          <Calendar size={12} className="text-blue-400" />
+    <div className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] px-6 py-1.5 flex items-center justify-between gap-4 text-xs font-medium text-slate-400">
+      {/* Current Date & Current Time */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1.5 text-slate-300">
+          <Calendar size={13} className="text-[#2563EB]" />
           <span>{formatDate(now)}</span>
         </div>
-        <div className="flex items-center gap-1 text-slate-300 font-mono">
-          <Clock size={12} className="text-indigo-400" />
+        <div className="flex items-center gap-1.5 text-slate-300 font-mono">
+          <Clock size={13} className="text-[#4F46E5]" />
           <span>{formatTime(now)}</span>
         </div>
       </div>
 
-      {/* Status & Active Users */}
+      {/* Last Updated & Online Status */}
       <div className="flex items-center gap-4">
-        <div className="hidden sm:flex items-center gap-1">
-          <RefreshCw size={11} className="text-slate-400" />
-          <span>Updated: Just now</span>
+        <div className="hidden sm:flex items-center gap-1.5">
+          <RefreshCw size={12} className="text-slate-400" />
+          <span>Last Updated: Just now</span>
         </div>
 
-        <div className="flex items-center gap-1 text-emerald-400 font-bold">
-          <Users size={12} />
-          <span>1,180 Active</span>
-        </div>
-
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-[10px]">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-          <Activity size={10} />
-          <span className="hidden sm:inline">Live Connection</span>
+        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[#22C55E] font-bold text-[11px]">
+          <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-ping" />
+          <Activity size={12} />
+          <span>Online • 99.98% System Health</span>
         </div>
       </div>
     </div>

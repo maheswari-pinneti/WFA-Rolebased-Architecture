@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../../auth/hooks/useAuth';
+import { Role } from '../../../security/roles/roles';
 import { Mail, Briefcase, Building, Shield, Calendar } from 'lucide-react';
 import { getRoleBadgeClass } from '../../../shared/utils/helpers';
 
@@ -24,7 +25,7 @@ export const Profile: React.FC = () => {
             <h3 className="text-xl font-bold">{user?.name}</h3>
             <p className="text-sm text-slate-400">{user?.title}</p>
             <div className="pt-2">
-              <span className={`badge ${getRoleBadgeClass(user?.role || '')}`}>
+              <span className={`badge ${getRoleBadgeClass(user?.role || Role.EMPLOYEE)}`}>
                 {user?.role}
               </span>
             </div>

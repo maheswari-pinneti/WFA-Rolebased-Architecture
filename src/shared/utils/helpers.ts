@@ -1,24 +1,36 @@
+import { Role } from '../../security/roles/roles';
+
+export const getRoleBadgeClass = (role: Role): string => {
+  switch (role) {
+    case Role.ADMIN:
+      return 'badge-admin';
+    case Role.HR:
+      return 'badge-hr';
+    case Role.TEAM_MANAGER:
+      return 'badge-manager';
+    case Role.TEAM_LEAD:
+      return 'badge-lead';
+    case Role.EMPLOYEE:
+      return 'badge-employee';
+    default:
+      return 'badge-employee';
+  }
+};
+
 export const formatDate = (dateString: string): string => {
-  if (!dateString) return '-';
+  if (!dateString) return 'N/A';
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
-  }).format(date);
+  });
 };
 
-export const formatPercent = (value: number): string => {
-  return `${value.toFixed(1)}%`;
-};
-
-export const getRoleBadgeClass = (role: string): string => {
-  switch (role) {
-    case 'ADMIN': return 'badge-admin';
-    case 'HR': return 'badge-hr';
-    case 'TEAM_MANAGER': return 'badge-manager';
-    case 'TEAM_LEAD': return 'badge-lead';
-    case 'EMPLOYEE': return 'badge-employee';
-    default: return 'badge-info';
-  }
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount);
 };
