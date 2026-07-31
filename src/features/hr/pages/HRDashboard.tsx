@@ -5,16 +5,14 @@ import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
 import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
+import { EmployeeTable } from '../../../components/tables/EmployeeTable';
 
-// 6 Interactive Charts
+// Custom HR Charts
 import { WorkforceTrendLine } from '../../analytics/charts/WorkforceTrendLine';
-import { DepartmentOverviewBar } from '../../analytics/charts/DepartmentOverviewBar';
-import { AttendanceAnalyticsArea } from '../../analytics/charts/AttendanceAnalyticsArea';
-import { EmployeeDistributionPie } from '../../analytics/charts/EmployeeDistributionPie';
-import { PerformanceRadar } from '../../analytics/charts/PerformanceRadar';
+import { AttritionDonut } from '../../analytics/charts/AttritionDonut';
 import { SalaryAnalyticsBar } from '../../analytics/charts/SalaryAnalyticsBar';
 
-import { UserCheck, Users, Briefcase, FileText, Plus, Clock, HeartHandshake, Star, AlertTriangle, DollarSign, Activity } from 'lucide-react';
+import { UserCheck, Users, Briefcase, FileText, Plus, Clock, HeartHandshake, Star, AlertTriangle, DollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const HRDashboard: React.FC = () => {
@@ -25,10 +23,17 @@ export const HRDashboard: React.FC = () => {
       title,
       metricValue: value,
       subtitle,
-      category: 'HR Operations Scope',
+      category: 'HR Operations Lifecycle',
       details,
     });
   };
+
+  const candidatePipeline = [
+    { name: 'Michael Faraday', role: 'Staff Frontend Engineer', stage: 'Technical Interview', status: 'SCHEDULED' },
+    { name: 'Ada Lovelace', role: 'Principal Systems Architect', stage: 'Final Leadership Round', status: 'IN_REVIEW' },
+    { name: 'Alan Turing', role: 'Senior AI Specialist', stage: 'Offer Stage', status: 'PENDING' },
+    { name: 'Grace Hopper', role: 'DevOps Lead Engineer', stage: 'Initial Screening', status: 'COMPLETED' },
+  ];
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]} requiredPermission={Permission.EMPLOYEE_READ}>
@@ -50,7 +55,7 @@ export const HRDashboard: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Link to="/hr/employees" className="btn btn-primary btn-sm flex items-center gap-1.5">
+            <Link to="/hr/employees" className="btn btn-primary btn-sm flex items-center gap-1.5 shadow-md">
               <Plus size={14} /> Add Employee
             </Link>
             <Link to="/hr/recruitment" className="btn btn-secondary btn-sm flex items-center gap-1.5">
@@ -177,30 +182,58 @@ export const HRDashboard: React.FC = () => {
           />
         </div>
 
-        {/* 6 Distinct Interactive Charts Grid */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-black tracking-tight text-[var(--text-primary)] flex items-center gap-2">
-            <Activity size={20} className="text-purple-400" /> HR Operations & Workforce Lifecycle Analytics (6 Chart Dimensions)
-          </h3>
+        {/* Section 1: Candidate Pipeline & Retention Donut */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <Briefcase size={18} className="text-purple-400" /> Active Talent Acquisition Candidate Pipeline
+              </h3>
+              <Link to="/hr/recruitment" className="text-xs font-bold text-blue-400 hover:underline flex items-center gap-1">
+                View Desk <ArrowRight size={12} />
+              </Link>
+            </div>
 
-          {/* Row 1: Line Chart & Bar Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-2.5">
+              {candidatePipeline.map((c, idx) => (
+                <div key={idx} className="p-3.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between text-xs">
+                  <div>
+                    <p className="font-bold text-sm text-[var(--text-primary)]">{c.name}</p>
+                    <p className="text-xs text-slate-400">{c.role} • <span className="text-purple-400 font-semibold">{c.stage}</span></p>
+                  </div>
+                  <span className="badge badge-success text-[10px] uppercase font-bold">{c.status}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
+            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Users size={18} className="text-emerald-400" /> Retention Rate & Attrition Donut Analysis
+            </h3>
+            <AttritionDonut />
+          </div>
+        </div>
+
+        {/* Section 2: Workforce Growth Timeline & Salary Analytics Bar */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
+            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Users size={18} className="text-blue-400" /> Monthly Workforce Growth Timeline
+            </h3>
             <WorkforceTrendLine />
-            <DepartmentOverviewBar />
           </div>
 
-          {/* Row 2: Area Chart & Pie Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AttendanceAnalyticsArea />
-            <EmployeeDistributionPie />
-          </div>
-
-          {/* Row 3: Radar Chart & Salary Bar Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PerformanceRadar />
+          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
+            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <DollarSign size={18} className="text-amber-400" /> Department Salary & Compensation Analytics
+            </h3>
             <SalaryAnalyticsBar />
           </div>
         </div>
+
+        {/* Section 3: Employee Table */}
+        <EmployeeTable />
 
         {/* Drill-Down Modal */}
         <DrillDownModal

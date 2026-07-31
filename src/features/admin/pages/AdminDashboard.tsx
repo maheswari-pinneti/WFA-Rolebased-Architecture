@@ -3,33 +3,37 @@ import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
-import { AdvancedFilterBar, FilterState } from '../../../shared/components/AdvancedFilterBar';
+import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
+import { EmployeeTable } from '../../../components/tables/EmployeeTable';
 
-// 6 Interactive Charts
-import { WorkforceTrendLine } from '../../analytics/charts/WorkforceTrendLine';
-import { DepartmentOverviewBar } from '../../analytics/charts/DepartmentOverviewBar';
-import { AttendanceAnalyticsArea } from '../../analytics/charts/AttendanceAnalyticsArea';
-import { EmployeeDistributionPie } from '../../analytics/charts/EmployeeDistributionPie';
-import { PerformanceRadar } from '../../analytics/charts/PerformanceRadar';
-import { SalaryAnalyticsBar } from '../../analytics/charts/SalaryAnalyticsBar';
+// Custom Admin Charts & Components
+import { DepartmentDistribution } from '../../analytics/charts/DepartmentDistribution';
+import { auditLogger } from '../../../security/audit/auditLogger';
 
-import { ShieldCheck, Users, Lock, History, Sliders, CheckCircle2, ShieldAlert, Activity, FileSpreadsheet, Server } from 'lucide-react';
+import { ShieldCheck, Users, Lock, History, Sliders, CheckCircle2, ShieldAlert, Activity, Server, Cpu, HardDrive, Database, ArrowRight, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const AdminDashboard: React.FC = () => {
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
-  const [activeFilter, setActiveFilter] = useState<string>('All Active Data');
+  const auditLogs = auditLogger.getLogs();
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
     setDrillDownData({
       title,
       metricValue: value,
       subtitle,
-      category: 'System Admin Scope',
+      category: 'System Admin Governance',
       details,
     });
   };
+
+  const systemServices = [
+    { name: 'API Gateway (Kong Cluster)', status: 'HEALTHY', latency: '12ms', load: '24%' },
+    { name: 'PostgreSQL Primary DB', status: 'HEALTHY', latency: '4ms', load: '42%' },
+    { name: 'Redis Cache Cluster', status: 'HEALTHY', latency: '1ms', load: '18%' },
+    { name: 'Kafka Audit Event Bus', status: 'HEALTHY', latency: '8ms', load: '31%' },
+  ];
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN]} requiredPermission={Permission.SYSTEM_CONFIG}>
@@ -43,7 +47,7 @@ export const AdminDashboard: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-2xl font-black tracking-tight text-white">System Administrator Console</h2>
-                <span className="badge badge-admin">LEVEL 0 ACCESS</span>
+                <span className="badge badge-admin">LEVEL 0 FULL CONTROL</span>
               </div>
               <p className="text-xs text-slate-300 mt-1">
                 Full platform architecture control, security governance, user management, and global audit stream.
@@ -51,19 +55,19 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Link to="/admin/users" className="btn btn-primary btn-sm flex items-center gap-1.5">
+            <Link to="/admin/users" className="btn btn-primary btn-sm flex items-center gap-1.5 shadow-md">
               <Users size={14} /> Manage Users
             </Link>
             <Link to="/admin/roles" className="btn btn-secondary btn-sm flex items-center gap-1.5">
-              <Lock size={14} /> Role Policies
+              <Lock size={14} /> Security Policies
             </Link>
           </div>
         </div>
 
         {/* Advanced Filter Bar */}
-        <AdvancedFilterBar onFilterChange={(f) => setActiveFilter(`${f.department} • ${f.dateRange}`)} />
+        <AdvancedFilterBar onFilterChange={() => {}} />
 
-        {/* 8 Reusable KPI Cards */}
+        {/* 8 System Admin Reusable KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="Global Users"
@@ -73,7 +77,7 @@ export const AdminDashboard: React.FC = () => {
             subtitle="Across 6 departments"
             icon={<Users size={20} />}
             accentColor="blue"
-            onClick={() => openDrillDown('Global Users Breakdown', '301 Accounts', 'Full organization active user directory', [
+            onClick={() => openDrillDown('Global User Accounts', '301 Accounts', 'Full organization account registry', [
               { label: 'System Admins', value: 4 },
               { label: 'HR Managers', value: 12 },
               { label: 'Department Managers', value: 28 },
@@ -88,8 +92,8 @@ export const AdminDashboard: React.FC = () => {
             subtitle="Strict RBAC active"
             icon={<Lock size={20} />}
             accentColor="purple"
-            onClick={() => openDrillDown('Security Policies Matrix', '13 Active Rules', 'Configured security clearance & ABAC rules', [
-              { label: 'Level 0 Admins', value: 'Full Control' },
+            onClick={() => openDrillDown('Security Policies Matrix', '13 Active Rules', 'RBAC & ABAC policy configuration', [
+              { label: 'Level 0 Admins', value: 'Full Access' },
               { label: 'Level 1 HR', value: 'Org Scope' },
               { label: 'Level 2 Managers', value: 'Dept Scope' },
             ])}
@@ -102,24 +106,22 @@ export const AdminDashboard: React.FC = () => {
             subtitle="Zero downtime Q2"
             icon={<Server size={20} />}
             accentColor="emerald"
-            onClick={() => openDrillDown('Infrastructure Uptime SLA', '99.98%', 'API gateway & DB replication uptime log', [
+            onClick={() => openDrillDown('Infrastructure Uptime SLA', '99.98%', 'API Gateway & DB Cluster availability', [
               { label: 'API Gateway', value: '99.99%' },
-              { label: 'Database Cluster', value: '100.0%' },
-              { label: 'Event Bus', value: '99.95%' },
+              { label: 'PostgreSQL DB', value: '100.0%' },
             ])}
           />
           <KPICard
             title="Audit Log Events"
-            value="14,280 Logs"
+            value={`${auditLogs.length} Events`}
             change={12.5}
             trend="up"
-            subtitle="Real-time security logs"
+            subtitle="Real-time security stream"
             icon={<History size={20} />}
             accentColor="amber"
-            onClick={() => openDrillDown('Security Audit Logs Stream', '14,280 Logs', 'SOC2 immutable security event log', [
-              { label: 'Access Grants', value: 13950 },
+            onClick={() => openDrillDown('Security Audit Event Stream', `${auditLogs.length} Events`, 'SOC2 compliance event log', [
+              { label: 'Granted Actions', value: 13950 },
               { label: 'Denied Attempts', value: 330 },
-              { label: 'Flagged Alerts', value: 0 },
             ])}
           />
           <KPICard
@@ -130,10 +132,9 @@ export const AdminDashboard: React.FC = () => {
             subtitle="Currently on shift"
             icon={<Activity size={20} />}
             accentColor="cyan"
-            onClick={() => openDrillDown('Active Shift Workforce', '284 Active', 'On-duty employee attendance roster', [
-              { label: 'On-site Office', value: 180 },
-              { label: 'Remote Shift', value: 104 },
-              { label: 'On PTO / Leave', value: 17 },
+            onClick={() => openDrillDown('Active Shift Roster', '284 Active', 'Real-time employee clock-in roster', [
+              { label: 'On-site HQ', value: 180 },
+              { label: 'Remote Duty', value: 104 },
             ])}
           />
           <KPICard
@@ -141,12 +142,12 @@ export const AdminDashboard: React.FC = () => {
             value="10,000 / min"
             change={4.0}
             trend="up"
-            subtitle="Peak load 18%"
+            subtitle="Peak capacity 18%"
             icon={<Sliders size={20} />}
             accentColor="purple"
-            onClick={() => openDrillDown('API Rate Limit Monitor', '10,000 req/min', 'Global API Gateway throughput', [
-              { label: 'Authentication API', value: '1,200 req/m' },
-              { label: 'Analytics Query API', value: '4,800 req/m' },
+            onClick={() => openDrillDown('API Rate Limits', '10,000 req/min', 'Global API Gateway rate limiting', [
+              { label: 'Auth Endpoint', value: '1,200 req/m' },
+              { label: 'Data Queries', value: '4,800 req/m' },
             ])}
           />
           <KPICard
@@ -154,53 +155,96 @@ export const AdminDashboard: React.FC = () => {
             value="98.5% Score"
             change={1.0}
             trend="up"
-            subtitle="Optimal performance"
+            subtitle="Optimal benchmark"
             icon={<CheckCircle2 size={20} />}
             accentColor="emerald"
-            onClick={() => openDrillDown('System Health Benchmark', '98.5%', 'Overall platform stability index', [
-              { label: 'Memory Usage', value: '34.2%' },
-              { label: 'CPU Utilization', value: '28.1%' },
+            onClick={() => openDrillDown('System Health Score', '98.5%', 'Hardware and memory resource score', [
+              { label: 'RAM Utilization', value: '34.2%' },
+              { label: 'CPU Core Load', value: '28.1%' },
             ])}
           />
           <KPICard
-            title="Flagged Alerts"
+            title="Flagged Security Alerts"
             value="0 Critical"
             change={-100}
             trend="down"
-            subtitle="Zero security breaches"
+            subtitle="Firewall protected"
             icon={<ShieldAlert size={20} />}
             accentColor="rose"
-            onClick={() => openDrillDown('Security Threat Monitor', '0 Critical Threats', 'Intrusion detection & firewall status', [
-              { label: 'Firewall Status', value: 'Protected' },
+            onClick={() => openDrillDown('Security Threat Monitor', '0 Critical Threat Alerts', 'Intrusion detection & WAF status', [
+              { label: 'WAF Firewall', value: 'Active' },
               { label: 'DDoS Mitigated', value: '100%' },
             ])}
           />
         </div>
 
-        {/* 6 Distinct Interactive Charts Grid */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-black tracking-tight text-[var(--text-primary)] flex items-center gap-2">
-            <Activity size={20} className="text-blue-500" /> Platform Infrastructure & Workforce Analytics (6 Chart Dimensions)
-          </h3>
+        {/* Section 1: Security Audit Stream & Infrastructure Hardware Health */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Audit Stream */}
+          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <History size={18} className="text-amber-400" /> System Audit Event Stream (Real-Time)
+              </h3>
+              <Link to="/admin/audit-logs" className="text-xs font-bold text-blue-400 hover:underline flex items-center gap-1">
+                View Log <ArrowRight size={12} />
+              </Link>
+            </div>
 
-          {/* Row 1: Line Chart & Bar Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <WorkforceTrendLine />
-            <DepartmentOverviewBar />
+            <div className="space-y-2.5">
+              {auditLogs.slice(0, 4).map((log) => (
+                <div key={log.id} className="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-1.5 rounded-lg ${log.status === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                      {log.status === 'SUCCESS' ? <CheckCircle2 size={14} /> : <ShieldAlert size={14} />}
+                    </div>
+                    <div>
+                      <p className="font-bold text-[var(--text-primary)]">{log.action}</p>
+                      <p className="text-[11px] text-slate-400">{log.details}</p>
+                    </div>
+                  </div>
+                  <span className="font-mono text-[10px] text-slate-400">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Row 2: Area Chart & Pie Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AttendanceAnalyticsArea />
-            <EmployeeDistributionPie />
-          </div>
+          {/* Infrastructure Health */}
+          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <Server size={18} className="text-emerald-400" /> Platform Infrastructure Hardware Status
+              </h3>
+              <span className="badge badge-success text-[10px] uppercase font-mono font-bold">OPERATIONAL</span>
+            </div>
 
-          {/* Row 3: Radar Chart & Salary Bar Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PerformanceRadar />
-            <SalaryAnalyticsBar />
+            <div className="space-y-3">
+              {systemServices.map((s, idx) => (
+                <div key={idx} className="p-3.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-3">
+                    <Database size={16} className="text-blue-400 shrink-0" />
+                    <div>
+                      <h4 className="font-bold text-sm text-[var(--text-primary)]">{s.name}</h4>
+                      <p className="text-[11px] text-slate-400">Latency: <span className="text-emerald-400 font-semibold">{s.latency}</span> • Load: {s.load}</p>
+                    </div>
+                  </div>
+                  <span className="badge badge-success text-[10px] font-bold">{s.status}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Section 2: Global Department Distribution Chart */}
+        <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
+          <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+            <Users size={18} className="text-purple-400" /> Global Department Distribution & Headcount Allocation
+          </h3>
+          <DepartmentDistribution />
+        </div>
+
+        {/* Section 3: Global Employee Directory */}
+        <EmployeeTable />
 
         {/* Drill-Down Modal */}
         <DrillDownModal
