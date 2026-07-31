@@ -16,7 +16,7 @@ import { Briefcase, Users, UserCheck, ShieldCheck, Zap, HeartHandshake, FileText
 
 export const ManagerDashboard: React.FC = () => {
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER]} requiredPermission={Permission.ANALYTICS_VIEW_TEAM}>
+    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER]} requiredPermission={Permission.TEAM_ANALYTICS_VIEW}>
       <div className="space-y-6">
         {/* Manager Header Banner */}
         <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-950/50 via-slate-900 to-indigo-950/40 border border-blue-500/30 flex items-center justify-between shadow-xl">

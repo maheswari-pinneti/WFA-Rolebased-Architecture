@@ -6,7 +6,7 @@ import { PerformanceChart } from '../../analytics/charts/PerformanceChart';
 
 export const Productivity: React.FC = () => {
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER, Role.TEAM_LEAD]} requiredPermission={Permission.ANALYTICS_VIEW_TEAM}>
+    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD]} requiredPermission={Permission.TEAM_ANALYTICS_VIEW}>
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight">Lead Productivity Matrix</h2>

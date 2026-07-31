@@ -7,7 +7,7 @@ import { AttendanceChart } from '../../analytics/charts/AttendanceChart';
 
 export const TeamAnalytics: React.FC = () => {
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER]} requiredPermission={Permission.ANALYTICS_VIEW_TEAM}>
+    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER]} requiredPermission={Permission.TEAM_ANALYTICS_VIEW}>
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight">Team Performance & Analytics</h2>

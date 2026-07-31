@@ -26,14 +26,14 @@ export class PolicyEngine {
     const { user, scope = DEFAULT_ROLE_SCOPES[user.role] } = context;
 
     // 1. RBAC / System Overrides
-    if (user.role === Role.SYSTEM_ADMIN) {
+    if (user.role === Role.ADMIN) {
       return { allowed: true };
     }
 
     // 2. PBAC (Permission-Based Access Control) Check
     const rolePermissions = ENTERPRISE_ROLE_PERMISSION_MAP[user.role] || [];
     const hasPermissionFlag =
-      rolePermissions.includes(Permission.SYSTEM_ALL) ||
+      rolePermissions.includes(Permission.VIEW_ALL_DATA) ||
       rolePermissions.includes(requiredPermission);
 
     if (!hasPermissionFlag) {

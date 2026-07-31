@@ -9,7 +9,7 @@ export const dashboardApi = {
         return dashboardData.admin;
       case Role.HR:
         return dashboardData.hr;
-      case Role.TEAM_MANAGER:
+      case Role.MANAGER:
         return dashboardData.manager;
       case Role.TEAM_LEAD:
         return dashboardData.lead;

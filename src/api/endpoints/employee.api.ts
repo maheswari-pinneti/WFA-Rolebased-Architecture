@@ -23,7 +23,7 @@ const generate10kEmployees = (): Employee[] => {
     'Customer Success Director',
     'Financial Analyst'
   ];
-  const roles = [Role.EMPLOYEE, Role.TEAM_LEAD, Role.TEAM_MANAGER, Role.HR, Role.ADMIN];
+  const roles = [Role.EMPLOYEE, Role.TEAM_LEAD, Role.MANAGER, Role.HR, Role.ADMIN];
   const statuses: Employee['status'][] = ['PRESENT', 'PRESENT', 'PRESENT', 'REMOTE', 'ON_LEAVE', 'OFFLINE'];
   const avatars = [
     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',

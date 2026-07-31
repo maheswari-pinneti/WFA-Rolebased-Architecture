@@ -3,21 +3,7 @@ export enum Role {
   HR = 'HR',
   MANAGER = 'MANAGER',
   TEAM_LEAD = 'TEAM_LEAD',
-  EMPLOYEE = 'EMPLOYEE',
-
-  // Legacy compatibility mappings
-  SYSTEM_ADMIN = 'ADMIN',
-  PLATFORM_ADMIN = 'ADMIN',
-  SECURITY_ADMIN = 'ADMIN',
-  ORGANIZATION_ADMIN = 'ADMIN',
-  HR_ADMIN = 'HR',
-  HR_SPECIALIST = 'HR',
-  DEPARTMENT_HEAD = 'MANAGER',
-  BUSINESS_MANAGER = 'MANAGER',
-  TEAM_MANAGER = 'MANAGER',
-  ANALYST = 'MANAGER',
-  AUDITOR = 'ADMIN',
-  VIEWER = 'EMPLOYEE',
+  EMPLOYEE = 'EMPLOYEE'
 }
 
 export const ROLE_LABELS: Record<Role, string> = {

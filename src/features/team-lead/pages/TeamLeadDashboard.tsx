@@ -16,7 +16,7 @@ import { GitPullRequest, Users, UserCheck, ShieldCheck, Zap, HeartHandshake, Fil
 
 export const TeamLeadDashboard: React.FC = () => {
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER, Role.TEAM_LEAD]} requiredPermission={Permission.ANALYTICS_VIEW_TEAM}>
+    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD]} requiredPermission={Permission.TEAM_ANALYTICS_VIEW}>
       <div className="space-y-6">
         {/* Team Lead Header Banner */}
         <div className="p-6 rounded-2xl bg-gradient-to-r from-teal-950/50 via-slate-900 to-cyan-950/40 border border-teal-500/30 flex items-center justify-between shadow-xl">

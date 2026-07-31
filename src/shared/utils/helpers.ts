@@ -6,7 +6,7 @@ export const getRoleBadgeClass = (role: Role): string => {
       return 'badge-admin';
     case Role.HR:
       return 'badge-hr';
-    case Role.TEAM_MANAGER:
+    case Role.MANAGER:
       return 'badge-manager';
     case Role.TEAM_LEAD:
       return 'badge-lead';
