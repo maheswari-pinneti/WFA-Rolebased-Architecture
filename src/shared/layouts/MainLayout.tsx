@@ -25,8 +25,11 @@ import {
   Layers,
   FileSpreadsheet,
   History,
-  Eye,
-  Briefcase
+  MapPin,
+  Briefcase,
+  DollarSign,
+  Target,
+  MessageSquare
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -42,76 +45,59 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   const [collapsed, setCollapsed] = useState(false);
   const [supportModalOpen, setSupportModalOpen] = useState(false);
 
-  // Distinct & Non-Overlapping Navigation per Role for 13 Profiles
+  // Exact Access Modules per Role from 5-Role RBAC Model
   const roleNavigationMap: Record<Role, NavigationItem[]> = {
-    [Role.SYSTEM_ADMIN]: [
-      { label: 'System Dashboard', path: '/system-admin', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-blue-500" /> },
-      { label: 'User Directory', path: '/admin/users', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'Roles & Policies', path: '/admin/roles', icon: <ShieldCheck size={24} strokeWidth={2} className="text-purple-400" /> },
-      { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={24} strokeWidth={2} className="text-emerald-400" /> },
-      { label: 'Security Audit', path: '/admin/reports', icon: <History size={24} strokeWidth={2} className="text-amber-400" /> },
+    [Role.ADMIN]: [
+      { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={22} strokeWidth={2} className="text-blue-500" /> },
+      { label: 'User Management', path: '/admin/users', icon: <Users size={22} strokeWidth={2} className="text-cyan-400" /> },
+      { label: 'Role Management', path: '/admin/roles', icon: <ShieldCheck size={22} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Permissions', path: '/admin/permissions', icon: <Lock size={22} strokeWidth={2} className="text-indigo-400" /> },
+      { label: 'Employee Control', path: '/admin/employees', icon: <UserCheck size={22} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'Departments', path: '/admin/departments', icon: <Building2 size={22} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Locations', path: '/admin/locations', icon: <MapPin size={22} strokeWidth={2} className="text-amber-400" /> },
+      { label: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={22} strokeWidth={2} className="text-cyan-400" /> },
+      { label: 'Reports', path: '/admin/reports', icon: <FileSpreadsheet size={22} strokeWidth={2} className="text-blue-400" /> },
+      { label: 'Audit Logs', path: '/admin/audit-logs', icon: <History size={22} strokeWidth={2} className="text-amber-400" /> },
+      { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={22} strokeWidth={2} className="text-slate-400" /> },
+      { label: 'Configuration', path: '/admin/configuration', icon: <Layers size={22} strokeWidth={2} className="text-teal-400" /> },
     ],
-    [Role.PLATFORM_ADMIN]: [
-      { label: 'Platform Dashboard', path: '/platform-admin', icon: <Layers size={24} strokeWidth={2} className="text-blue-500" /> },
-      { label: 'Module Manager', path: '/admin/settings', icon: <Sliders size={24} strokeWidth={2} className="text-cyan-400" /> },
+    [Role.HR]: [
+      { label: 'HR Dashboard', path: '/hr/dashboard', icon: <LayoutDashboard size={22} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Employee Management', path: '/hr/employees', icon: <Users size={22} strokeWidth={2} className="text-cyan-400" /> },
+      { label: 'Recruitment', path: '/hr/recruitment', icon: <Briefcase size={22} strokeWidth={2} className="text-amber-400" /> },
+      { label: 'Attendance', path: '/hr/attendance', icon: <Clock size={22} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'Leave Management', path: '/hr/leave', icon: <FileText size={22} strokeWidth={2} className="text-blue-400" /> },
+      { label: 'Performance', path: '/hr/performance', icon: <TrendingUp size={22} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Payroll Reports', path: '/hr/payroll-reports', icon: <DollarSign size={22} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'Workforce Analytics', path: '/hr/workforce-analytics', icon: <BarChart3 size={22} strokeWidth={2} className="text-indigo-400" /> },
+      { label: 'HR Reports', path: '/hr/reports', icon: <FileSpreadsheet size={22} strokeWidth={2} className="text-amber-400" /> },
     ],
-    [Role.SECURITY_ADMIN]: [
-      { label: 'Security Desk', path: '/security-admin', icon: <Lock size={24} strokeWidth={2} className="text-purple-500" /> },
-      { label: 'Access Policies', path: '/admin/roles', icon: <ShieldCheck size={24} strokeWidth={2} className="text-purple-400" /> },
-      { label: 'Audit Logs', path: '/admin/reports', icon: <History size={24} strokeWidth={2} className="text-amber-400" /> },
-    ],
-    [Role.ORGANIZATION_ADMIN]: [
-      { label: 'Org Dashboard', path: '/org-admin', icon: <Building2 size={24} strokeWidth={2} className="text-indigo-400" /> },
-      { label: 'Departments', path: '/admin/users', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'Headcount Reports', path: '/admin/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
-    ],
-    [Role.HR_ADMIN]: [
-      { label: 'HR Dashboard', path: '/hr-admin', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-purple-400" /> },
-      { label: 'Employee Directory', path: '/hr/employees', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'Attendance Desk', path: '/hr/attendance', icon: <Clock size={24} strokeWidth={2} className="text-emerald-400" /> },
-      { label: 'Performance', path: '/hr/performance', icon: <TrendingUp size={24} strokeWidth={2} className="text-blue-400" /> },
-      { label: 'HR Reports', path: '/hr/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
-    ],
-    [Role.HR_SPECIALIST]: [
-      { label: 'Specialist Desk', path: '/hr-specialist', icon: <Briefcase size={24} strokeWidth={2} className="text-purple-400" /> },
-      { label: 'Recruitment & Candidates', path: '/hr/employees', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'Shift Rotations', path: '/hr/attendance', icon: <Clock size={24} strokeWidth={2} className="text-emerald-400" /> },
-    ],
-    [Role.DEPARTMENT_HEAD]: [
-      { label: 'Dept Dashboard', path: '/dept-head', icon: <Building2 size={24} strokeWidth={2} className="text-indigo-400" /> },
-      { label: 'Department Analytics', path: '/manager/analytics', icon: <BarChart3 size={24} strokeWidth={2} className="text-indigo-400" /> },
-      { label: 'Headcount Reports', path: '/manager/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
-    ],
-    [Role.BUSINESS_MANAGER]: [
-      { label: 'Manager Dashboard', path: '/business-manager', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-blue-400" /> },
-      { label: 'Team Analytics', path: '/manager/analytics', icon: <BarChart3 size={24} strokeWidth={2} className="text-indigo-400" /> },
-      { label: 'Approvals Desk', path: '/manager/approvals', icon: <CheckCircle2 size={24} strokeWidth={2} className="text-emerald-400" /> },
-      { label: 'Team Reports', path: '/manager/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
+    [Role.MANAGER]: [
+      { label: 'Manager Dashboard', path: '/manager/dashboard', icon: <LayoutDashboard size={22} strokeWidth={2} className="text-blue-400" /> },
+      { label: 'Team Overview', path: '/manager/team', icon: <Users size={22} strokeWidth={2} className="text-cyan-400" /> },
+      { label: 'Team Analytics', path: '/manager/analytics', icon: <BarChart3 size={22} strokeWidth={2} className="text-indigo-400" /> },
+      { label: 'Attendance', path: '/manager/attendance', icon: <Clock size={22} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'Leave Approval', path: '/manager/approvals', icon: <CheckCircle2 size={22} strokeWidth={2} className="text-teal-400" /> },
+      { label: 'Performance Review', path: '/manager/performance', icon: <TrendingUp size={22} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Team Reports', path: '/manager/reports', icon: <FileSpreadsheet size={22} strokeWidth={2} className="text-amber-400" /> },
+      { label: 'Productivity', path: '/manager/productivity', icon: <Zap size={22} strokeWidth={2} className="text-amber-400" /> },
     ],
     [Role.TEAM_LEAD]: [
-      { label: 'Lead Dashboard', path: '/team-lead', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-teal-400" /> },
-      { label: 'Team Members', path: '/team-lead/members', icon: <UserCheck size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'Productivity Velocity', path: '/team-lead/productivity', icon: <Zap size={24} strokeWidth={2} className="text-amber-400" /> },
-      { label: 'Tasks', path: '/team-lead/tasks', icon: <Flame size={24} strokeWidth={2} className="text-rose-400" /> },
+      { label: 'Team Dashboard', path: '/team-lead/dashboard', icon: <LayoutDashboard size={22} strokeWidth={2} className="text-teal-400" /> },
+      { label: 'Task Monitoring', path: '/team-lead/tasks', icon: <Flame size={22} strokeWidth={2} className="text-rose-400" /> },
+      { label: 'Attendance Tracking', path: '/team-lead/attendance', icon: <Clock size={22} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'Productivity Analytics', path: '/team-lead/productivity', icon: <Zap size={22} strokeWidth={2} className="text-amber-400" /> },
+      { label: 'Team Performance', path: '/team-lead/performance', icon: <TrendingUp size={22} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Feedback Management', path: '/team-lead/feedback', icon: <MessageSquare size={22} strokeWidth={2} className="text-blue-400" /> },
     ],
     [Role.EMPLOYEE]: [
-      { label: 'My Dashboard', path: '/employee', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-emerald-400" /> },
-      { label: 'My Attendance', path: '/employee/attendance', icon: <Clock size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'My Performance', path: '/employee/performance', icon: <TrendingUp size={24} strokeWidth={2} className="text-blue-400" /> },
-      { label: 'My Profile', path: '/employee/profile', icon: <Compass size={24} strokeWidth={2} className="text-purple-400" /> },
-      { label: 'Requests', path: '/employee/requests', icon: <FileText size={24} strokeWidth={2} className="text-amber-400" /> },
-    ],
-    [Role.ANALYST]: [
-      { label: 'BI Analytics Dashboard', path: '/analyst', icon: <BarChart3 size={24} strokeWidth={2} className="text-indigo-400" /> },
-      { label: 'Report Builder', path: '/manager/reports', icon: <FileSpreadsheet size={24} strokeWidth={2} className="text-emerald-400" /> },
-    ],
-    [Role.AUDITOR]: [
-      { label: 'Audit Dashboard', path: '/auditor', icon: <History size={24} strokeWidth={2} className="text-amber-400" /> },
-      { label: 'Compliance Reports', path: '/admin/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-purple-400" /> },
-    ],
-    [Role.VIEWER]: [
-      { label: 'Executive Read View', path: '/viewer', icon: <Eye size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'Reports View', path: '/employee/performance', icon: <BarChart3 size={24} strokeWidth={2} className="text-blue-400" /> },
+      { label: 'My Dashboard', path: '/employee/dashboard', icon: <LayoutDashboard size={22} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'My Profile', path: '/employee/profile', icon: <Compass size={22} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Attendance', path: '/employee/attendance', icon: <Clock size={22} strokeWidth={2} className="text-cyan-400" /> },
+      { label: 'Leave Request', path: '/employee/leave', icon: <FileText size={22} strokeWidth={2} className="text-amber-400" /> },
+      { label: 'My Performance', path: '/employee/performance', icon: <TrendingUp size={22} strokeWidth={2} className="text-blue-400" /> },
+      { label: 'My Goals', path: '/employee/goals', icon: <Target size={22} strokeWidth={2} className="text-rose-400" /> },
+      { label: 'Payslip View', path: '/employee/payslips', icon: <DollarSign size={22} strokeWidth={2} className="text-emerald-400" /> },
     ],
   };
 
@@ -130,10 +116,10 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
         {/* Dynamic Left Sidebar */}
         <aside
           className={`bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col shrink-0 fixed md:static inset-y-[102px] left-0 z-30 transition-all duration-200 ${
-            collapsed ? 'w-[64px]' : 'w-[220px]'
+            collapsed ? 'w-[64px]' : 'w-[230px]'
           } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
         >
-          <nav className="flex-1 overflow-y-auto p-3 space-y-1.5">
+          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
             {currentNav.map((item) => {
               const active = location.pathname === item.path;
 
@@ -146,7 +132,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                   title={collapsed ? item.label : undefined}
                 >
                   <span className="shrink-0">{item.icon}</span>
-                  {!collapsed && <span className="font-medium text-sm">{item.label}</span>}
+                  {!collapsed && <span className="font-medium text-xs tracking-tight">{item.label}</span>}
                 </Link>
               );
             })}
@@ -159,8 +145,8 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
               className="nav-link w-full text-left text-blue-500 hover:bg-blue-500/10 transition-colors"
               title={collapsed ? 'Company Help & Support' : undefined}
             >
-              <LifeBuoy size={24} strokeWidth={2} className="text-blue-500 shrink-0" />
-              {!collapsed && <span className="font-semibold text-sm">Help & Support</span>}
+              <LifeBuoy size={22} strokeWidth={2} className="text-blue-500 shrink-0" />
+              {!collapsed && <span className="font-semibold text-xs">Help & Support</span>}
             </button>
 
             <div className="text-[10px] text-slate-400 text-center font-mono pt-1">
