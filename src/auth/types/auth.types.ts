@@ -8,7 +8,10 @@ export interface User {
   role: Role;
   avatar?: string;
   department: string;
+  team?: string;
+  location?: string;
   title: string;
+  clearanceLevel?: number;
   status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
   permissions: Permission[];
 }

@@ -48,11 +48,11 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <MainLayout>
               <Routes>
-                {/* Admin Role Routes */}
+                {/* System & Security Admin Routes */}
                 <Route
                   path="/admin"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.PLATFORM_ADMIN, Role.SECURITY_ADMIN, Role.ORGANIZATION_ADMIN, Role.AUDITOR]}>
                       <AdminDashboard />
                     </RoleGuard>
                   }
@@ -60,7 +60,7 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/admin/users"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.ORGANIZATION_ADMIN]}>
                       <UserManagement />
                     </RoleGuard>
                   }
@@ -68,7 +68,7 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/admin/roles"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.SECURITY_ADMIN]}>
                       <RoleManagement />
                     </RoleGuard>
                   }
@@ -76,17 +76,25 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/admin/settings"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.PLATFORM_ADMIN]}>
                       <SystemSettings />
                     </RoleGuard>
                   }
                 />
+                <Route
+                  path="/admin/reports"
+                  element={
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.SECURITY_ADMIN, Role.ORGANIZATION_ADMIN, Role.AUDITOR]}>
+                      <HRReports />
+                    </RoleGuard>
+                  }
+                />
 
-                {/* HR Role Routes */}
+                {/* HR Admin & HR Specialist Routes */}
                 <Route
                   path="/hr"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.HR_SPECIALIST]}>
                       <HRDashboard />
                     </RoleGuard>
                   }
@@ -94,7 +102,7 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/hr/employees"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.HR_SPECIALIST]}>
                       <EmployeeManagement />
                     </RoleGuard>
                   }
@@ -102,7 +110,7 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/hr/attendance"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.HR_SPECIALIST]}>
                       <AttendanceManagement />
                     </RoleGuard>
                   }
@@ -110,17 +118,17 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/hr/reports"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.HR_ADMIN]}>
                       <HRReports />
                     </RoleGuard>
                   }
                 />
 
-                {/* Team Manager Role Routes */}
+                {/* Management & Analytics Routes */}
                 <Route
                   path="/manager"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.TEAM_MANAGER]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER]}>
                       <ManagerDashboard />
                     </RoleGuard>
                   }
@@ -128,7 +136,7 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/manager/analytics"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.TEAM_MANAGER]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER, Role.ANALYST]}>
                       <TeamAnalytics />
                     </RoleGuard>
                   }
@@ -136,17 +144,17 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/manager/reports"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.TEAM_MANAGER]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER, Role.ANALYST]}>
                       <TeamReports />
                     </RoleGuard>
                   }
                 />
 
-                {/* Team Lead Role Routes */}
+                {/* Operational Team Lead Routes */}
                 <Route
                   path="/team-lead"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.TEAM_LEAD]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.TEAM_LEAD]}>
                       <TeamLeadDashboard />
                     </RoleGuard>
                   }
@@ -154,17 +162,22 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/team-lead/productivity"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.TEAM_LEAD]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.TEAM_LEAD]}>
                       <Productivity />
                     </RoleGuard>
                   }
                 />
 
-                {/* Employee Self-Service Routes */}
+                {/* Employee Self-Service & Viewer Routes */}
                 <Route
                   path="/employee"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]}>
+                    <RoleGuard allowedRoles={[
+                      Role.SYSTEM_ADMIN, Role.PLATFORM_ADMIN, Role.SECURITY_ADMIN,
+                      Role.ORGANIZATION_ADMIN, Role.HR_ADMIN, Role.HR_SPECIALIST,
+                      Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER, Role.TEAM_LEAD,
+                      Role.EMPLOYEE, Role.ANALYST, Role.AUDITOR, Role.VIEWER
+                    ]}>
                       <EmployeeDashboard />
                     </RoleGuard>
                   }
@@ -172,7 +185,12 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/employee/profile"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]}>
+                    <RoleGuard allowedRoles={[
+                      Role.SYSTEM_ADMIN, Role.PLATFORM_ADMIN, Role.SECURITY_ADMIN,
+                      Role.ORGANIZATION_ADMIN, Role.HR_ADMIN, Role.HR_SPECIALIST,
+                      Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER, Role.TEAM_LEAD,
+                      Role.EMPLOYEE, Role.ANALYST, Role.AUDITOR, Role.VIEWER
+                    ]}>
                       <Profile />
                     </RoleGuard>
                   }
@@ -180,7 +198,9 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/employee/attendance"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]}>
+                    <RoleGuard allowedRoles={[
+                      Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.BUSINESS_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE
+                    ]}>
                       <MyAttendance />
                     </RoleGuard>
                   }
@@ -188,13 +208,15 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/employee/performance"
                   element={
-                    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.TEAM_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]}>
+                    <RoleGuard allowedRoles={[
+                      Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.BUSINESS_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE, Role.VIEWER
+                    ]}>
                       <MyPerformance />
                     </RoleGuard>
                   }
                 />
 
-                {/* Root & Default Route Fallback */}
+                {/* Default Route Fallback */}
                 <Route path="/" element={<Navigate to="/admin" replace />} />
                 <Route path="*" element={<Navigate to="/admin" replace />} />
               </Routes>

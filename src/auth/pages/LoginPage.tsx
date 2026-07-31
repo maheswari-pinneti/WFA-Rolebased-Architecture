@@ -10,11 +10,19 @@ export const LoginPage: React.FC = () => {
   const location = useLocation();
 
   const roleHomePathMap: Record<Role, string> = {
-    [Role.ADMIN]: '/admin',
-    [Role.HR]: '/hr',
-    [Role.TEAM_MANAGER]: '/manager',
+    [Role.SYSTEM_ADMIN]: '/admin',
+    [Role.PLATFORM_ADMIN]: '/admin',
+    [Role.SECURITY_ADMIN]: '/admin',
+    [Role.ORGANIZATION_ADMIN]: '/admin',
+    [Role.HR_ADMIN]: '/hr',
+    [Role.HR_SPECIALIST]: '/hr',
+    [Role.DEPARTMENT_HEAD]: '/manager',
+    [Role.BUSINESS_MANAGER]: '/manager',
     [Role.TEAM_LEAD]: '/team-lead',
     [Role.EMPLOYEE]: '/employee',
+    [Role.ANALYST]: '/manager/analytics',
+    [Role.AUDITOR]: '/admin/reports',
+    [Role.VIEWER]: '/employee',
   };
 
   useEffect(() => {
