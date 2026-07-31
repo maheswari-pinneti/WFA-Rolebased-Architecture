@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { Role } from '../../security/roles/roles';
 import { EnterpriseHeader } from './components/EnterpriseHeader';
 import { InformationBar } from './components/InformationBar';
+import { SupportModal } from '../components/SupportModal';
 import {
   LayoutDashboard,
   Users,
@@ -18,7 +19,8 @@ import {
   Flame,
   UserCheck,
   Compass,
-  FileText
+  FileText,
+  LifeBuoy
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -32,6 +34,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
 
   // Standardized 24px Lucide React Sidebar Navigation Icons
   const roleNavigationMap: Record<Role, NavigationItem[]> = {
@@ -75,7 +78,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
 
   return (
     <div data-role={role} className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
-      {/* 72px Fixed Enterprise Header */}
+      {/* Fixed Enterprise Header */}
       <EnterpriseHeader onToggleSidebar={() => setCollapsed(!collapsed)} />
 
       {/* Real-time Status Information Bar */}
@@ -108,8 +111,20 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
             })}
           </nav>
 
-          <div className="p-3 border-t border-[var(--border-color)] text-[10px] text-slate-400 text-center font-mono">
-            {!collapsed ? 'Workforce Analytics v3.0' : 'v3.0'}
+          {/* Company Help & Support Sidebar Option */}
+          <div className="p-3 border-t border-[var(--border-color)] space-y-2">
+            <button
+              onClick={() => setSupportModalOpen(true)}
+              className="nav-link w-full text-left text-blue-500 hover:bg-blue-500/10 transition-colors"
+              title={collapsed ? 'Company Help & Support' : undefined}
+            >
+              <LifeBuoy size={24} strokeWidth={2} className="text-blue-500 shrink-0" />
+              {!collapsed && <span className="font-semibold text-sm">Help & Support</span>}
+            </button>
+
+            <div className="text-[10px] text-slate-400 text-center font-mono pt-1">
+              {!collapsed ? 'Workforce Analytics v3.0' : 'v3.0'}
+            </div>
           </div>
         </aside>
 
@@ -118,6 +133,12 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
           {children}
         </main>
       </div>
+
+      {/* Support & IT Helpdesk Modal */}
+      <SupportModal
+        isOpen={supportModalOpen}
+        onClose={() => setSupportModalOpen(false)}
+      />
     </div>
   );
 };

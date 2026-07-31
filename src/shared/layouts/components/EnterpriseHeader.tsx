@@ -9,18 +9,13 @@ import {
   Menu,
   Search,
   Bell,
-  MessageSquare,
   Sun,
   Moon,
-  RotateCw,
-  HelpCircle,
   User as UserIcon,
   Settings,
   Shield,
-  Activity,
   LogOut,
   ChevronDown,
-  ChevronRight,
   Sparkles,
   CheckCircle2,
   History,
@@ -28,8 +23,8 @@ import {
   Layers,
   Building2,
   ShieldCheck,
-  Briefcase,
-  ChevronLeft
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface EnterpriseHeaderProps {
@@ -48,7 +43,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
   // Dropdown States
   const [activeDropdown, setActiveDropdown] = useState<'profile' | 'role' | 'notif' | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Drill-Down Scope State
   const [drillDownView, setDrillDownView] = useState<'roles' | 'departments' | 'permissions'>('roles');
@@ -80,11 +74,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     setDrillDownView('roles');
   };
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 800);
-  };
-
   const handleRoleChange = (newRole: Role) => {
     switchRole(newRole);
     setActiveDropdown(null);
@@ -112,7 +101,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         <button
           onClick={onToggleSidebar}
           aria-label="Toggle Sidebar Menu"
-          className="p-2 rounded-xl text-slate-400 hover:bg-[var(--bg-tertiary)] hover:text-slate-100 transition-all hover:scale-105"
+          className="p-2 rounded-xl text-slate-400 hover:bg-[var(--bg-tertiary)] hover:text-slate-100 transition-all hover:scale-105 border border-transparent hover:border-[var(--border-color)]"
           title="Toggle Navigation Menu"
         >
           <Menu size={24} strokeWidth={2} />
@@ -131,24 +120,22 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </div>
       </div>
 
-      {/* Center Section: Global Search Bar with Drill-Down Categories */}
-      <div className="hidden lg:flex items-center max-w-[420px] w-full relative">
-        <div className="relative w-full">
-          <Search size={20} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+      {/* Center Section: Global Search Bar with Clean Layout */}
+      <div className="hidden lg:flex items-center max-w-[440px] w-full relative">
+        <div className="relative w-full flex items-center">
+          <Search size={18} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onFocus={() => setSearchFocused(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="Global Search"
-            placeholder={`Search in ${searchCategory === 'all' ? 'entire platform' : searchCategory}...`}
-            className="w-full pl-10 pr-24 py-2 text-sm rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-[#2563EB] shadow-inner transition-colors"
+            placeholder={`Search ${searchCategory === 'all' ? 'platform' : searchCategory}...`}
+            className="w-full pl-10 pr-20 py-2 text-sm rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-[#2563EB] shadow-inner transition-colors"
           />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <kbd className="text-[10px] font-mono font-bold text-slate-400 bg-slate-800/40 px-1.5 py-0.5 rounded border border-slate-700/50 pointer-events-none hidden xl:inline-block">
-              Ctrl + K
-            </kbd>
-          </div>
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-slate-800/40 px-1.5 py-0.5 rounded border border-slate-700/50 pointer-events-none hidden xl:inline-block">
+            Ctrl + K
+          </kbd>
         </div>
 
         {/* Search Drill-Down Dropdown */}
@@ -212,18 +199,8 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         )}
       </div>
 
-      {/* Right Section: Lucide Icons, Scope Drill-Down Selector & Profile */}
+      {/* Right Section: Notifications, Theme Toggle, Scope Selector & Profile */}
       <div className="flex items-center gap-3 shrink-0">
-        {/* Dashboard Refresh Button */}
-        <button
-          onClick={handleRefresh}
-          aria-label="Refresh Dashboard Data"
-          className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-slate-100 transition-all hover:scale-105"
-          title="Refresh Dashboard"
-        >
-          <RotateCw size={20} strokeWidth={2} className={isRefreshing ? 'animate-spin text-[#2563EB]' : ''} />
-        </button>
-
         {/* Notifications */}
         <div className="relative">
           <button
@@ -258,15 +235,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           )}
         </div>
 
-        {/* Messages */}
-        <button
-          aria-label="Open Messages"
-          className="hidden sm:flex p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-slate-100 transition-all hover:scale-105"
-          title="Messages"
-        >
-          <MessageSquare size={20} strokeWidth={2} />
-        </button>
-
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
@@ -282,7 +250,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           <button
             onClick={() => toggleDropdown('role')}
             aria-label="Switch Security Role Scope"
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold hover:border-[#2563EB] transition-colors"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold hover:border-[#2563EB] transition-colors"
           >
             <span className={`badge ${getRoleBadgeClass(role)}`}>
               {ROLE_LABELS[role]}
@@ -306,7 +274,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     </button>
                   )}
                   <span className="text-slate-400 uppercase tracking-wider">
-                    {drillDownView === 'roles' ? 'Security Scope' : drillDownView === 'departments' ? 'Department Scope' : 'Active Permissions'}
+                    {drillDownView === 'roles' ? 'Security Scope' : 'Department Scope'}
                   </span>
                 </div>
                 <div className="flex gap-1">
