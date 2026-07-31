@@ -49,7 +49,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
   const [selectedDept, setSelectedDept] = useState<string>('Global Operations');
   const [showPermissionsPreview, setShowPermissionsPreview] = useState(false);
 
-  const availableRoles = Object.values(Role).filter((r) => typeof r === 'string' && !['ADMIN', 'HR', 'TEAM_MANAGER'].includes(r));
+  const availableRoles: Role[] = [Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE];
   
   const departmentsList = [
     { id: 'eng', name: 'Engineering & Technology', code: 'ENG', head: 'David Sterling' },
