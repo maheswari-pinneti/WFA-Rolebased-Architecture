@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useTheme } from '../../../design-system/theme/theme';
-import { Role, ROLE_LABELS } from '../../../security/roles/roles';
+import { Role, ROLE_LABELS, ROLE_HOME_PATHS } from '../../../security/roles/roles';
 import { getRoleBadgeClass } from '../../utils/helpers';
 import { StacklyLogo } from '../../../components/common/StacklyLogo';
 import {
@@ -77,14 +77,8 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
   const handleRoleChange = (newRole: Role) => {
     switchRole(newRole);
     setActiveDropdown(null);
-
-    switch (newRole) {
-      case Role.ADMIN: navigate('/admin'); break;
-      case Role.HR: navigate('/hr'); break;
-      case Role.TEAM_MANAGER: navigate('/manager'); break;
-      case Role.TEAM_LEAD: navigate('/team-lead'); break;
-      case Role.EMPLOYEE: navigate('/employee'); break;
-    }
+    const targetPath = ROLE_HOME_PATHS[newRole] || '/employee';
+    navigate(targetPath);
   };
 
   const recentSearches = [

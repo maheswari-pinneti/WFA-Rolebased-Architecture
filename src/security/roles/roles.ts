@@ -42,6 +42,22 @@ export const ROLE_LABELS: Record<Role, string> = {
   [Role.VIEWER]: 'Read-Only Viewer',
 };
 
+export const ROLE_HOME_PATHS: Record<Role, string> = {
+  [Role.SYSTEM_ADMIN]: '/system-admin',
+  [Role.PLATFORM_ADMIN]: '/platform-admin',
+  [Role.SECURITY_ADMIN]: '/security-admin',
+  [Role.ORGANIZATION_ADMIN]: '/org-admin',
+  [Role.HR_ADMIN]: '/hr-admin',
+  [Role.HR_SPECIALIST]: '/hr-specialist',
+  [Role.DEPARTMENT_HEAD]: '/dept-head',
+  [Role.BUSINESS_MANAGER]: '/business-manager',
+  [Role.TEAM_LEAD]: '/team-lead',
+  [Role.EMPLOYEE]: '/employee',
+  [Role.ANALYST]: '/analyst',
+  [Role.AUDITOR]: '/auditor',
+  [Role.VIEWER]: '/viewer',
+};
+
 export const ROLE_LEVELS: Record<Role, number> = {
   [Role.SYSTEM_ADMIN]: 0,
   [Role.PLATFORM_ADMIN]: 1,

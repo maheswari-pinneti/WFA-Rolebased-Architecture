@@ -5,34 +5,49 @@ import { RoleGuard } from '../../security/guards/RoleGuard';
 import { MainLayout } from '../../shared/layouts/MainLayout';
 import { LoginPage } from '../../auth/pages/LoginPage';
 import { LogoutPage } from '../../auth/pages/LogoutPage';
-import { Role } from '../../security/roles/roles';
+import { Role, ROLE_HOME_PATHS } from '../../security/roles/roles';
+import { useAuth } from '../../auth/hooks/useAuth';
 
-// Admin Pages
+// Admin Dashboards & Pages
 import { AdminDashboard } from '../../features/admin/pages/AdminDashboard';
+import { PlatformAdminDashboard } from '../../features/admin/pages/PlatformAdminDashboard';
+import { SecurityAdminDashboard } from '../../features/admin/pages/SecurityAdminDashboard';
+import { OrgAdminDashboard } from '../../features/admin/pages/OrgAdminDashboard';
+import { AuditorDashboard } from '../../features/admin/pages/AuditorDashboard';
 import { UserManagement } from '../../features/admin/pages/UserManagement';
 import { RoleManagement } from '../../features/admin/pages/RoleManagement';
 import { SystemSettings } from '../../features/admin/pages/SystemSettings';
 
-// HR Pages
+// HR Dashboards & Pages
 import { HRDashboard } from '../../features/hr/pages/HRDashboard';
+import { HRSpecialistDashboard } from '../../features/hr/pages/HRSpecialistDashboard';
 import { EmployeeManagement } from '../../features/hr/pages/EmployeeManagement';
 import { AttendanceManagement } from '../../features/hr/pages/AttendanceManagement';
 import { HRReports } from '../../features/hr/pages/HRReports';
 
-// Team Manager Pages
+// Management & Analytics Dashboards
+import { DeptHeadDashboard } from '../../features/team-manager/pages/DeptHeadDashboard';
 import { ManagerDashboard } from '../../features/team-manager/pages/ManagerDashboard';
 import { TeamAnalytics } from '../../features/team-manager/pages/TeamAnalytics';
 import { TeamReports } from '../../features/team-manager/pages/TeamReports';
+import { AnalystDashboard } from '../../features/analytics/pages/AnalystDashboard';
 
-// Team Lead Pages
+// Operational Team Lead Dashboard
 import { TeamLeadDashboard } from '../../features/team-lead/pages/TeamLeadDashboard';
 import { Productivity } from '../../features/team-lead/pages/Productivity';
 
-// Employee Pages
+// Employee & Viewer Dashboards
 import { EmployeeDashboard } from '../../features/employee/pages/EmployeeDashboard';
+import { ViewerDashboard } from '../../features/employee/pages/ViewerDashboard';
 import { Profile } from '../../features/employee/pages/Profile';
 import { MyAttendance } from '../../features/employee/pages/MyAttendance';
 import { MyPerformance } from '../../features/employee/pages/MyPerformance';
+
+const DefaultHomeRedirect: React.FC = () => {
+  const { role } = useAuth();
+  const target = ROLE_HOME_PATHS[role] || '/employee';
+  return <Navigate to={target} replace />;
+};
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -48,15 +63,137 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <MainLayout>
               <Routes>
-                {/* System & Security Admin Routes */}
+                {/* 1. SYSTEM ADMIN DASHBOARD */}
                 <Route
-                  path="/admin"
+                  path="/system-admin"
                   element={
-                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.PLATFORM_ADMIN, Role.SECURITY_ADMIN, Role.ORGANIZATION_ADMIN, Role.AUDITOR]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN]}>
                       <AdminDashboard />
                     </RoleGuard>
                   }
                 />
+
+                {/* 2. PLATFORM ADMIN DASHBOARD */}
+                <Route
+                  path="/platform-admin"
+                  element={
+                    <RoleGuard allowedRoles={[Role.PLATFORM_ADMIN, Role.SYSTEM_ADMIN]}>
+                      <PlatformAdminDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 3. SECURITY ADMIN DASHBOARD */}
+                <Route
+                  path="/security-admin"
+                  element={
+                    <RoleGuard allowedRoles={[Role.SECURITY_ADMIN, Role.SYSTEM_ADMIN]}>
+                      <SecurityAdminDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 4. ORGANIZATION ADMIN DASHBOARD */}
+                <Route
+                  path="/org-admin"
+                  element={
+                    <RoleGuard allowedRoles={[Role.ORGANIZATION_ADMIN, Role.SYSTEM_ADMIN]}>
+                      <OrgAdminDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 5. HR ADMIN DASHBOARD */}
+                <Route
+                  path="/hr-admin"
+                  element={
+                    <RoleGuard allowedRoles={[Role.HR_ADMIN, Role.SYSTEM_ADMIN]}>
+                      <HRDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 6. HR SPECIALIST DASHBOARD */}
+                <Route
+                  path="/hr-specialist"
+                  element={
+                    <RoleGuard allowedRoles={[Role.HR_SPECIALIST, Role.HR_ADMIN, Role.SYSTEM_ADMIN]}>
+                      <HRSpecialistDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 7. DEPARTMENT HEAD DASHBOARD */}
+                <Route
+                  path="/dept-head"
+                  element={
+                    <RoleGuard allowedRoles={[Role.DEPARTMENT_HEAD, Role.SYSTEM_ADMIN]}>
+                      <DeptHeadDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 8. BUSINESS MANAGER DASHBOARD */}
+                <Route
+                  path="/business-manager"
+                  element={
+                    <RoleGuard allowedRoles={[Role.BUSINESS_MANAGER, Role.SYSTEM_ADMIN]}>
+                      <ManagerDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 9. TEAM LEAD DASHBOARD */}
+                <Route
+                  path="/team-lead"
+                  element={
+                    <RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.SYSTEM_ADMIN]}>
+                      <TeamLeadDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 10. EMPLOYEE SELF SERVICE DASHBOARD */}
+                <Route
+                  path="/employee"
+                  element={
+                    <RoleGuard allowedRoles={[Role.EMPLOYEE, Role.SYSTEM_ADMIN]}>
+                      <EmployeeDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 11. ANALYST BI DASHBOARD */}
+                <Route
+                  path="/analyst"
+                  element={
+                    <RoleGuard allowedRoles={[Role.ANALYST, Role.SYSTEM_ADMIN]}>
+                      <AnalystDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 12. AUDITOR DASHBOARD */}
+                <Route
+                  path="/auditor"
+                  element={
+                    <RoleGuard allowedRoles={[Role.AUDITOR, Role.SYSTEM_ADMIN]}>
+                      <AuditorDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* 13. VIEWER READ-ONLY DASHBOARD */}
+                <Route
+                  path="/viewer"
+                  element={
+                    <RoleGuard allowedRoles={[Role.VIEWER, Role.SYSTEM_ADMIN]}>
+                      <ViewerDashboard />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* Shared Sub-Pages with Strict RBAC Control */}
                 <Route
                   path="/admin/users"
                   element={
@@ -89,16 +226,6 @@ export const AppRoutes: React.FC = () => {
                     </RoleGuard>
                   }
                 />
-
-                {/* HR Admin & HR Specialist Routes */}
-                <Route
-                  path="/hr"
-                  element={
-                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.HR_SPECIALIST]}>
-                      <HRDashboard />
-                    </RoleGuard>
-                  }
-                />
                 <Route
                   path="/hr/employees"
                   element={
@@ -123,16 +250,6 @@ export const AppRoutes: React.FC = () => {
                     </RoleGuard>
                   }
                 />
-
-                {/* Management & Analytics Routes */}
-                <Route
-                  path="/manager"
-                  element={
-                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER]}>
-                      <ManagerDashboard />
-                    </RoleGuard>
-                  }
-                />
                 <Route
                   path="/manager/analytics"
                   element={
@@ -149,36 +266,11 @@ export const AppRoutes: React.FC = () => {
                     </RoleGuard>
                   }
                 />
-
-                {/* Operational Team Lead Routes */}
-                <Route
-                  path="/team-lead"
-                  element={
-                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.TEAM_LEAD]}>
-                      <TeamLeadDashboard />
-                    </RoleGuard>
-                  }
-                />
                 <Route
                   path="/team-lead/productivity"
                   element={
                     <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.TEAM_LEAD]}>
                       <Productivity />
-                    </RoleGuard>
-                  }
-                />
-
-                {/* Employee Self-Service & Viewer Routes */}
-                <Route
-                  path="/employee"
-                  element={
-                    <RoleGuard allowedRoles={[
-                      Role.SYSTEM_ADMIN, Role.PLATFORM_ADMIN, Role.SECURITY_ADMIN,
-                      Role.ORGANIZATION_ADMIN, Role.HR_ADMIN, Role.HR_SPECIALIST,
-                      Role.DEPARTMENT_HEAD, Role.BUSINESS_MANAGER, Role.TEAM_LEAD,
-                      Role.EMPLOYEE, Role.ANALYST, Role.AUDITOR, Role.VIEWER
-                    ]}>
-                      <EmployeeDashboard />
                     </RoleGuard>
                   }
                 />
@@ -198,9 +290,7 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/employee/attendance"
                   element={
-                    <RoleGuard allowedRoles={[
-                      Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.BUSINESS_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE
-                    ]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.EMPLOYEE]}>
                       <MyAttendance />
                     </RoleGuard>
                   }
@@ -208,17 +298,20 @@ export const AppRoutes: React.FC = () => {
                 <Route
                   path="/employee/performance"
                   element={
-                    <RoleGuard allowedRoles={[
-                      Role.SYSTEM_ADMIN, Role.HR_ADMIN, Role.BUSINESS_MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE, Role.VIEWER
-                    ]}>
+                    <RoleGuard allowedRoles={[Role.SYSTEM_ADMIN, Role.EMPLOYEE, Role.VIEWER]}>
                       <MyPerformance />
                     </RoleGuard>
                   }
                 />
 
+                {/* Legacy Redirects */}
+                <Route path="/admin" element={<Navigate to="/system-admin" replace />} />
+                <Route path="/hr" element={<Navigate to="/hr-admin" replace />} />
+                <Route path="/manager" element={<Navigate to="/business-manager" replace />} />
+
                 {/* Default Route Fallback */}
-                <Route path="/" element={<Navigate to="/admin" replace />} />
-                <Route path="*" element={<Navigate to="/admin" replace />} />
+                <Route path="/" element={<DefaultHomeRedirect />} />
+                <Route path="*" element={<DefaultHomeRedirect />} />
               </Routes>
             </MainLayout>
           </ProtectedRoute>

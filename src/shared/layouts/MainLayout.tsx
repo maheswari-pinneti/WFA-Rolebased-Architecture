@@ -42,49 +42,48 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   const [collapsed, setCollapsed] = useState(false);
   const [supportModalOpen, setSupportModalOpen] = useState(false);
 
-  // Standardized 24px Lucide React Sidebar Navigation Icons for 13 Enterprise Roles
+  // Distinct & Non-Overlapping Navigation per Role for 13 Profiles
   const roleNavigationMap: Record<Role, NavigationItem[]> = {
     [Role.SYSTEM_ADMIN]: [
-      { label: 'System Overview', path: '/admin', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-blue-500" /> },
+      { label: 'System Dashboard', path: '/system-admin', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-blue-500" /> },
       { label: 'User Directory', path: '/admin/users', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
       { label: 'Roles & Policies', path: '/admin/roles', icon: <ShieldCheck size={24} strokeWidth={2} className="text-purple-400" /> },
       { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={24} strokeWidth={2} className="text-emerald-400" /> },
       { label: 'Security Audit', path: '/admin/reports', icon: <History size={24} strokeWidth={2} className="text-amber-400" /> },
     ],
     [Role.PLATFORM_ADMIN]: [
-      { label: 'Platform Dashboard', path: '/admin', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-blue-500" /> },
-      { label: 'Module Manager', path: '/admin/settings', icon: <Layers size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={24} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'Platform Dashboard', path: '/platform-admin', icon: <Layers size={24} strokeWidth={2} className="text-blue-500" /> },
+      { label: 'Module Manager', path: '/admin/settings', icon: <Sliders size={24} strokeWidth={2} className="text-cyan-400" /> },
     ],
     [Role.SECURITY_ADMIN]: [
-      { label: 'Security Overview', path: '/admin', icon: <Lock size={24} strokeWidth={2} className="text-purple-500" /> },
+      { label: 'Security Desk', path: '/security-admin', icon: <Lock size={24} strokeWidth={2} className="text-purple-500" /> },
       { label: 'Access Policies', path: '/admin/roles', icon: <ShieldCheck size={24} strokeWidth={2} className="text-purple-400" /> },
       { label: 'Audit Logs', path: '/admin/reports', icon: <History size={24} strokeWidth={2} className="text-amber-400" /> },
     ],
     [Role.ORGANIZATION_ADMIN]: [
-      { label: 'Org Dashboard', path: '/admin', icon: <Building2 size={24} strokeWidth={2} className="text-indigo-400" /> },
+      { label: 'Org Dashboard', path: '/org-admin', icon: <Building2 size={24} strokeWidth={2} className="text-indigo-400" /> },
       { label: 'Departments', path: '/admin/users', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
       { label: 'Headcount Reports', path: '/admin/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
     ],
     [Role.HR_ADMIN]: [
-      { label: 'HR Dashboard', path: '/hr', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'HR Dashboard', path: '/hr-admin', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-purple-400" /> },
       { label: 'Employee Directory', path: '/hr/employees', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
       { label: 'Attendance Desk', path: '/hr/attendance', icon: <Clock size={24} strokeWidth={2} className="text-emerald-400" /> },
       { label: 'Performance', path: '/hr/performance', icon: <TrendingUp size={24} strokeWidth={2} className="text-blue-400" /> },
       { label: 'HR Reports', path: '/hr/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
     ],
     [Role.HR_SPECIALIST]: [
-      { label: 'HR Operations', path: '/hr', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-purple-400" /> },
-      { label: 'Employee Directory', path: '/hr/employees', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
-      { label: 'Recruitment & Shifts', path: '/hr/attendance', icon: <Briefcase size={24} strokeWidth={2} className="text-emerald-400" /> },
+      { label: 'Specialist Desk', path: '/hr-specialist', icon: <Briefcase size={24} strokeWidth={2} className="text-purple-400" /> },
+      { label: 'Recruitment & Candidates', path: '/hr/employees', icon: <Users size={24} strokeWidth={2} className="text-cyan-400" /> },
+      { label: 'Shift Rotations', path: '/hr/attendance', icon: <Clock size={24} strokeWidth={2} className="text-emerald-400" /> },
     ],
     [Role.DEPARTMENT_HEAD]: [
-      { label: 'Dept Overview', path: '/manager', icon: <Building2 size={24} strokeWidth={2} className="text-indigo-400" /> },
+      { label: 'Dept Dashboard', path: '/dept-head', icon: <Building2 size={24} strokeWidth={2} className="text-indigo-400" /> },
       { label: 'Department Analytics', path: '/manager/analytics', icon: <BarChart3 size={24} strokeWidth={2} className="text-indigo-400" /> },
       { label: 'Headcount Reports', path: '/manager/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
     ],
     [Role.BUSINESS_MANAGER]: [
-      { label: 'Manager Dashboard', path: '/manager', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-blue-400" /> },
+      { label: 'Manager Dashboard', path: '/business-manager', icon: <LayoutDashboard size={24} strokeWidth={2} className="text-blue-400" /> },
       { label: 'Team Analytics', path: '/manager/analytics', icon: <BarChart3 size={24} strokeWidth={2} className="text-indigo-400" /> },
       { label: 'Approvals Desk', path: '/manager/approvals', icon: <CheckCircle2 size={24} strokeWidth={2} className="text-emerald-400" /> },
       { label: 'Team Reports', path: '/manager/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-amber-400" /> },
@@ -103,15 +102,15 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
       { label: 'Requests', path: '/employee/requests', icon: <FileText size={24} strokeWidth={2} className="text-amber-400" /> },
     ],
     [Role.ANALYST]: [
-      { label: 'BI Analytics', path: '/manager/analytics', icon: <BarChart3 size={24} strokeWidth={2} className="text-indigo-400" /> },
+      { label: 'BI Analytics Dashboard', path: '/analyst', icon: <BarChart3 size={24} strokeWidth={2} className="text-indigo-400" /> },
       { label: 'Report Builder', path: '/manager/reports', icon: <FileSpreadsheet size={24} strokeWidth={2} className="text-emerald-400" /> },
     ],
     [Role.AUDITOR]: [
-      { label: 'Audit Dashboard', path: '/admin', icon: <History size={24} strokeWidth={2} className="text-amber-400" /> },
+      { label: 'Audit Dashboard', path: '/auditor', icon: <History size={24} strokeWidth={2} className="text-amber-400" /> },
       { label: 'Compliance Reports', path: '/admin/reports', icon: <BarChart3 size={24} strokeWidth={2} className="text-purple-400" /> },
     ],
     [Role.VIEWER]: [
-      { label: 'Read-Only View', path: '/employee', icon: <Eye size={24} strokeWidth={2} className="text-cyan-400" /> },
+      { label: 'Executive Read View', path: '/viewer', icon: <Eye size={24} strokeWidth={2} className="text-cyan-400" /> },
       { label: 'Reports View', path: '/employee/performance', icon: <BarChart3 size={24} strokeWidth={2} className="text-blue-400" /> },
     ],
   };
