@@ -1,122 +1,70 @@
-import React, { useState } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { ColumnDefinition, Column } from '../types/common.types';
 
-export interface Column<T> {
-  header: string;
-  accessorKey?: keyof T;
-  cell?: (item: T) => React.ReactNode;
-}
+export type { Column };
 
-interface DataTableProps<T> {
+export interface DataTableProps<T> {
+  columns: ColumnDefinition<T>[];
   data: T[];
-  columns: Column<T>[];
+  keyExtractor?: (item: T) => string;
+  emptyMessage?: string;
   searchPlaceholder?: string;
   searchFilter?: (item: T, query: string) => boolean;
-  pageSize?: number;
 }
 
-export function DataTable<T extends { id: string }>({
-  data,
+export function DataTable<T>({
   columns,
-  searchPlaceholder = 'Search records...',
-  searchFilter,
-  pageSize = 6,
+  data,
+  keyExtractor = (item: any) => item.id || JSON.stringify(item),
+  emptyMessage = 'No records found.',
 }: DataTableProps<T>) {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-
-  const filteredData = React.useMemo(() => {
-    if (!search.trim() || !searchFilter) return data;
-    return data.filter((item) => searchFilter(item, search.toLowerCase()));
-  }, [data, search, searchFilter]);
-
-  const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
-  const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredData.slice(start, start + pageSize);
-  }, [filteredData, page, pageSize]);
+  if (data.length === 0) {
+    return (
+      <div className="p-8 text-center text-slate-400 text-xs font-semibold glass-panel">
+        {emptyMessage}
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {searchFilter && (
-        <div className="relative max-w-sm">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg bg-slate-800/80 border border-slate-700/80 text-slate-200 focus:outline-none focus:border-indigo-500"
-          />
-        </div>
-      )}
-
-      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/50">
+    <div className="glass-panel overflow-hidden">
+      <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-800/40 text-slate-400 font-semibold border-b border-slate-800">
+          <thead className="bg-slate-800/40 text-slate-400 border-b border-slate-800 text-xs font-bold uppercase tracking-wider">
             <tr>
               {columns.map((col, idx) => (
-                <th key={idx} className="px-5 py-3.5">
+                <th key={col.key || col.accessorKey || idx} className="py-3.5 px-4">
                   {col.header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60">
-            {paginatedData.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="px-5 py-8 text-center text-slate-500">
-                  No matching records found.
-                </td>
-              </tr>
-            ) : (
-              paginatedData.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-800/30 transition-colors">
-                  {columns.map((col, idx) => (
-                    <td key={idx} className="px-5 py-3.5 font-medium text-slate-200">
-                      {col.cell
-                        ? col.cell(item)
-                        : col.accessorKey
-                        ? String(item[col.accessorKey] ?? '-')
-                        : null}
+            {data.map((item) => (
+              <tr key={keyExtractor(item)} className="hover:bg-slate-800/20 transition-colors">
+                {columns.map((col, idx) => {
+                  const val = col.accessorKey ? (item as any)[col.accessorKey] : undefined;
+                  let rendered: React.ReactNode = null;
+
+                  if (col.cell) {
+                    rendered = (col.cell as any)(item, { row: { original: item }, getValue: () => val });
+                  } else if (col.render) {
+                    rendered = col.render(item);
+                  } else {
+                    rendered = val ?? (col.key ? (item as any)[col.key] : '');
+                  }
+
+                  return (
+                    <td key={col.key || col.accessorKey || idx} className="py-3.5 px-4 text-slate-200">
+                      {rendered}
                     </td>
-                  ))}
-                </tr>
-              ))
-            )}
+                  );
+                })}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-2 text-xs text-slate-400">
-          <span>
-            Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, filteredData.length)} of {filteredData.length} records
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              disabled={page === 1}
-              className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-40"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <span className="font-semibold text-slate-200">
-              Page {page} of {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              disabled={page === totalPages}
-              className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-40"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

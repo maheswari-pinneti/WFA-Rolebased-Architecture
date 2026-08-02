@@ -32,7 +32,7 @@ export const UserManagement: React.FC = () => {
   const columns: Column<User>[] = [
     {
       header: 'Account User',
-      cell: (user) => (
+      cell: (user: User) => (
         <div className="flex items-center gap-3">
           <img
             src={user.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
@@ -49,7 +49,7 @@ export const UserManagement: React.FC = () => {
     { header: 'Department', accessorKey: 'department' },
     {
       header: 'Assigned Role',
-      cell: (user) => (
+      cell: (user: User) => (
         <select
           value={user.role}
           onChange={(e) => handleRoleChange(user.id, e.target.value as Role)}
@@ -65,7 +65,7 @@ export const UserManagement: React.FC = () => {
     },
     {
       header: 'Status',
-      cell: (user) => (
+      cell: (user: User) => (
         <span className="badge badge-success">
           {user.status}
         </span>
@@ -73,7 +73,7 @@ export const UserManagement: React.FC = () => {
     },
     {
       header: 'Actions',
-      cell: (user) => (
+      cell: (user: User) => (
         <button
           onClick={() => handleDelete(user.id)}
           className="p-1.5 text-slate-400 hover:text-red-400 rounded-lg hover:bg-slate-800 transition-colors"

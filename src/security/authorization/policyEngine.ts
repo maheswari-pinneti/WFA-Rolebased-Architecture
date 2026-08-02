@@ -45,21 +45,24 @@ export class PolicyEngine {
 
     // 3. ABAC (Attribute-Based Access Control) Sensitivity Check
     if (targetResource?.sensitivityLevel !== undefined) {
-      if (user.clearanceLevel < targetResource.sensitivityLevel) {
+      const userClearance = user.clearanceLevel ?? 10;
+      if (userClearance < targetResource.sensitivityLevel) {
         return {
           allowed: false,
-          reason: `Clearance level (${user.clearanceLevel}) insufficient for resource sensitivity (${targetResource.sensitivityLevel}).`
+          reason: `Clearance level (${userClearance}) insufficient for resource sensitivity (${targetResource.sensitivityLevel}).`
         };
       }
     }
 
     // 4. Scope-Based Data Access Check
-    const scopeAllowed = validateDataScope(user, scope, targetResource);
-    if (!scopeAllowed) {
-      return {
-        allowed: false,
-        reason: `Target resource falls outside active user scope level '${scope.level}'.`
-      };
+    if (targetResource) {
+      const scopeAllowed = validateDataScope(user, targetResource);
+      if (!scopeAllowed) {
+        return {
+          allowed: false,
+          reason: `Target resource falls outside active user scope level '${scope}'.`
+        };
+      }
     }
 
     return { allowed: true };

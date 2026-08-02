@@ -1,45 +1,39 @@
-import { Role } from '../../security/roles/roles';
+import React from 'react';
+
+export type StatusVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+
+export interface ColumnDefinition<T> {
+  key?: string;
+  header: string;
+  accessorKey?: string;
+  cell?: ((item: T, info?: any) => React.ReactNode) | ((info: { row: { original: T }; getValue?: () => any }) => React.ReactNode);
+  render?: (item: T) => React.ReactNode;
+  sortable?: boolean;
+}
+
+export type Column<T> = ColumnDefinition<T>;
 
 export interface Employee {
   id: string;
-  employeeCode: string;
   name: string;
   email: string;
-  role: Role;
+  role: string;
   department: string;
-  designation: string;
-  managerId?: string;
-  managerName?: string;
-  joinDate: string;
-  status: 'PRESENT' | 'REMOTE' | 'ON_LEAVE' | 'OFFLINE';
-  performanceScore: number; // 0 - 100
-  attendanceRate: number; // Percentage
-  avatar: string;
+  status: string;
+  avatar?: string;
+  phone?: string;
+  location?: string;
+  code?: string;
+  employeeCode?: string;
+  designation?: string;
+  performanceScore?: number;
+  attendanceRate?: number;
+  joinDate?: string;
 }
 
-export interface AttendanceRecord {
-  id: string;
-  employeeId: string;
-  employeeName: string;
-  date: string;
-  clockIn: string;
-  clockOut: string | null;
-  status: 'PRESENT' | 'LATE' | 'HALF_DAY' | 'ABSENT' | 'ON_LEAVE';
-  workMode: 'OFFICE' | 'REMOTE' | 'HYBRID';
-  hoursWorked: number;
-}
-
-export interface DashboardMetric {
-  title: string;
-  value: string | number;
-  change: number; // percentage change
-  trend: 'up' | 'down' | 'neutral';
-  description: string;
-}
-
-export interface ChartDataPoint {
-  label: string;
-  value: number;
-  secondaryValue?: number;
-  category?: string;
+export interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  children: React.ReactNode;
 }

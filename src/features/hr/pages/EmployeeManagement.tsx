@@ -26,16 +26,16 @@ export const EmployeeManagement: React.FC = () => {
   const columns: Column<Employee>[] = [
     {
       header: 'Employee Name',
-      cell: (emp) => (
+      cell: (emp: Employee) => (
         <div className="flex items-center gap-3">
           <img
-            src={emp.avatar}
+            src={emp.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'}
             alt={emp.name}
             className="w-8 h-8 rounded-full object-cover border border-slate-700"
           />
           <div>
             <p className="font-bold text-slate-100">{emp.name}</p>
-            <p className="text-xs text-slate-400">{emp.employeeCode} • {emp.email}</p>
+            <p className="text-xs text-slate-400">{emp.employeeCode || emp.code || 'WFA-1000'} • {emp.email}</p>
           </div>
         </div>
       ),
@@ -44,15 +44,15 @@ export const EmployeeManagement: React.FC = () => {
     { header: 'Designation', accessorKey: 'designation' },
     {
       header: 'Role',
-      cell: (emp) => (
-        <span className={`badge ${getRoleBadgeClass(emp.role)}`}>
+      cell: (emp: Employee) => (
+        <span className={`badge ${getRoleBadgeClass(emp.role as any)}`}>
           {emp.role}
         </span>
       ),
     },
     {
       header: 'Workplace Status',
-      cell: (emp) => (
+      cell: (emp: Employee) => (
         <select
           value={emp.status}
           onChange={(e) => handleStatusChange(emp.id, e.target.value as Employee['status'])}
@@ -67,21 +67,21 @@ export const EmployeeManagement: React.FC = () => {
     },
     {
       header: 'Performance',
-      cell: (emp) => (
+      cell: (emp: Employee) => (
         <div className="flex items-center gap-2">
           <div className="w-16 bg-slate-800 h-2 rounded-full overflow-hidden">
             <div
               className="bg-indigo-500 h-full rounded-full"
-              style={{ width: `${emp.performanceScore}%` }}
+              style={{ width: `${emp.performanceScore || 90}%` }}
             />
           </div>
-          <span className="text-xs font-bold">{emp.performanceScore}%</span>
+          <span className="text-xs font-bold">{emp.performanceScore || 90}%</span>
         </div>
       ),
     },
     {
       header: 'Joined Date',
-      cell: (emp) => formatDate(emp.joinDate),
+      cell: (emp: Employee) => formatDate(emp.joinDate || '2025-01-01'),
     },
   ];
 
@@ -104,12 +104,16 @@ export const EmployeeManagement: React.FC = () => {
               data={employees}
               columns={columns}
               searchPlaceholder="Search by code, name, designation, department..."
-              searchFilter={(emp, q) =>
-                emp.name.toLowerCase().includes(q) ||
-                emp.employeeCode.toLowerCase().includes(q) ||
-                emp.department.toLowerCase().includes(q) ||
-                emp.designation.toLowerCase().includes(q)
-              }
+              searchFilter={(emp: Employee, q: string) => {
+                const code = emp.employeeCode || emp.code || '';
+                const desig = emp.designation || '';
+                return (
+                  emp.name.toLowerCase().includes(q) ||
+                  code.toLowerCase().includes(q) ||
+                  emp.department.toLowerCase().includes(q) ||
+                  desig.toLowerCase().includes(q)
+                );
+              }}
             />
           </div>
         )}

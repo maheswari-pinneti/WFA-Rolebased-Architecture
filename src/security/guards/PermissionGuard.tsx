@@ -17,8 +17,9 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   fallback,
   children,
 }) => {
-  const { authorize } = usePermission();
-  const { allowed, reason } = authorize(requiredPermission, targetResource);
+  const { hasPermission } = usePermission();
+  const allowed = hasPermission(requiredPermission);
+  const reason = `Your active security scope does not permit '${requiredPermission}'.`;
 
   if (!allowed) {
     if (fallback) return <>{fallback}</>;

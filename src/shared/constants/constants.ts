@@ -1,18 +1,15 @@
-export const APP_NAME = 'Stackly Workforce Analytics Platform';
-export const API_TIMEOUT = 10000;
-export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'stackly_auth_token',
-  USER_DATA: 'stackly_user_data',
-  THEME_MODE: 'stackly_theme_mode'
+export const APP_NAME = 'Workforce Intelligence Platform';
+export const APP_VERSION = '1.0.0';
+export const DEFAULT_PAGE_SIZE = 10;
+export const API_TIMEOUT_MS = 15000;
+export const API_TIMEOUT = 15000;
+
+export const LOCAL_STORAGE_KEYS = {
+  AUTH_TOKEN: 'auth_token',
+  USER_ROLE: 'user_role',
+  THEME_MODE: 'theme_mode',
+  SIDEBAR_COLLAPSED: 'sidebar_collapsed',
+  USER_DATA: 'user_data',
 };
 
-export const API_ENDPOINTS = {
-  LOGIN: '/auth/login',
-  LOGOUT: '/auth/logout',
-  REFRESH_TOKEN: '/auth/refresh',
-  CURRENT_USER: '/auth/me',
-  EMPLOYEES: '/employees',
-  DEPARTMENTS: '/departments',
-  ROLES: '/roles',
-  REPORTS: '/reports'
-};
+export const STORAGE_KEYS = LOCAL_STORAGE_KEYS;

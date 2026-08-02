@@ -24,11 +24,13 @@ export const EmployeeTable: React.FC = () => {
   };
 
   const filteredEmployees = employees.filter((emp) => {
+    const code = emp.employeeCode || emp.code || '';
+    const desig = emp.designation || '';
     const matchesSearch =
       emp.name.toLowerCase().includes(search.toLowerCase()) ||
-      emp.employeeCode.toLowerCase().includes(search.toLowerCase()) ||
+      code.toLowerCase().includes(search.toLowerCase()) ||
       emp.email.toLowerCase().includes(search.toLowerCase()) ||
-      emp.designation.toLowerCase().includes(search.toLowerCase());
+      desig.toLowerCase().includes(search.toLowerCase());
 
     const matchesDept = departmentFilter === 'ALL' || emp.department === departmentFilter;
 
@@ -116,86 +118,86 @@ export const EmployeeTable: React.FC = () => {
       </div>
 
       {/* Roster Table */}
-      {isLoading ? (
-        <div className="p-8 text-center text-slate-400 font-semibold">Loading 10,000 employee workforce directory...</div>
-      ) : (
-        <div className="overflow-x-auto rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)]">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)]">
+      <div className="overflow-x-auto rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)]">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)]">
+            <tr>
+              <th className="px-5 py-3">Employee Details</th>
+              <th className="px-5 py-3">Department & Designation</th>
+              <th className="px-5 py-3">Role Level</th>
+              <th className="px-5 py-3">Shift Status</th>
+              <th className="px-5 py-3">Performance Meter</th>
+              <th className="px-5 py-3">Join Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[var(--border-color)]">
+            {isLoading ? (
               <tr>
-                <th className="px-5 py-3">Employee Details</th>
-                <th className="px-5 py-3">Department & Designation</th>
-                <th className="px-5 py-3">Role Level</th>
-                <th className="px-5 py-3">Shift Status</th>
-                <th className="px-5 py-3">Performance Meter</th>
-                <th className="px-5 py-3">Join Date</th>
+                <td colSpan={6} className="px-5 py-8 text-center text-slate-400 font-semibold">Loading 10,000 employee workforce directory...</td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border-color)]">
-              {paginatedEmployees.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
-                    No matching employee records found.
+            ) : paginatedEmployees.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
+                  No matching employee records found.
+                </td>
+              </tr>
+            ) : (
+              paginatedEmployees.map((emp) => (
+                <tr key={emp.id} className="hover:bg-[var(--bg-hover)] transition-colors">
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={emp.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'}
+                        alt={emp.name}
+                        className="w-9 h-9 rounded-full object-cover border border-[var(--border-color)] shrink-0"
+                      />
+                      <div>
+                        <p className="font-bold text-[var(--text-primary)]">{emp.name}</p>
+                        <p className="text-xs text-slate-400 font-mono">{emp.employeeCode || emp.code || 'WFA-1000'} • {emp.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3">
+                    <p className="font-bold text-[var(--text-primary)]">{emp.department}</p>
+                    <p className="text-xs text-slate-400">{emp.designation || 'Specialist'}</p>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span className={`badge ${getRoleBadgeClass(emp.role as any)}`}>
+                      {emp.role}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3">
+                    <select
+                      value={emp.status}
+                      onChange={(e) => handleStatusChange(emp.id, e.target.value as Employee['status'])}
+                      className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] cursor-pointer"
+                    >
+                      <option value="PRESENT">PRESENT</option>
+                      <option value="REMOTE">REMOTE</option>
+                      <option value="ON_LEAVE">ON_LEAVE</option>
+                      <option value="OFFLINE">OFFLINE</option>
+                    </select>
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 bg-[var(--bg-tertiary)] h-2 rounded-full overflow-hidden border border-[var(--border-color)]">
+                        <div
+                          className="bg-blue-500 h-full rounded-full"
+                          style={{ width: `${emp.performanceScore || 90}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-extrabold text-[var(--text-primary)]">{emp.performanceScore || 90}%</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3 text-xs text-slate-400 font-medium">
+                    {formatDate(emp.joinDate || '2025-01-01')}
                   </td>
                 </tr>
-              ) : (
-                paginatedEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-[var(--bg-hover)] transition-colors">
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={emp.avatar}
-                          alt={emp.name}
-                          className="w-9 h-9 rounded-full object-cover border border-[var(--border-color)] shrink-0"
-                        />
-                        <div>
-                          <p className="font-bold text-[var(--text-primary)]">{emp.name}</p>
-                          <p className="text-xs text-slate-400 font-mono">{emp.employeeCode} • {emp.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <p className="font-bold text-[var(--text-primary)]">{emp.department}</p>
-                      <p className="text-xs text-slate-400">{emp.designation}</p>
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className={`badge ${getRoleBadgeClass(emp.role)}`}>
-                        {emp.role}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <select
-                        value={emp.status}
-                        onChange={(e) => handleStatusChange(emp.id, e.target.value as Employee['status'])}
-                        className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] cursor-pointer"
-                      >
-                        <option value="PRESENT">PRESENT</option>
-                        <option value="REMOTE">REMOTE</option>
-                        <option value="ON_LEAVE">ON_LEAVE</option>
-                        <option value="OFFLINE">OFFLINE</option>
-                      </select>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 bg-[var(--bg-tertiary)] h-2 rounded-full overflow-hidden border border-[var(--border-color)]">
-                          <div
-                            className="bg-blue-500 h-full rounded-full"
-                            style={{ width: `${emp.performanceScore}%` }}
-                          />
-                        </div>
-                        <span className="text-xs font-extrabold text-[var(--text-primary)]">{emp.performanceScore}%</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3 text-xs text-slate-400 font-medium">
-                      {formatDate(emp.joinDate)}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Advanced Pagination Controls for 10,000 Records */}
       {totalPages > 1 && (
