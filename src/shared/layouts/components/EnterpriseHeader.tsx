@@ -115,10 +115,10 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </div>
       </div>
 
-      {/* Center Section: Global Search Bar with Dark Glassmorphism Styling */}
-      <div className="hidden lg:flex items-center max-w-[440px] w-full relative">
+      {/* Center Section: Global Search Bar with Theme Adaptive Glassmorphism Styling */}
+      <div className="hidden lg:flex items-center max-w-[400px] w-full relative">
         <div className="relative w-full flex items-center">
-          <Search size={18} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          <Search size={16} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
           <input
             type="text"
             value={searchQuery}
@@ -126,9 +126,9 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="Global Search"
             placeholder={`Search ${searchCategory === 'all' ? 'platform' : searchCategory}...`}
-            className="w-full pl-10 pr-20 py-2 text-sm rounded-xl bg-slate-900/80 border border-slate-700/80 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#2563EB] shadow-inner transition-colors"
+            className="w-full pl-9 pr-24 py-2 text-xs rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500 shadow-inner transition-colors"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/50 pointer-events-none hidden xl:inline-block">
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-[var(--bg-primary)] px-2 py-0.5 rounded-lg border border-[var(--border-color)] pointer-events-none hidden xl:flex items-center gap-1 shrink-0">
             Ctrl + K
           </kbd>
         </div>

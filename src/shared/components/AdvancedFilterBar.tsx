@@ -20,19 +20,19 @@ export const AdvancedFilterBar: React.FC<AdvancedFilterBarProps> = ({
 }) => {
   return (
     <div className="glass-panel p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-      <div className="relative flex-1">
-        <Search size={16} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
+      <div className="relative flex-1 flex items-center">
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-9 pr-8 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 transition-colors"
+          className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] rounded-xl pl-9 pr-8 py-2 focus:outline-none focus:border-blue-500 transition-colors"
         />
         {searchQuery && onClear && (
           <button
             onClick={onClear}
-            className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-200"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
           >
             <X size={14} />
           </button>

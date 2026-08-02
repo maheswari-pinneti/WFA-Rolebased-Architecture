@@ -253,13 +253,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!collapsed && (
           <div className="px-3 pt-3 pb-1">
             <div className="relative flex items-center">
-              <Search size={14} className="absolute left-3 text-slate-400 pointer-events-none" />
+              <Search size={14} className="absolute left-3 text-slate-400 pointer-events-none z-10" />
               <input
                 type="text"
                 placeholder="Filter links..."
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs text-slate-200 placeholder-slate-500 rounded-xl pl-8 pr-7 py-1.5 focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] rounded-xl pl-8 pr-7 py-1.5 focus:outline-none focus:border-blue-500 transition-colors"
               />
               {filterQuery && (
                 <button
@@ -318,7 +318,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </span>
 
                       {!collapsed && (
-                        <span className="font-semibold text-xs tracking-tight truncate flex-1">
+                        <span className="font-semibold text-xs tracking-tight truncate flex-1 min-w-0">
                           {item.label}
                         </span>
                       )}
@@ -326,7 +326,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {/* Badge if present */}
                       {!collapsed && item.badge && (
                         <span
-                          className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md border ${getBadgeStyle(
+                          className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md border ml-auto shrink-0 ${getBadgeStyle(
                             item.badge.variant
                           )}`}
                         >

@@ -61,6 +61,34 @@ body {
   min-height: 100vh;
 }
 
+/* Universal Theme Adaptive Input Elements */
+input[type="text"],
+input[type="number"],
+input[type="search"],
+select,
+textarea {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  font-family: var(--font-family);
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="text"]::placeholder,
+input[type="search"]::placeholder,
+textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.8;
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--stackly-blue) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
+}
+
 /* Flex Utilities */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
