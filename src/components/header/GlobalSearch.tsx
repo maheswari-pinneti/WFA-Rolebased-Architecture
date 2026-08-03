@@ -49,12 +49,9 @@ export const GlobalSearch: React.FC = () => {
           value={query}
           onFocus={() => setFocused(true)}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={`Search ${category === 'all' ? 'platform' : category}...`}
-          className="w-full pl-9 pr-24 py-2 text-xs rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500 shadow-inner transition-colors"
+          placeholder={`Search ${category === 'all' ? 'employees, departments, attendance...' : category}...`}
+          className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500 shadow-inner transition-colors"
         />
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-[var(--bg-primary)] px-2 py-0.5 rounded-lg border border-[var(--border-color)] pointer-events-none hidden xl:flex items-center gap-1 shrink-0">
-          Ctrl + K
-        </kbd>
       </div>
 
       {focused && (
