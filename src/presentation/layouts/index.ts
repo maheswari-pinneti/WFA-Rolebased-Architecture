@@ -1,4 +1,4 @@
 // Presentation Layer Layouts Export Entry
-export * from '../../shared/layouts/DashboardLayout';
-export * from '../../shared/layouts/components/Header';
-export * from '../../shared/layouts/components/Sidebar';
+export * from '../../layouts/DashboardLayout/DashboardLayout';
+export * from '../../layouts/Header/EnterpriseHeader';
+export * from '../../layouts/Sidebar/Sidebar';
