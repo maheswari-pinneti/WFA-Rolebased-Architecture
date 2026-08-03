@@ -29,8 +29,8 @@ export const DepartmentOverviewBar: React.FC = () => {
         <span className="badge badge-info">6 Departments</span>
       </div>
 
-      <div className="w-full h-[250px]">
-        <ResponsiveContainer width="100%" height={250}>
+      <div className="w-full h-[250px] min-h-[250px]">
+        <ResponsiveContainer width="100%" height={250} minWidth={200} minHeight={250}>
           <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
             <XAxis dataKey="department" stroke="#94a3b8" tick={{ fontSize: 11 }} />

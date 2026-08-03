@@ -1,4 +1,13 @@
 import React from 'react';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip
+} from 'recharts';
 
 interface WorkforceTrendProps {
   data?: { label: string; value: number }[];
@@ -14,36 +23,43 @@ export const WorkforceTrend: React.FC<WorkforceTrendProps> = ({
     { label: 'Jun', value: 1248 },
   ]
 }) => {
-  const maxValue = Math.max(...data.map(d => d.value));
-
   return (
-    <div className="glass-panel p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="glass-panel p-6 min-h-[360px] flex flex-col justify-between">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-base font-bold">Workforce Growth Trend</h3>
-          <p className="text-xs text-slate-400">Total active headcount progression</p>
+          <h3 className="text-base font-bold text-slate-100">Workforce Growth Trend</h3>
+          <p className="text-xs text-slate-400">Total active headcount progression (YTD)</p>
         </div>
-        <span className="badge badge-success">+35.6% YTD</span>
+        <span className="badge badge-success text-xs">+35.6% YTD Growth</span>
       </div>
 
-      <div className="h-48 flex items-end justify-between gap-3 pt-6 px-2">
-        {data.map((item, idx) => {
-          const heightPercent = (item.value / maxValue) * 100;
-          return (
-            <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
-              <div className="text-[10px] font-semibold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                {item.value}
-              </div>
-              <div className="w-full bg-slate-800 rounded-t-md relative overflow-hidden flex items-end h-36">
-                <div
-                  className="w-full bg-gradient-to-t from-indigo-600 to-cyan-400 rounded-t-md transition-all duration-500 group-hover:brightness-125"
-                  style={{ height: `${heightPercent}%` }}
-                />
-              </div>
-              <span className="text-xs text-slate-400 font-medium">{item.label}</span>
-            </div>
-          );
-        })}
+      <div className="w-full h-[260px] min-h-[260px]">
+        <ResponsiveContainer width="100%" height={260} minWidth={200} minHeight={260}>
+          <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+            <XAxis dataKey="label" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+            <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} />
+            <Tooltip
+              contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc' }}
+              formatter={(val: any) => [`${val} Headcount`, 'Active Staff']}
+            />
+            <Area
+              type="monotone"
+              dataKey="value"
+              name="Active Staff"
+              stroke="#3b82f6"
+              strokeWidth={3}
+              fillOpacity={1}
+              fill="url(#growthGrad)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

@@ -1,41 +1,58 @@
 import React from 'react';
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend
+} from 'recharts';
+
+const data = [
+  { name: 'Present in Office', value: 64, color: '#10b981' },
+  { name: 'Remote / WFH', value: 28, color: '#6366f1' },
+  { name: 'Approved Leave', value: 5, color: '#f59e0b' },
+  { name: 'Unexcused / Absent', value: 3, color: '#ef4444' },
+];
 
 export const AttendanceChart: React.FC = () => {
-  const categories = [
-    { label: 'Present in Office', percentage: 64, color: 'bg-emerald-500' },
-    { label: 'Remote / WFH', percentage: 28, color: 'bg-indigo-500' },
-    { label: 'Approved Leave', percentage: 5, color: 'bg-amber-500' },
-    { label: 'Unexcused / Absent', percentage: 3, color: 'bg-red-500' },
-  ];
-
   return (
-    <div className="glass-panel p-6">
-      <div className="mb-4">
-        <h3 className="text-base font-bold">Daily Workforce Status Breakdown</h3>
-        <p className="text-xs text-slate-400">Real-time attendance & location metrics</p>
+    <div className="glass-panel p-6 min-h-[360px] flex flex-col justify-between">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-base font-bold text-slate-100">Daily Workforce Status Breakdown</h3>
+          <p className="text-xs text-slate-400">Real-time attendance & location metrics</p>
+        </div>
+        <span className="badge badge-success text-xs">92% On Duty</span>
       </div>
 
-      <div className="h-4 w-full rounded-full bg-slate-800 flex overflow-hidden my-6">
-        {categories.map((c, i) => (
-          <div
-            key={i}
-            className={`${c.color} h-full transition-all duration-500`}
-            style={{ width: `${c.percentage}%` }}
-            title={`${c.label}: ${c.percentage}%`}
-          />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        {categories.map((c, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <span className={`w-3 h-3 rounded-full ${c.color}`} />
-            <div>
-              <p className="text-xs font-semibold text-slate-300">{c.label}</p>
-              <p className="text-sm font-bold">{c.percentage}%</p>
-            </div>
-          </div>
-        ))}
+      <div className="w-full h-[260px] min-h-[260px]">
+        <ResponsiveContainer width="100%" height={260} minWidth={200} minHeight={260}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={50}
+              outerRadius={85}
+              paddingAngle={4}
+              dataKey="value"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc' }}
+              formatter={(val: any) => [`${val}%`, 'Ratio']}
+            />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              wrapperStyle={{ fontSize: '11px', color: '#cbd5e1', paddingTop: '10px' }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

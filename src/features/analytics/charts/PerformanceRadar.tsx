@@ -30,8 +30,8 @@ export const PerformanceRadar: React.FC = () => {
         <span className="badge badge-purple">4.8 / 5.0 Rating</span>
       </div>
 
-      <div className="w-full h-[250px]">
-        <ResponsiveContainer width="100%" height={250}>
+      <div className="w-full h-[250px] min-h-[250px]">
+        <ResponsiveContainer width="100%" height={250} minWidth={200} minHeight={250}>
           <RadarChart cx="50%" cy="50%" outerRadius={75} data={data}>
             <PolarGrid stroke="#334155" />
             <PolarAngleAxis dataKey="subject" stroke="#94a3b8" tick={{ fontSize: 11 }} />

@@ -25,8 +25,8 @@ export const EmployeeDistributionPie: React.FC = () => {
         <span className="badge badge-manager">Workplace Mode</span>
       </div>
 
-      <div className="w-full h-[250px]">
-        <ResponsiveContainer width="100%" height={250}>
+      <div className="w-full h-[250px] min-h-[250px]">
+        <ResponsiveContainer width="100%" height={250} minWidth={200} minHeight={250}>
           <PieChart>
             <Tooltip
               contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '10px', color: '#f8fafc' }}
