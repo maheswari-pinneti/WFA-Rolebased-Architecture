@@ -1,6 +1,6 @@
-# Workforce Analytics Intelligence Platform - Enterprise System Architecture
+# Workforce Analytics Dashboard - MVP Enterprise Architecture
 
-This document presents the official 5-Layer MVP (Model-View-Presenter) enterprise architecture, security flow, database design, and folder structure for the **Workforce Analytics Intelligence Platform**.
+This document defines the 5-layer Model-View-Presenter (MVP) enterprise architecture, authentication flow, RBAC + DBAC security architecture, request sequence flow, database ER model, and frontend directory structure for the **Workforce Analytics Dashboard**.
 
 ---
 
