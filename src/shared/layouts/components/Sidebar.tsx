@@ -306,8 +306,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       title={collapsed ? item.label : undefined}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
                         active
-                          ? 'bg-blue-600/20 border border-blue-500/50 text-white font-bold shadow-md shadow-blue-500/10'
-                          : 'hover:bg-slate-800/60 text-slate-300 border border-transparent hover:border-slate-700/50'
+                          ? 'bg-blue-600/15 border border-blue-500/50 text-blue-500 font-bold shadow-md shadow-blue-500/10'
+                          : 'hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-transparent hover:border-[var(--border-color)]'
                       } ${collapsed ? 'justify-center px-0' : ''}`}
                     >
                       {/* Active Indicator Bar on Left */}
@@ -338,7 +338,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                       {/* Collapsed Hover Tooltip */}
                       {collapsed && (
-                        <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-900 text-slate-100 border border-slate-700 shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2">
+                        <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2">
                           {item.label}
                           {item.badge && (
                             <span
