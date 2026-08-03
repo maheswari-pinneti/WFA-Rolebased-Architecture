@@ -193,6 +193,59 @@ export const AdminDashboard: React.FC = () => {
               { label: 'Q2 Growth', value: '+19.1%' },
             ])}
           />
+          <KPICard
+            title="Open Requisitions"
+            value="24 Roles"
+            change={6.2}
+            trend="up"
+            subtitle="Hiring pipeline active"
+            icon={<Activity size={20} />}
+            accentColor="blue"
+            onClick={() => openDrillDown('Active Hiring Requisitions', '24 Positions', 'Open job requisitions', [
+              { label: 'Senior Engineers', value: 12 },
+              { label: 'Product Managers', value: 6 },
+              { label: 'Sales Executives', value: 6 },
+            ])}
+          />
+          <KPICard
+            title="Payroll Expenditure"
+            value="$4.8M / mo"
+            change={3.1}
+            trend="up"
+            subtitle="Monthly compensation budget"
+            icon={<Building2 size={20} />}
+            accentColor="emerald"
+            onClick={() => openDrillDown('Monthly Compensation Budget', '$4.8M', 'Total monthly payroll', [
+              { label: 'Base Salaries', value: '$3.9M' },
+              { label: 'Benefits & Taxes', value: '$900K' },
+            ])}
+          />
+          <KPICard
+            title="Retention Rate"
+            value="94.6%"
+            change={2.4}
+            trend="up"
+            subtitle="Low annual attrition"
+            icon={<ShieldCheck size={20} />}
+            accentColor="purple"
+            onClick={() => openDrillDown('Employee Retention Index', '94.6%', 'Workforce retention rate', [
+              { label: 'Engineering Retention', value: '96.2%' },
+              { label: 'Sales Retention', value: '92.4%' },
+            ])}
+          />
+          <KPICard
+            title="Training Certifications"
+            value="842 Badges"
+            change={18.4}
+            trend="up"
+            subtitle="Skill development completed"
+            icon={<Award size={20} />}
+            accentColor="amber"
+            onClick={() => openDrillDown('Skill Certification Badges', '842 Earned', 'Learning & development metrics', [
+              { label: 'Cloud Architecture', value: 340 },
+              { label: 'Security & Compliance', value: 502 },
+            ])}
+          />
         </div>
 
         {/* 4 Interactive SVG Recharts Section */}
