@@ -3,6 +3,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { ROLE_LABELS } from '../../security/roles/roles';
 import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { LogoutModal } from '../../auth/components/LogoutModal';
 
 interface UserProfileProps {
   collapsed?: boolean;
@@ -11,9 +12,16 @@ interface UserProfileProps {
 export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
   const { user, role, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
 
   if (!user) return null;
+
+  const handleConfirmLogout = () => {
+    setShowLogoutModal(false);
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="p-3 border-b border-[var(--border-color)] relative">
@@ -34,9 +42,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
 
         {!collapsed && (
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-[var(--text-primary)] truncate">{user.name}</p>
-            <p className="text-[10px] text-slate-400 truncate">{ROLE_LABELS[role]}</p>
-            <p className="text-[9.5px] font-semibold text-purple-400 truncate">
+            <p className="text-xs font-extrabold text-[var(--text-primary)] truncate">{user.name || 'Maheswari Pinneti'}</p>
+            <p className="text-[10px] text-blue-500 font-bold truncate">{user.title || 'Frontend Developer'}</p>
+            <p className="text-[9.5px] font-medium text-slate-400 truncate">
               {user.department || 'Engineering Department'}
             </p>
           </div>
@@ -47,22 +55,22 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
 
       {/* Profile Dropdown Menu */}
       {dropdownOpen && (
-        <div className="absolute left-3 right-3 top-full mt-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] p-2 shadow-2xl z-50 rounded-xl space-y-1 text-xs text-[var(--text-primary)]">
+        <div className="absolute left-3 right-3 top-full mt-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] p-2 shadow-2xl z-50 rounded-xl space-y-1 text-xs text-[var(--text-primary)] animate-fadeIn">
           <button
             onClick={() => {
               setDropdownOpen(false);
               navigate('/employee/profile');
             }}
-            className="w-full text-left px-3 py-2 rounded-lg hover:bg-[var(--bg-tertiary)] flex items-center gap-2"
+            className="w-full text-left px-3 py-2 rounded-lg hover:bg-[var(--bg-tertiary)] flex items-center gap-2 font-medium"
           >
-            <User size={14} className="text-blue-500" /> View Profile
+            <User size={14} className="text-blue-500" /> Profile
           </button>
           <button
             onClick={() => {
               setDropdownOpen(false);
               navigate('/admin/settings');
             }}
-            className="w-full text-left px-3 py-2 rounded-lg hover:bg-[var(--bg-tertiary)] flex items-center gap-2"
+            className="w-full text-left px-3 py-2 rounded-lg hover:bg-[var(--bg-tertiary)] flex items-center gap-2 font-medium"
           >
             <Settings size={14} className="text-indigo-500" /> Account Settings
           </button>
@@ -70,8 +78,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
             <button
               onClick={() => {
                 setDropdownOpen(false);
-                logout();
-                navigate('/login');
+                setShowLogoutModal(true);
               }}
               className="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-500/10 text-rose-500 font-bold flex items-center gap-2"
             >
@@ -80,6 +87,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
           </div>
         </div>
       )}
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirmLogout={handleConfirmLogout}
+      />
     </div>
   );
 };
