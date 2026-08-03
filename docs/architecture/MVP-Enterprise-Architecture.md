@@ -470,7 +470,7 @@ flowchart TD
     JWT --> ROLE["Role Validation (RBAC Levels 1 - 5)"]
     ROLE --> DEPT["Department Validation (DBAC Scoping)"]
     DEPT --> PERM["Permission Validation (30+ Granular Rules)"]
-    PERM --> ROUTE["Protected Route Access (<RoleGuard>)"]
+    PERM --> ROUTE["Protected Route Access (RoleGuard Component)"]
     ROUTE --> API["API Authorization (Axios Bearer Token)"]
     API --> DB_FILTER["Database Query Filtering (SQL Where Clause Scope)"]
     DB_FILTER --> END_OK(["Authorized JSON Data Response"])
