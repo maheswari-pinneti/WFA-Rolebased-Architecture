@@ -5,6 +5,7 @@ import { useTheme } from '../../../design-system/theme/theme';
 import { Role, ROLE_LABELS, ROLE_HOME_PATHS } from '../../../security/roles/roles';
 import { getRoleBadgeClass } from '../../utils/helpers';
 import { StacklyLogo } from '../../../components/common/StacklyLogo';
+import { LogoutModal } from '../../../auth/components/LogoutModal';
 import {
   Menu,
   Search,
@@ -120,8 +121,15 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     setUnreadCount(0);
   };
 
-  const handleLogout = () => {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogoutClick = () => {
     setActiveDropdown(null);
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = () => {
+    setShowLogoutModal(false);
     logout();
     navigate('/login');
   };
@@ -493,7 +501,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
                 <div className="border-t border-[var(--border-color)] pt-1.5">
                   <button
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     className="w-full text-left px-4 py-2 hover:bg-rose-500/10 text-rose-500 flex items-center gap-2.5 font-bold"
                   >
                     <LogOut size={18} strokeWidth={2} /> Logout
@@ -504,6 +512,13 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           </div>
         )}
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirmLogout={handleConfirmLogout}
+      />
     </header>
   );
 };
