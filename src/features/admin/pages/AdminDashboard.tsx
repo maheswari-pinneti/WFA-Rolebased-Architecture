@@ -276,7 +276,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Drill Down Modal */}
-        <DrillDownModal data={drillDownData} onClose={() => setDrillDownData(null)} />
+        <DrillDownModal isOpen={!!drillDownData} data={drillDownData} onClose={() => setDrillDownData(null)} />
       </div>
     </RoleGuard>
   );
