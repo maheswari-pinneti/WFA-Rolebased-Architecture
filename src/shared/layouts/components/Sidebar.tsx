@@ -30,7 +30,23 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  X
+  X,
+  Sparkles,
+  ShieldAlert,
+  FolderKanban,
+  BrainCircuit,
+  Workflow,
+  Network,
+  Activity,
+  CalendarDays,
+  Receipt,
+  Award,
+  BellRing,
+  HeartPulse,
+  Laptop,
+  UserCog,
+  PieChart,
+  BadgePercent
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -67,92 +83,92 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const location = useLocation();
   const [filterQuery, setFilterQuery] = useState('');
 
-  // Structured Categorized Role Navigation
+  // Structured Categorized Role Navigation with Enhanced Icons & Color Accents
   const roleCategorizedNavMap: Record<Role, NavigationCategory[]> = {
     [Role.ADMIN]: [
       {
         category: 'Main Overview',
         items: [
-          { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={20} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2.2} className="text-blue-400" /> },
+          { label: 'Analytics', path: '/admin/analytics', icon: <PieChart size={20} strokeWidth={2.2} className="text-cyan-400" /> },
         ],
       },
       {
-        category: 'Access & Control',
+        category: 'Access & Security',
         items: [
-          { label: 'User Management', path: '/admin/users', icon: <Users size={20} strokeWidth={2} className="text-cyan-400" />, badge: { text: 'Active', variant: 'blue' } },
-          { label: 'Role Management', path: '/admin/roles', icon: <ShieldCheck size={20} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Permissions', path: '/admin/permissions', icon: <Lock size={20} strokeWidth={2} className="text-indigo-400" /> },
-          { label: 'Employee Control', path: '/admin/employees', icon: <UserCheck size={20} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'User Management', path: '/admin/users', icon: <UserCog size={20} strokeWidth={2.2} className="text-cyan-400" />, badge: { text: 'Active', variant: 'blue' } },
+          { label: 'Role Management', path: '/admin/roles', icon: <ShieldCheck size={20} strokeWidth={2.2} className="text-purple-400" /> },
+          { label: 'Permissions', path: '/admin/permissions', icon: <Lock size={20} strokeWidth={2.2} className="text-indigo-400" /> },
+          { label: 'Employee Control', path: '/admin/employees', icon: <UserCheck size={20} strokeWidth={2.2} className="text-emerald-400" /> },
         ],
       },
       {
-        category: 'Organization',
+        category: 'Organization Infrastructure',
         items: [
-          { label: 'Departments', path: '/admin/departments', icon: <Building2 size={20} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Locations', path: '/admin/locations', icon: <MapPin size={20} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Departments', path: '/admin/departments', icon: <Network size={20} strokeWidth={2.2} className="text-purple-400" /> },
+          { label: 'Locations', path: '/admin/locations', icon: <MapPin size={20} strokeWidth={2.2} className="text-amber-400" /> },
         ],
       },
       {
-        category: 'System & Audit',
+        category: 'System Governance',
         items: [
-          { label: 'Reports', path: '/admin/reports', icon: <FileSpreadsheet size={20} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Audit Logs', path: '/admin/audit-logs', icon: <History size={20} strokeWidth={2} className="text-amber-400" />, badge: { text: 'Live', variant: 'emerald' } },
-          { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={20} strokeWidth={2} className="text-slate-400" /> },
-          { label: 'Configuration', path: '/admin/configuration', icon: <Layers size={20} strokeWidth={2} className="text-teal-400" /> },
+          { label: 'Reports', path: '/admin/reports', icon: <FileSpreadsheet size={20} strokeWidth={2.2} className="text-blue-400" /> },
+          { label: 'Audit Logs', path: '/admin/audit-logs', icon: <ShieldAlert size={20} strokeWidth={2.2} className="text-rose-400" />, badge: { text: 'Live', variant: 'emerald' } },
+          { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={20} strokeWidth={2.2} className="text-slate-400" /> },
+          { label: 'Configuration', path: '/admin/configuration', icon: <Workflow size={20} strokeWidth={2.2} className="text-teal-400" /> },
         ],
       },
     ],
 
     [Role.HR]: [
       {
-        category: 'Core HR',
+        category: 'Core HR Ops',
         items: [
-          { label: 'HR Dashboard', path: '/hr/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Employee Management', path: '/hr/employees', icon: <Users size={20} strokeWidth={2} className="text-cyan-400" /> },
-          { label: 'Recruitment', path: '/hr/recruitment', icon: <Briefcase size={20} strokeWidth={2} className="text-amber-400" />, badge: { text: 'Hiring', variant: 'purple' } },
+          { label: 'HR Dashboard', path: '/hr/dashboard', icon: <Sparkles size={20} strokeWidth={2.2} className="text-purple-400" /> },
+          { label: 'Employee Management', path: '/hr/employees', icon: <Users size={20} strokeWidth={2.2} className="text-cyan-400" /> },
+          { label: 'Recruitment', path: '/hr/recruitment', icon: <Briefcase size={20} strokeWidth={2.2} className="text-amber-400" />, badge: { text: 'Hiring', variant: 'purple' } },
         ],
       },
       {
         category: 'Workforce Operations',
         items: [
-          { label: 'Attendance', path: '/hr/attendance', icon: <Clock size={20} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Leave Management', path: '/hr/leave', icon: <FileText size={20} strokeWidth={2} className="text-blue-400" />, badge: { text: '5 New', variant: 'rose' } },
-          { label: 'Performance', path: '/hr/performance', icon: <TrendingUp size={20} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Attendance', path: '/hr/attendance', icon: <CalendarDays size={20} strokeWidth={2.2} className="text-emerald-400" /> },
+          { label: 'Leave Management', path: '/hr/leave', icon: <FileText size={20} strokeWidth={2.2} className="text-blue-400" />, badge: { text: '5 New', variant: 'rose' } },
+          { label: 'Performance', path: '/hr/performance', icon: <Award size={20} strokeWidth={2.2} className="text-purple-400" /> },
         ],
       },
       {
-        category: 'Finance & Insights',
+        category: 'Finance & Ledger',
         items: [
-          { label: 'Payroll Reports', path: '/hr/payroll-reports', icon: <DollarSign size={20} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Workforce Analytics', path: '/hr/workforce-analytics', icon: <BarChart3 size={20} strokeWidth={2} className="text-indigo-400" /> },
-          { label: 'HR Reports', path: '/hr/reports', icon: <FileSpreadsheet size={20} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Payroll Reports', path: '/hr/payroll-reports', icon: <Receipt size={20} strokeWidth={2.2} className="text-emerald-400" /> },
+          { label: 'Workforce Analytics', path: '/hr/workforce-analytics', icon: <BarChart3 size={20} strokeWidth={2.2} className="text-indigo-400" /> },
+          { label: 'HR Reports', path: '/hr/reports', icon: <FileSpreadsheet size={20} strokeWidth={2.2} className="text-amber-400" /> },
         ],
       },
     ],
 
     [Role.MANAGER]: [
       {
-        category: 'Management Hub',
+        category: 'Department Scope Hub',
         items: [
-          { label: 'Manager Dashboard', path: '/manager/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Team Overview', path: '/manager/team', icon: <Users size={20} strokeWidth={2} className="text-cyan-400" /> },
-          { label: 'Team Analytics', path: '/manager/analytics', icon: <BarChart3 size={20} strokeWidth={2} className="text-indigo-400" /> },
+          { label: 'Manager Dashboard', path: '/manager/dashboard', icon: <FolderKanban size={20} strokeWidth={2.2} className="text-blue-400" /> },
+          { label: 'Team Overview', path: '/manager/team', icon: <Users size={20} strokeWidth={2.2} className="text-cyan-400" /> },
+          { label: 'Team Analytics', path: '/manager/analytics', icon: <Activity size={20} strokeWidth={2.2} className="text-indigo-400" /> },
         ],
       },
       {
         category: 'Operations & Approvals',
         items: [
-          { label: 'Attendance', path: '/manager/attendance', icon: <Clock size={20} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Leave Approval', path: '/manager/approvals', icon: <CheckCircle2 size={20} strokeWidth={2} className="text-teal-400" />, badge: { text: '3 Review', variant: 'amber' } },
-          { label: 'Performance Review', path: '/manager/performance', icon: <TrendingUp size={20} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Attendance', path: '/manager/attendance', icon: <Clock size={20} strokeWidth={2.2} className="text-emerald-400" /> },
+          { label: 'Leave Approval', path: '/manager/approvals', icon: <CheckCircle2 size={20} strokeWidth={2.2} className="text-teal-400" />, badge: { text: '3 Review', variant: 'amber' } },
+          { label: 'Performance Review', path: '/manager/performance', icon: <TrendingUp size={20} strokeWidth={2.2} className="text-purple-400" /> },
         ],
       },
       {
-        category: 'Reports & Productivity',
+        category: 'Reports & Velocity',
         items: [
-          { label: 'Team Reports', path: '/manager/reports', icon: <FileSpreadsheet size={20} strokeWidth={2} className="text-amber-400" /> },
-          { label: 'Productivity', path: '/manager/productivity', icon: <Zap size={20} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Team Reports', path: '/manager/reports', icon: <FileSpreadsheet size={20} strokeWidth={2.2} className="text-amber-400" /> },
+          { label: 'Productivity', path: '/manager/productivity', icon: <Zap size={20} strokeWidth={2.2} className="text-amber-400" /> },
         ],
       },
     ],
@@ -161,17 +177,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {
         category: 'Lead Operations',
         items: [
-          { label: 'Team Dashboard', path: '/team-lead/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2} className="text-teal-400" /> },
-          { label: 'Task Monitoring', path: '/team-lead/tasks', icon: <Flame size={20} strokeWidth={2} className="text-rose-400" />, badge: { text: '8 Active', variant: 'rose' } },
+          { label: 'Team Dashboard', path: '/team-lead/dashboard', icon: <BrainCircuit size={20} strokeWidth={2.2} className="text-teal-400" /> },
+          { label: 'Task Monitoring', path: '/team-lead/tasks', icon: <Flame size={20} strokeWidth={2.2} className="text-rose-400" />, badge: { text: '8 Active', variant: 'rose' } },
         ],
       },
       {
-        category: 'Tracking & Analytics',
+        category: 'Sprint Tracking',
         items: [
-          { label: 'Attendance Tracking', path: '/team-lead/attendance', icon: <Clock size={20} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Productivity Analytics', path: '/team-lead/productivity', icon: <Zap size={20} strokeWidth={2} className="text-amber-400" /> },
-          { label: 'Team Performance', path: '/team-lead/performance', icon: <TrendingUp size={20} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Feedback Management', path: '/team-lead/feedback', icon: <MessageSquare size={20} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Attendance Tracking', path: '/team-lead/attendance', icon: <Clock size={20} strokeWidth={2.2} className="text-emerald-400" /> },
+          { label: 'Productivity Analytics', path: '/team-lead/productivity', icon: <BadgePercent size={20} strokeWidth={2.2} className="text-amber-400" /> },
+          { label: 'Team Performance', path: '/team-lead/performance', icon: <Award size={20} strokeWidth={2.2} className="text-purple-400" /> },
+          { label: 'Feedback Management', path: '/team-lead/feedback', icon: <MessageSquare size={20} strokeWidth={2.2} className="text-blue-400" /> },
         ],
       },
     ],
@@ -180,18 +196,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {
         category: 'Personal Portal',
         items: [
-          { label: 'My Dashboard', path: '/employee/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'My Profile', path: '/employee/profile', icon: <Compass size={20} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'My Dashboard', path: '/employee/dashboard', icon: <Laptop size={20} strokeWidth={2.2} className="text-emerald-400" /> },
+          { label: 'My Profile', path: '/employee/profile', icon: <Compass size={20} strokeWidth={2.2} className="text-purple-400" /> },
         ],
       },
       {
         category: 'Work & Requests',
         items: [
-          { label: 'Attendance', path: '/employee/attendance', icon: <Clock size={20} strokeWidth={2} className="text-cyan-400" /> },
-          { label: 'Leave Request', path: '/employee/leave', icon: <FileText size={20} strokeWidth={2} className="text-amber-400" /> },
-          { label: 'My Performance', path: '/employee/performance', icon: <TrendingUp size={20} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'My Goals', path: '/employee/goals', icon: <Target size={20} strokeWidth={2} className="text-rose-400" /> },
-          { label: 'Payslip View', path: '/employee/payslips', icon: <DollarSign size={20} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Attendance', path: '/employee/attendance', icon: <Clock size={20} strokeWidth={2.2} className="text-cyan-400" /> },
+          { label: 'Leave Request', path: '/employee/leave', icon: <FileText size={20} strokeWidth={2.2} className="text-amber-400" /> },
+          { label: 'My Performance', path: '/employee/performance', icon: <HeartPulse size={20} strokeWidth={2.2} className="text-blue-400" /> },
+          { label: 'My Goals', path: '/employee/goals', icon: <Target size={20} strokeWidth={2.2} className="text-rose-400" /> },
+          { label: 'Payslip View', path: '/employee/payslips', icon: <DollarSign size={20} strokeWidth={2.2} className="text-emerald-400" /> },
         ],
       },
     ],
