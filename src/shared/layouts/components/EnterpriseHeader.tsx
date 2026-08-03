@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useTheme } from '../../../design-system/theme/theme';
 import { Role, ROLE_LABELS, ROLE_HOME_PATHS } from '../../../security/roles/roles';
@@ -19,57 +19,54 @@ import {
   ChevronDown,
   Sparkles,
   CheckCircle2,
-  History,
   Filter,
   Layers,
   Building2,
   ShieldCheck,
-  ChevronLeft,
   ChevronRight,
   Check,
-  X
+  X,
+  MessageSquare,
+  HelpCircle,
+  Plus,
+  Download,
+  Clock,
+  FileSpreadsheet,
+  Home
 } from 'lucide-react';
 
 interface EnterpriseHeaderProps {
   onToggleSidebar: () => void;
+  onOpenHelp?: () => void;
 }
 
-export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSidebar }) => {
+export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSidebar, onOpenHelp }) => {
   const { user, logout, switchRole, role, permissions } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Search & Drill-Down Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchCategory, setSearchCategory] = useState<'all' | 'employees' | 'departments' | 'reports' | 'security'>('all');
 
-  // Notifications State
-  const [unreadCount, setUnreadCount] = useState(2);
+  // Notifications & Messages State
+  const [unreadCount, setUnreadCount] = useState(3);
   const [notifications, setNotifications] = useState([
-    { id: '1', title: 'Q2 Headcount Report Ready', subtitle: 'HR Operations', time: '5m ago', type: 'info', path: '/hr/reports', read: false },
-    { id: '2', title: 'Security Audit Verified', subtitle: 'System Governance', time: '1h ago', type: 'success', path: '/admin/audit-logs', read: false },
-    { id: '3', title: 'Leave Approvals Queue', subtitle: '3 Pending Requests', time: '2h ago', type: 'warning', path: '/manager/approvals', read: true },
+    { id: '1', title: 'Attendance Alert: 3 Late Clock-Ins', subtitle: 'HR Operations', time: '5m ago', type: 'warning', path: '/hr/attendance', read: false },
+    { id: '2', title: 'Leave Request Pending Review', subtitle: 'Sarah Connor (Engineering)', time: '45m ago', type: 'info', path: '/manager/approvals', read: false },
+    { id: '3', title: 'System Security Audit Completed', subtitle: 'Compliance Stream', time: '2h ago', type: 'success', path: '/admin/audit-logs', read: false },
   ]);
 
   // Dropdown States
-  const [activeDropdown, setActiveDropdown] = useState<'profile' | 'role' | 'notif' | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<'profile' | 'role' | 'notif' | 'messages' | null>(null);
 
-  // Drill-Down Scope State
-  const [drillDownView, setDrillDownView] = useState<'roles' | 'departments'>('roles');
+  // Scope State
   const [selectedDept, setSelectedDept] = useState<string>('Global Operations');
   const [showPermissionsPreview, setShowPermissionsPreview] = useState(false);
   const [deptToast, setDeptToast] = useState<string | null>(null);
-
-  const availableRoles: Role[] = [Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE];
-  
-  const departmentsList = [
-    { id: 'eng', name: 'Engineering & Technology', code: 'ENG', head: 'David Sterling' },
-    { id: 'hr', name: 'Human Resources & Talent', code: 'HR', head: 'Elena Rostova' },
-    { id: 'prod', name: 'Product & UX Design', code: 'DES', head: 'Sarah Connor' },
-    { id: 'ops', name: 'Global Operations', code: 'OPS', head: 'Marcus Vance' },
-    { id: 'sales', name: 'Enterprise Sales', code: 'SALES', head: 'Alex Mercer' },
-  ];
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const searchResultsMap = [
     { title: 'Global Headcount & Department Analytics', category: 'reports', path: '/admin/analytics' },
@@ -91,9 +88,8 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const toggleDropdown = (name: 'profile' | 'role' | 'notif') => {
+  const toggleDropdown = (name: 'profile' | 'role' | 'notif' | 'messages') => {
     setActiveDropdown((prev) => (prev === name ? null : name));
-    setDrillDownView('roles');
   };
 
   const handleRoleChange = (newRole: Role) => {
@@ -101,13 +97,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     setActiveDropdown(null);
     const targetPath = ROLE_HOME_PATHS[newRole] || '/employee/dashboard';
     navigate(targetPath);
-  };
-
-  const handleDeptSelect = (deptName: string) => {
-    setSelectedDept(deptName);
-    setActiveDropdown(null);
-    setDeptToast(`Scope switched to ${deptName}`);
-    setTimeout(() => setDeptToast(null), 3000);
   };
 
   const handleSearchSubmit = (path: string) => {
@@ -121,8 +110,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     setUnreadCount(0);
   };
 
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-
   const handleLogoutClick = () => {
     setActiveDropdown(null);
     setShowLogoutModal(true);
@@ -134,6 +121,72 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     navigate('/login');
   };
 
+  // Dynamic Breadcrumb Generator based on Route
+  const getBreadcrumbItems = () => {
+    const path = location.pathname;
+    if (path.includes('/admin/employees') || path.includes('/hr/employees')) {
+      return [
+        { label: 'Workforce', path: '/admin/dashboard' },
+        { label: 'Employees', path: '/admin/employees', active: true },
+      ];
+    }
+    if (path.includes('/hr/attendance') || path.includes('/employee/attendance')) {
+      return [
+        { label: 'Attendance', path: '/hr/attendance' },
+        { label: 'My Attendance', path: '/employee/attendance', active: true },
+      ];
+    }
+    if (path.includes('/hr/performance') || path.includes('/employee/performance')) {
+      return [
+        { label: 'Performance', path: '/hr/performance' },
+        { label: 'Goals & KPIs', path: '/hr/performance#kpis', active: true },
+      ];
+    }
+    if (path.includes('/hr/reports') || path.includes('/admin/analytics')) {
+      return [
+        { label: 'Reports', path: '/hr/reports' },
+        { label: 'Export Center', path: '/hr/reports#export', active: true },
+      ];
+    }
+    return [{ label: 'Dashboard', path: '/admin/dashboard', active: true }];
+  };
+
+  // Dynamic Contextual Action Buttons based on Page Route
+  const getPageContextActions = () => {
+    const path = location.pathname;
+    if (path.includes('/employees')) {
+      return (
+        <div className="hidden xl:flex items-center gap-2">
+          <Link to="/admin/employees#add" className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+            <Plus size={14} /> Add Employee
+          </Link>
+          <button onClick={() => navigate('/hr/reports#export')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
+            <Download size={14} /> Export
+          </button>
+        </div>
+      );
+    }
+    if (path.includes('/attendance')) {
+      return (
+        <div className="hidden xl:flex items-center gap-2">
+          <button onClick={() => navigate('/hr/attendance#clock')} className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+            <Clock size={14} /> Check In / Out
+          </button>
+        </div>
+      );
+    }
+    if (path.includes('/reports') || path.includes('/analytics')) {
+      return (
+        <div className="hidden xl:flex items-center gap-2">
+          <button onClick={() => navigate('/hr/reports#generate')} className="px-2.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+            <FileSpreadsheet size={14} /> Generate Report
+          </button>
+        </div>
+      );
+    }
+    return null;
+  };
+
   const filteredSearchResults = searchResultsMap.filter((item) => {
     const matchesCategory = searchCategory === 'all' || item.category === searchCategory;
     const matchesQuery = !searchQuery || item.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -141,7 +194,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
   });
 
   return (
-    <header className="h-[72px] px-6 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between gap-6 shadow-sm transition-colors">
+    <header className="h-[72px] px-6 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between gap-6 shadow-sm transition-colors font-sans shrink-0">
       {/* Toast Alert for Department Scope Switch */}
       {deptToast && (
         <div className="fixed top-20 right-6 z-50 bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-fadeIn">
@@ -149,32 +202,48 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </div>
       )}
 
-      {/* Left Section: Logo, Application Title, Subtitle, Hamburger Menu */}
+      {/* LEFT SECTION: Sidebar Toggle, Stackly Logo & Dynamic Breadcrumb Navigation */}
       <div className="flex items-center gap-4 shrink-0">
         <button
           onClick={onToggleSidebar}
           aria-label="Toggle Sidebar Menu"
           className="p-2 rounded-xl text-slate-400 hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] transition-all hover:scale-105 border border-transparent hover:border-[var(--border-color)]"
-          title="Toggle Navigation Menu"
+          title="Toggle Navigation Sidebar"
         >
-          <Menu size={24} strokeWidth={2} />
+          <Menu size={22} strokeWidth={2} />
         </button>
 
         <div className="flex items-center gap-3">
-          <StacklyLogo size={32} showText={false} />
-          <div className="flex flex-col justify-center">
-            <h1 className="text-[22px] md:text-[24px] font-bold tracking-tight text-[var(--text-primary)] leading-tight font-sans">
-              Workforce Analytics
-            </h1>
-            <p className="text-[12px] font-medium text-slate-400 leading-none mt-0.5 hidden sm:block">
-              Enterprise Workforce Intelligence Platform
-            </p>
+          <StacklyLogo size={30} showText={false} />
+
+          {/* Dynamic Breadcrumbs & Page Context Actions */}
+          <div className="flex items-center gap-3">
+            <nav className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+              <Link to="/" className="hover:text-blue-500 flex items-center gap-1 transition-colors">
+                <Home size={14} />
+              </Link>
+              {getBreadcrumbItems().map((crumb, idx) => (
+                <React.Fragment key={idx}>
+                  <ChevronRight size={12} className="text-slate-500 shrink-0" />
+                  {crumb.active ? (
+                    <span className="font-extrabold text-[var(--text-primary)]">{crumb.label}</span>
+                  ) : (
+                    <Link to={crumb.path} className="hover:text-blue-500 transition-colors">
+                      {crumb.label}
+                    </Link>
+                  )}
+                </React.Fragment>
+              ))}
+            </nav>
+
+            {/* Optional Page Context Actions */}
+            {getPageContextActions()}
           </div>
         </div>
       </div>
 
-      {/* Center Section: Global Search Bar */}
-      <div className="hidden lg:flex items-center max-w-[400px] w-full relative">
+      {/* CENTER SECTION: Fixed Global Search Bar */}
+      <div className="hidden lg:flex items-center max-w-[420px] w-full relative">
         <div className="relative w-full flex items-center">
           <Search size={16} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
           <input
@@ -188,7 +257,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
               }
             }}
             aria-label="Global Search"
-            placeholder={`Search ${searchCategory === 'all' ? 'platform' : searchCategory}...`}
+            placeholder="Search employees, reports, departments..."
             className="w-full pl-9 pr-24 py-2 text-xs rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500 shadow-inner transition-colors"
           />
           <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-[var(--bg-primary)] px-2 py-0.5 rounded-lg border border-[var(--border-color)] pointer-events-none hidden xl:flex items-center gap-1 shrink-0">
@@ -196,9 +265,9 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           </kbd>
         </div>
 
-        {/* Search Dropdown */}
+        {/* Search Results Dropdown */}
         {searchFocused && (
-          <div className="absolute left-0 right-0 top-full mt-2 p-4 shadow-2xl z-50 bg-[var(--bg-secondary)] border border-[var(--border-color)] backdrop-blur-xl rounded-2xl space-y-3 text-[var(--text-primary)]">
+          <div className="absolute left-0 right-0 top-full mt-2 p-4 shadow-2xl z-50 bg-[var(--bg-secondary)] border border-[var(--border-color)] backdrop-blur-xl rounded-2xl space-y-3 text-[var(--text-primary)] animate-fadeIn">
             <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2.5">
               <span className="text-xs font-bold text-[var(--text-muted)] flex items-center gap-1.5">
                 <Filter size={14} strokeWidth={2} /> Category Scope
@@ -249,9 +318,9 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         )}
       </div>
 
-      {/* Right Section: Notifications, Theme Toggle, Scope Selector & Profile */}
+      {/* RIGHT SECTION: Notification Bell, Messages, Theme Toggle, Help Icon & User Profile */}
       <div className="flex items-center gap-3 shrink-0">
-        {/* Notifications Dropdown */}
+        {/* 1. Notification Bell Icon & Dropdown */}
         <div className="relative">
           <button
             onClick={() => toggleDropdown('notif')}
@@ -261,12 +330,12 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           >
             <Bell size={20} strokeWidth={2} />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#EF4444] border-2 border-[var(--bg-secondary)] animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-[var(--bg-secondary)] animate-pulse" />
             )}
           </button>
 
           {activeDropdown === 'notif' && (
-            <div className="absolute right-0 mt-2 w-80 bg-[var(--bg-secondary)] border border-[var(--border-color)] py-3 px-4 shadow-2xl z-50 rounded-2xl space-y-3 text-[var(--text-primary)]">
+            <div className="absolute right-0 mt-2 w-80 bg-[var(--bg-secondary)] border border-[var(--border-color)] py-3 px-4 shadow-2xl z-50 rounded-2xl space-y-3 text-[var(--text-primary)] animate-fadeIn">
               <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
                 <span className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
                   <Sparkles size={16} strokeWidth={2} className="text-blue-500" /> Notifications
@@ -306,7 +375,17 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           )}
         </div>
 
-        {/* Theme Toggle */}
+        {/* 2. Messages Icon Dropdown */}
+        <button
+          onClick={() => toggleDropdown('messages')}
+          aria-label="View Messages"
+          className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-[var(--text-primary)] transition-all hover:scale-105 relative hidden sm:block"
+          title="Team Messages"
+        >
+          <MessageSquare size={20} strokeWidth={2} />
+        </button>
+
+        {/* 3. Theme Toggle (Light / Dark Navy) */}
         <button
           onClick={toggleTheme}
           aria-label="Toggle Light or Dark Theme"
@@ -316,118 +395,17 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           {theme === 'dark' ? <Sun size={20} strokeWidth={2} className="text-[#F59E0B]" /> : <Moon size={20} strokeWidth={2} className="text-[#2563EB]" />}
         </button>
 
-        {/* Security Scope & Department Dropdown Selector */}
-        <div className="relative hidden md:block">
-          <button
-            onClick={() => toggleDropdown('role')}
-            aria-label="Switch Security Role Scope"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold hover:border-[#2563EB] transition-colors"
-          >
-            <span className={`badge ${getRoleBadgeClass(role)}`}>
-              {ROLE_LABELS[role]}
-            </span>
-            <span className="text-[11px] text-slate-400 hidden xl:inline-block">• {selectedDept}</span>
-            <ChevronDown size={14} strokeWidth={2} className="text-slate-400" />
-          </button>
+        {/* 4. Help Center & IT Support Desk Icon */}
+        <button
+          onClick={onOpenHelp}
+          aria-label="Help & IT Desk Support"
+          className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-[var(--text-primary)] transition-all hover:scale-105 hidden md:block"
+          title="24/7 Enterprise Help & IT Support"
+        >
+          <HelpCircle size={20} strokeWidth={2} />
+        </button>
 
-          {/* Scope Menu Dropdown */}
-          {activeDropdown === 'role' && (
-            <div className="absolute right-0 mt-2 w-80 bg-[var(--bg-secondary)] border border-[var(--border-color)] p-3.5 shadow-2xl z-50 rounded-2xl space-y-3 text-[var(--text-primary)] max-h-[85vh] overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2.5 shrink-0">
-                <div className="flex items-center gap-1 text-[11px] font-bold">
-                  {drillDownView !== 'roles' && (
-                    <button
-                      onClick={() => setDrillDownView('roles')}
-                      className="p-1 rounded hover:bg-[var(--bg-tertiary)] text-blue-500"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                  )}
-                  <span className="text-slate-400 uppercase tracking-wider">
-                    {drillDownView === 'roles' ? 'Security Role Scope' : 'Department Scope'}
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setDrillDownView('roles')}
-                    className={`px-2 py-0.5 text-[10px] font-bold rounded ${drillDownView === 'roles' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
-                  >
-                    Roles
-                  </button>
-                  <button
-                    onClick={() => setDrillDownView('departments')}
-                    className={`px-2 py-0.5 text-[10px] font-bold rounded ${drillDownView === 'departments' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
-                  >
-                    Depts
-                  </button>
-                </div>
-              </div>
-
-              {/* View 1: Role Switcher */}
-              {drillDownView === 'roles' && (
-                <div className="space-y-1 overflow-y-auto max-h-[340px] pr-1">
-                  {availableRoles.map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => handleRoleChange(r as Role)}
-                      className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center justify-between transition-colors ${
-                        role === r ? 'font-black text-blue-500 bg-blue-500/10 border border-blue-500/30' : 'text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <ShieldCheck size={16} className={role === r ? 'text-blue-500' : 'text-slate-400'} />
-                        <span className="truncate">{ROLE_LABELS[r as Role]}</span>
-                      </div>
-                      {role === r ? (
-                        <CheckCircle2 size={16} strokeWidth={2} className="text-blue-500 shrink-0" />
-                      ) : (
-                        <ChevronRight size={14} className="text-slate-400 shrink-0" />
-                      )}
-                    </button>
-                  ))}
-
-                  <div className="pt-2 border-t border-[var(--border-color)]">
-                    <button
-                      onClick={() => setDrillDownView('departments')}
-                      className="w-full px-3 py-2 text-xs text-[var(--text-primary)] font-bold bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] rounded-xl flex items-center justify-between transition-colors"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Building2 size={14} className="text-purple-400" /> Drill Down Department
-                      </span>
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* View 2: Department Drill-Down Level */}
-              {drillDownView === 'departments' && (
-                <div className="space-y-1.5 overflow-y-auto max-h-[340px] pr-1">
-                  <p className="text-[10px] font-bold text-slate-400 px-1 mb-1 uppercase">Select Organizational Scope:</p>
-                  {departmentsList.map((dept) => (
-                    <button
-                      key={dept.id}
-                      onClick={() => handleDeptSelect(dept.name)}
-                      className={`w-full text-left p-2.5 rounded-xl border text-xs transition-colors flex items-center justify-between ${
-                        selectedDept === dept.name
-                          ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 font-bold'
-                          : 'bg-[var(--bg-tertiary)] border-[var(--border-color)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
-                      }`}
-                    >
-                      <div>
-                        <p className="font-semibold">{dept.name}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">Head: {dept.head}</p>
-                      </div>
-                      <span className="badge badge-info text-[9px]">{dept.code}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* User Profile Avatar & Dropdown Menu */}
+        {/* 5. User Profile Avatar & Dropdown */}
         {user && (
           <div className="relative border-l border-[var(--border-color)] pl-3">
             <button
@@ -439,16 +417,20 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                 <img
                   src={user.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
                   alt={user.name}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-[#2563EB] shrink-0 shadow-md"
+                  className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shrink-0 shadow-md"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#22C55E] border-2 border-[var(--bg-secondary)]" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[var(--bg-secondary)]" />
+              </div>
+              <div className="hidden xl:flex flex-col text-left">
+                <span className="text-xs font-bold text-[var(--text-primary)] leading-tight">{user.name || 'Maheswari Pinneti'}</span>
+                <span className="text-[10px] text-slate-400 leading-none mt-0.5">{ROLE_LABELS[role]}</span>
               </div>
               <ChevronDown size={14} strokeWidth={2} className="text-slate-400 hidden sm:block" />
             </button>
 
+            {/* Profile Dropdown */}
             {activeDropdown === 'profile' && (
-              <div className="absolute right-0 mt-2 w-64 bg-[var(--bg-secondary)] border border-[var(--border-color)] py-2 shadow-2xl z-50 text-xs rounded-2xl text-[var(--text-primary)]">
-                {/* User Info Header */}
+              <div className="absolute right-0 mt-2 w-64 bg-[var(--bg-secondary)] border border-[var(--border-color)] py-2 shadow-2xl z-50 text-xs rounded-2xl text-[var(--text-primary)] animate-fadeIn">
                 <div className="px-4 py-3 border-b border-[var(--border-color)]">
                   <p className="font-bold text-sm text-[var(--text-primary)]">{user.name}</p>
                   <p className="text-[11px] text-slate-400">{user.email}</p>
@@ -463,7 +445,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                   </div>
                 </div>
 
-                {/* Drill-Down Permissions Matrix Accordion */}
                 {showPermissionsPreview && (
                   <div className="p-3 bg-[var(--bg-primary)] border-b border-[var(--border-color)] text-[10px] space-y-1.5 max-h-36 overflow-y-auto">
                     <p className="font-extrabold text-slate-400 uppercase tracking-wider">Active Permissions ({permissions.length})</p>
@@ -477,25 +458,24 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                   </div>
                 )}
 
-                {/* Navigation Items */}
                 <div className="py-1.5 space-y-0.5 font-medium">
                   <button
                     onClick={() => { navigate('/employee/profile'); setActiveDropdown(null); }}
                     className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
                   >
-                    <UserIcon size={18} strokeWidth={2} className="text-[#2563EB]" /> View Profile
+                    <UserIcon size={18} strokeWidth={2} className="text-blue-500" /> My Profile
                   </button>
                   <button
                     onClick={() => { navigate('/admin/settings'); setActiveDropdown(null); }}
                     className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
                   >
-                    <Settings size={18} strokeWidth={2} className="text-[#4F46E5]" /> My Settings
+                    <Settings size={18} strokeWidth={2} className="text-indigo-500" /> Account Settings
                   </button>
                   <button
                     onClick={() => { navigate('/admin/roles'); setActiveDropdown(null); }}
                     className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
                   >
-                    <Shield size={18} strokeWidth={2} className="text-[#F59E0B]" /> Security Policy
+                    <Shield size={18} strokeWidth={2} className="text-amber-500" /> Security
                   </button>
                 </div>
 
