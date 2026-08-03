@@ -1,6 +1,7 @@
-# Workforce Analytics Dashboard - MVP Enterprise Architecture
+# WORKFORCE ANALYTICS DASHBOARD
+## Enterprise System Architecture & Technical Specifications (MVP Design Pattern)
 
-This document defines the 5-layer Model-View-Presenter (MVP) enterprise architecture, authentication flow, RBAC + DBAC security architecture, request sequence flow, database ER model, and frontend directory structure for the **Workforce Analytics Dashboard**.
+The **Workforce Analytics Dashboard** is an enterprise-grade workforce intelligence platform built on a 5-Layer **Model-View-Presenter (MVP)** architecture pattern. This document provides complete architectural specifications, layer responsibilities, sequence flows, security boundaries, and database entity relationships.
 
 ---
 
@@ -11,29 +12,29 @@ This document defines the 5-layer Model-View-Presenter (MVP) enterprise architec
 title: "Workforce Analytics Dashboard - MVP Enterprise Architecture"
 ---
 flowchart TD
-    subgraph USERS["Enterprise Users"]
-        U1["Admin (System Admin)"]
-        U2["HR Manager (HR Ops)"]
-        U3["Dept Manager (Engineering / Finance / Sales)"]
+    subgraph USERS["Enterprise Users (5 Role Tiers)"]
+        U1["Admin (System Administrator)"]
+        U2["HR Manager (HR Operations)"]
+        U3["Dept Manager (Department Head)"]
         U4["Team Lead (Sprint Lead)"]
         U5["Employee (Self-Service)"]
     end
 
-    subgraph VIEW["PRESENTATION LAYER (VIEW - React 18 + TS + Vite)"]
+    subgraph VIEW["1. PRESENTATION LAYER (VIEW)"]
         V_LOGIN["Login Page"]
-        V_DASH["Dashboard & KPI Cards"]
-        V_EMP["Employee Dashboard"]
-        V_ATT["Attendance Dashboard"]
-        V_PERF["Performance Dashboard"]
-        V_REP["Reports Dashboard"]
+        V_DASH["Admin Dashboard"]
+        V_EMP_DASH["Employee Dashboard"]
+        V_ATT_DASH["Attendance Dashboard"]
+        V_PERF_DASH["Performance Dashboard"]
+        V_REP_DASH["Reports Dashboard"]
         V_USER_MGMT["User Management"]
         V_ROLE_MGMT["Role Management"]
         V_PERM_MGMT["Permission Management"]
-        V_SETT["System Settings"]
-        V_COMP["Recharts, Tables & Filter Bars"]
+        V_SETTINGS["System Settings"]
+        V_COMPONENTS["UI Components (Recharts, Tables, Filters)"]
     end
 
-    subgraph PRESENTER["PRESENTER LAYER (State & Event Validation)"]
+    subgraph PRESENTER["2. PRESENTER LAYER (UI Logic & ViewModel)"]
         P_AUTH["Authentication Presenter"]
         P_DASH["Dashboard Presenter"]
         P_EMP["Employee Presenter"]
@@ -43,7 +44,7 @@ flowchart TD
         P_PERM["Permission Presenter"]
     end
 
-    subgraph BUSINESS["BUSINESS LAYER (Business Services & Rules)"]
+    subgraph BUSINESS["3. BUSINESS LAYER (Core Business Services)"]
         B_AUTH["Authentication Service"]
         B_USER["User Management Service"]
         B_ROLE["Role Service"]
@@ -57,7 +58,7 @@ flowchart TD
         B_NOTIF["Notification Service"]
     end
 
-    subgraph PERSISTENCE["PERSISTENCE LAYER (Repositories & Data Access)"]
+    subgraph PERSISTENCE["4. PERSISTENCE LAYER (Repositories)"]
         R_USER["User Repository"]
         R_EMP["Employee Repository"]
         R_ROLE["Role Repository"]
@@ -70,7 +71,7 @@ flowchart TD
         R_REP["Report Repository"]
     end
 
-    subgraph DB["DATABASE LAYER (Relational Schema)"]
+    subgraph DB["5. DATABASE LAYER (Relational Storage)"]
         DB_USERS[("USERS")]
         DB_ROLES[("ROLES")]
         DB_PERMS[("PERMISSIONS")]
@@ -94,12 +95,64 @@ flowchart TD
 
 ---
 
-## 2. Authentication Flow
+## 2. Detailed Layer Specifications
+
+### 1. Presentation Layer (View)
+- **Components**: `Login Page`, `Dashboard`, `Employee Dashboard`, `Attendance Dashboard`, `Performance Dashboard`, `Reports Dashboard`, `User Management`, `Role Management`, `Permission Management`, `Settings`, `Charts`, `Tables`, `Filters`.
+- **Responsibilities**:
+  - Render dynamic user interfaces & glassmorphism components.
+  - Receive user mouse/keyboard input events.
+  - Render real-time SVG charts (Recharts) and data tables.
+  - Display role-based views dynamically based on user session state.
+- **Technologies**: React 18/19, TypeScript, Vite, React Router, Redux Toolkit, React Query, Material UI, Tailwind CSS, Recharts.
+
+### 2. Presenter Layer
+- **Components**: `Authentication Presenter`, `Dashboard Presenter`, `Employee Presenter`, `Attendance Presenter`, `Performance Presenter`, `Report Presenter`, `Permission Presenter`.
+- **Responsibilities**:
+  - Connect View components with Business Layer services.
+  - Intercept UI events and validate user action prerequisites.
+  - Transform raw DTO responses into UI ViewModels.
+  - Validate form fields and user permissions before dispatching.
+
+### 3. Business Layer
+- **Services**: `Authentication Service`, `User Management Service`, `Role Service`, `Permission Service`, `Employee Service`, `Department Service`, `Attendance Service`, `Performance Service`, `Payroll Service`, `Report Service`, `Notification Service`.
+- **Responsibilities**:
+  - Execute business rules & KPI calculation logic.
+  - Enforce RBAC validation & DBAC department access boundaries.
+  - Handle approval workflows & event notifications.
+- **Business Rule Example**:
+  ```text
+  IF user.role == "ENGINEERING_MANAGER" AND department == "ENGINEERING":
+      ALLOW: Engineering analytics & team metrics
+      DENY: Finance payroll & salary records
+  ```
+
+### 4. Persistence Layer
+- **Repositories**: `User Repository`, `Employee Repository`, `Role Repository`, `Permission Repository`, `Department Repository`, `Team Repository`, `Attendance Repository`, `Performance Repository`, `Payroll Repository`, `Report Repository`.
+- **Responsibilities**:
+  - Abstract database communication and query construction.
+  - Perform CRUD operations and data mapping.
+  - Manage database transactions and connection pools.
+
+### 5. Database Layer
+- **Tables**: `USERS`, `ROLES`, `PERMISSIONS`, `ROLE_PERMISSIONS`, `DEPARTMENTS`, `TEAMS`, `EMPLOYEES`, `ATTENDANCE`, `PERFORMANCE`, `PAYROLL`, `REPORTS`, `AUDIT_LOGS`.
+- **Relationships**:
+  - User belongs to Role (`USERS.role_id -> ROLES.role_id`)
+  - User belongs to Department (`USERS.department_id -> DEPARTMENTS.department_id`)
+  - Department contains Teams (`DEPARTMENTS -> TEAMS`)
+  - Team contains Employees (`TEAMS -> EMPLOYEES`)
+  - Role contains Permissions (`ROLES -> ROLE_PERMISSIONS -> PERMISSIONS`)
+  - Employee has Attendance (`EMPLOYEES -> ATTENDANCE`)
+  - Employee has Performance (`EMPLOYEES -> PERFORMANCE`)
+
+---
+
+## 3. Authentication & Security Flow
 
 ```mermaid
 sequenceDiagram
     autonumber
-    title: Workforce Analytics Dashboard - Authentication & Security Flow
+    title: Workforce Analytics Dashboard - Authentication Flow
     actor User
     participant View as Login Page (View)
     participant Pres as Auth Presenter
@@ -108,33 +161,33 @@ sequenceDiagram
     participant JWT as JWT Issuer
     participant DB as PostgreSQL Database
 
-    User->>View: 1. Enter Email (e.g. employee@company.com) & Password
+    User->>View: 1. Enter Corporate Email (@company.com) & Password
     View->>Pres: 2. Submit Credentials
     
-    alt Invalid Email Domain (e.g. @gmail.com)
-        Pres-->>View: Reject (Domain Access Denied)
-        View-->>User: Display Error: Only @company.com permitted
+    alt Invalid Email Domain (e.g. user@gmail.com)
+        Pres-->>View: Reject Authentication (Invalid Domain)
+        View-->>User: Error: Only official @company.com emails permitted
     else Valid Corporate Domain (@company.com)
-        Pres->>AuthSvc: 3. Validate Password Hash
-        AuthSvc->>DB: Query User & Password Hash
+        Pres->>AuthSvc: 3. Verify Password Hash
+        AuthSvc->>DB: Query User & Credentials
         DB-->>AuthSvc: User Record Data
         
-        alt Password Mismatch
+        alt Invalid Password
             AuthSvc-->>Pres: Authentication Failed
-            Pres-->>View: Display Error: Invalid Credentials
-        else Password Verified
-            AuthSvc->>MFA: 4. Trigger MFA Challenge (OTP / Authenticator)
-            MFA-->>User: Send 6-Digit Code
+            Pres-->>View: Error: Invalid Credentials
+        else Password Validated
+            AuthSvc->>MFA: 4. Trigger MFA Challenge (OTP Code)
+            MFA-->>User: Send 6-Digit Verification Code
             User->>View: 5. Enter MFA Code (123456)
             View->>Pres: Submit MFA Code
             
-            alt MFA Code Invalid
-                Pres-->>View: Display Error: MFA Verification Failed
-            else MFA Code Valid
-                Pres->>JWT: 6. Issue JWT Access Token & Refresh Token
-                JWT-->>Pres: Return JWT Token & Claims (Role, Dept, Perms)
-                Pres->>View: Store JWT Session & Redirect
-                View-->>User: 7. Display Authorized Dashboard
+            alt MFA Failed
+                Pres-->>View: Error: Invalid MFA OTP Code
+            else MFA Succeeded
+                Pres->>JWT: 6. Generate JWT Access Token & Refresh Token
+                JWT-->>Pres: Return Token with Claims (Role, Dept, Permissions)
+                Pres->>View: Store JWT Session & Set Auth State
+                View-->>User: 7. Redirect to Authorized Dashboard
             end
         end
     end
@@ -142,100 +195,99 @@ sequenceDiagram
 
 ---
 
-## 3. RBAC + Department Access (DBAC) Architecture
+## 4. RBAC + Department Access (DBAC) Architecture
 
 ```mermaid
 ---
-title: "Workforce Analytics Dashboard - RBAC + Department Access (DBAC) Architecture"
+title: "Workforce Analytics Dashboard - RBAC + Department Access Architecture"
 ---
 flowchart TD
-    subgraph ROLES["RBAC Hierarchy (5 Level Tiers)"]
-        LEVEL1["LEVEL 1: ADMIN<br/>(Full Organization Access)"]
-        LEVEL2["LEVEL 2: HR MANAGER<br/>(Workforce & Recruitment Scope)"]
-        LEVEL3["LEVEL 3: DEPARTMENT MANAGER<br/>(Single Department DBAC Boundary)"]
-        LEVEL4["LEVEL 4: TEAM LEAD<br/>(Assigned Team Members Scope)"]
-        LEVEL5["LEVEL 5: EMPLOYEE<br/>(Self Data Only Scope)"]
+    subgraph ROLES["RBAC Role Hierarchy"]
+        R1["ADMIN (Level 1 - Full Governance)"]
+        R2["HR MANAGER (Level 2 - Org HR Ops)"]
+        R3["DEPARTMENT MANAGER (Level 3 - Dept DBAC Boundary)"]
+        R4["TEAM LEAD (Level 4 - Sprint Team Scope)"]
+        R5["EMPLOYEE (Level 5 - Self-Service Only)"]
 
-        LEVEL1 --> LEVEL2
-        LEVEL2 --> LEVEL3
-        LEVEL3 --> LEVEL4
-        LEVEL4 --> LEVEL5
+        R1 --> R2
+        R2 --> R3
+        R3 --> R4
+        R4 --> R5
     end
 
-    subgraph DBAC["Department Access Control (DBAC Boundary)"]
+    subgraph DEPARTMENTS["DBAC Department Boundaries"]
         D_HR["Human Resources"]
-        D_ENG["Engineering<br/>(Frontend, Backend, QA, DevOps)"]
-        D_FIN["Finance<br/>(Payroll & Salary)"]
-        D_SALES["Sales<br/>(Quota & Pipelines)"]
-        D_MKT["Marketing<br/>(Campaigns)"]
-        D_OPS["Operations<br/>(Logistics)"]
-        D_SUPP["Customer Support<br/>(Ticket SLAs)"]
+        D_ENG["Engineering"]
+        D_FIN["Finance"]
+        D_SALES["Sales"]
+        D_MKT["Marketing"]
+        D_OPS["Operations"]
+        D_SUPP["Customer Support"]
     end
 
-    subgraph MATRIX["Permission Level Matrix"]
-        P_SYS["System Config & Audit Logs"]
-        P_EMP["Employee Directory & HR"]
-        P_DEPT["Department Analytics & Approvals"]
-        P_TEAM["Sprint Tasks & Attendance"]
-        P_SELF["Personal Dashboard & Payslips"]
+    subgraph SCOPE["Access Permission Scopes"]
+        P1["Full Platform & System Settings"]
+        P2["Workforce Directory & Recruitment"]
+        P3["Department Analytics & Approvals"]
+        P4["Team Sprint & Attendance Tracking"]
+        P5["Personal Profile & Payslip View"]
     end
 
-    LEVEL1 -.->|Full Access| D_HR & D_ENG & D_FIN & D_SALES & D_MKT & D_OPS & D_SUPP
-    LEVEL2 -.->|All Employees| D_HR & D_ENG & D_FIN & D_SALES & D_MKT & D_OPS & D_SUPP
-    LEVEL3 -.->|Scoped DBAC| D_ENG
-    LEVEL3 -.->|Scoped DBAC| D_FIN
-    LEVEL3 -.->|Scoped DBAC| D_SALES
-    LEVEL4 -.->|Direct Reports| D_ENG
-    LEVEL5 -.->|Self Record| D_ENG
+    R1 -.->|Unrestricted Access| D_HR & D_ENG & D_FIN & D_SALES & D_MKT & D_OPS & D_SUPP
+    R2 -.->|All Departments| D_HR & D_ENG & D_FIN & D_SALES & D_MKT & D_OPS & D_SUPP
+    R3 -.->|Scoped DBAC Boundary| D_ENG
+    R3 -.->|Scoped DBAC Boundary| D_FIN
+    R4 -.->|Assigned Team Only| D_ENG
+    R5 -.->|Self Record Only| D_ENG
 
-    LEVEL1 --> P_SYS
-    LEVEL2 --> P_EMP
-    LEVEL3 --> P_DEPT
-    LEVEL4 --> P_TEAM
-    LEVEL5 --> P_SELF
+    R1 --> P1
+    R2 --> P2
+    R3 --> P3
+    R4 --> P4
+    R5 --> P5
 ```
 
 ---
 
-## 4. Complete Request Flow
+## 5. Complete Request Flow
 
 ```mermaid
 sequenceDiagram
     autonumber
-    title: Workforce Analytics Dashboard - Complete MVP Request Flow
+    title: Workforce Analytics Dashboard - Complete Request Flow
     actor User
-    participant View as React View (UI)
+    participant View as React View Component
     participant Pres as Presenter Layer
     participant Svc as Business Service
-    participant Repo as Repository
-    participant DB as Database Layer
+    participant Repo as Repository Layer
+    participant DB as Database Engine
 
-    User->>View: 1. User Action (e.g. Click Approve Leave Request)
-    View->>Pres: 2. Dispatch UI Event (handleApproveLeave)
-    Pres->>Pres: 3. Validate Inputs & Check Permission Matrix
-    Pres->>Svc: 4. Execute Business Action (approveLeaveRequest)
-    Svc->>Svc: 5. Apply RBAC & DBAC Scoping (Validate Dept & Role)
+    User->>View: 1. User Action (e.g. Request Leave / Submit Evaluation)
+    View->>Pres: 2. Dispatch Action Event
+    Pres->>Pres: 3. Validate View State & Inputs
+    Pres->>Svc: 4. Invoke Business Service Operation
+    Svc->>Svc: 5. Enforce RBAC & DBAC Authorization Rules
     
-    alt Authorization Fails
-        Svc-->>Pres: 403 Forbidden Error
-        Pres-->>View: Display Authorization Denied Alert
-        View-->>User: Show Security Warning
-    else Authorization Passed
-        Svc->>Repo: 6. Request Database Update (updateLeaveStatus)
-        Repo->>DB: 7. Execute SQL Query / Transaction
-        DB-->>Repo: 8. SQL Query Result & Row Impact
-        Repo-->>Svc: 9. Repository Entity Response
-        Svc->>Svc: 10. Process KPI & Audit Log Event
-        Svc-->>Pres: 11. Return Formatted Business DTO
-        Pres->>Pres: 12. Transform DTO into ViewModel State
-        Pres-->>View: 13. Re-render View with Updated State
-        View-->>User: 14. Render Success Notification & Updated UI
+    alt Unauthorized Access
+        Svc-->>Pres: 403 Forbidden (DBAC Boundary Breach)
+        Pres-->>View: Show Permission Denied Alert
+        View-->>User: Display Security Warning
+    else Authorization Granted
+        Svc->>Repo: 6. Execute Repository Query Method
+        Repo->>DB: 7. Run SQL Prepared Statement / Transaction
+        DB-->>Repo: 8. Return Result Set / Affected Rows
+        Repo-->>Svc: 9. Return Data Entity
+        Svc->>Svc: 10. Compute Business Logic & Audit Event
+        Svc-->>Pres: 11. Return Business DTO Response
+        Pres->>Pres: 12. Format Data into View Model State
+        Pres-->>View: 13. Trigger Re-render with Updated Data
+        View-->>User: 14. Update UI Display & Render Confirmation
     end
 ```
 
 ---
 
-## 5. Database ER Diagram
+## 6. Database ER Diagram
 
 ```mermaid
 erDiagram
@@ -355,7 +407,7 @@ erDiagram
 
 ---
 
-## 6. Frontend Folder Architecture
+## 7. Frontend Folder Architecture
 
 ```mermaid
 ---
@@ -404,7 +456,7 @@ graph TD
 
 ---
 
-## 7. Security Architecture
+## 8. Security Architecture Flow
 
 ```mermaid
 ---
