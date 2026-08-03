@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../../auth/hooks/useAuth';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
@@ -16,6 +17,7 @@ import { UserCheck, Users, Briefcase, FileText, Plus, Clock, HeartHandshake, Sta
 import { Link } from 'react-router-dom';
 
 export const HRDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
@@ -28,6 +30,15 @@ export const HRDashboard: React.FC = () => {
     });
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Elena';
+
   const candidatePipeline = [
     { name: 'Michael Faraday', role: 'Staff Frontend Engineer', stage: 'Technical Interview', status: 'SCHEDULED' },
     { name: 'Ada Lovelace', role: 'Principal Systems Architect', stage: 'Final Leadership Round', status: 'IN_REVIEW' },
@@ -37,7 +48,7 @@ export const HRDashboard: React.FC = () => {
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]} requiredPermission={Permission.EMPLOYEE_READ}>
-      <div className="space-y-6 animate-fadeIn">
+      <div className="space-y-6 animate-fadeIn font-sans">
         {/* HR Header Banner */}
         <div className="p-6 rounded-2xl bg-gradient-to-r from-purple-950/50 via-slate-900 to-indigo-950/40 border border-purple-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
           <div className="flex items-center gap-4">
@@ -46,8 +57,8 @@ export const HRDashboard: React.FC = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black tracking-tight text-white">HR Operations & Talent Portal</h2>
-                <span className="badge badge-hr">WORKFORCE OPERATIONS</span>
+                <h2 className="text-2xl font-black tracking-tight text-white">{getGreeting()}, {firstName} 👋</h2>
+                <span className="badge badge-hr">HR OPERATIONS PORTAL</span>
               </div>
               <p className="text-xs text-slate-300 mt-1">
                 Workforce lifecycle, candidate recruitment, payroll analysis & employee attendance oversight.

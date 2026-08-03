@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../../auth/hooks/useAuth';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
@@ -33,6 +34,7 @@ import {
 import { Link } from 'react-router-dom';
 
 export const AdminDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
@@ -52,20 +54,29 @@ export const AdminDashboard: React.FC = () => {
     day: 'numeric',
   });
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Maheswari';
+
   return (
     <RoleGuard allowedRoles={[Role.ADMIN]} requiredPermission={Permission.SYSTEM_CONFIG}>
       <div className="space-y-6 animate-fadeIn font-sans">
-        {/* Morning Greeting & Quick Actions Header */}
+        {/* Dynamic Human Greeting & Quick Actions Header */}
         <div className="p-6 lg:p-8 rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-800 to-slate-900 text-white border border-blue-500/30 shadow-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
           <div className="space-y-2 z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold backdrop-blur-md border border-white/20">
               <Calendar size={14} className="text-blue-300" /> {currentDateFormatted}
             </div>
             <h2 className="text-2xl lg:text-3xl font-black tracking-tight">
-              Good Morning, John
+              {getGreeting()}, {firstName} 👋
             </h2>
             <p className="text-xs text-blue-100 font-medium">
-              Department: <span className="font-bold text-white">Executive Governance</span> • Role: <span className="font-bold text-amber-300">System Administrator</span>
+              Department: <span className="font-bold text-white">{user?.department || 'Executive Governance'}</span> • Scope: <span className="font-bold text-amber-300">System Administrator</span>
             </p>
           </div>
 
