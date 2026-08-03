@@ -8,27 +8,35 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
       groupTitle: 'Dashboard',
       items: [
         {
-          id: 'admin-overview',
-          title: 'Organization Overview',
+          id: 'admin-exec-overview',
+          title: 'Executive Overview',
           icon: 'LayoutDashboard',
           path: '/admin/dashboard',
           roles: [Role.ADMIN],
           permissions: [Permission.SYSTEM_CONFIG],
         },
         {
-          id: 'admin-workforce-analytics',
-          title: 'Workforce Analytics',
+          id: 'admin-workforce-kpis',
+          title: 'Workforce KPIs',
+          icon: 'PieChart',
+          path: '/admin/dashboard#kpis',
+          roles: [Role.ADMIN],
+        },
+        {
+          id: 'admin-org-analytics',
+          title: 'Organization Analytics',
           icon: 'BarChart3',
           path: '/admin/analytics',
           roles: [Role.ADMIN],
           permissions: [Permission.REPORT_VIEW_ALL],
         },
         {
-          id: 'admin-kpi-dash',
-          title: 'KPI Dashboard',
-          icon: 'PieChart',
-          path: '/admin/dashboard#kpi',
+          id: 'admin-realtime-insights',
+          title: 'Real-Time Insights',
+          icon: 'Zap',
+          path: '/admin/dashboard#insights',
           roles: [Role.ADMIN],
+          badge: { text: 'Live', variant: 'emerald' },
         },
       ],
     },
@@ -36,14 +44,35 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
       groupTitle: 'User Management',
       items: [
         {
-          id: 'admin-users',
-          title: 'Users',
+          id: 'admin-all-users',
+          title: 'All Users',
           icon: 'UserCog',
           path: '/admin/users',
           roles: [Role.ADMIN],
           permissions: [Permission.USER_MANAGE],
           badge: { text: 'Active', variant: 'blue' },
         },
+        {
+          id: 'admin-create-user',
+          title: 'Create User',
+          icon: 'UserPlus',
+          path: '/admin/users#create',
+          roles: [Role.ADMIN],
+          permissions: [Permission.USER_CREATE],
+        },
+        {
+          id: 'admin-user-directory',
+          title: 'User Directory',
+          icon: 'Users',
+          path: '/admin/users#directory',
+          roles: [Role.ADMIN],
+          permissions: [Permission.USER_MANAGE],
+        },
+      ],
+    },
+    {
+      groupTitle: 'Role & Permissions',
+      items: [
         {
           id: 'admin-roles',
           title: 'Roles',
@@ -60,10 +89,18 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           roles: [Role.ADMIN],
           permissions: [Permission.ROLE_MANAGE],
         },
+        {
+          id: 'admin-access-matrix',
+          title: 'Access Control Matrix',
+          icon: 'Layers',
+          path: '/admin/permissions#matrix',
+          roles: [Role.ADMIN],
+          permissions: [Permission.ROLE_MANAGE],
+        },
       ],
     },
     {
-      groupTitle: 'Organization',
+      groupTitle: 'Organization Structure',
       items: [
         {
           id: 'admin-depts',
@@ -89,7 +126,7 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
       ],
     },
     {
-      groupTitle: 'Employee Management',
+      groupTitle: 'Workforce Analytics',
       items: [
         {
           id: 'admin-emp-directory',
@@ -99,19 +136,35 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           roles: [Role.ADMIN],
           permissions: [Permission.EMPLOYEE_VIEW_ALL],
         },
+        {
+          id: 'admin-attrition-analytics',
+          title: 'Attrition Analytics',
+          icon: 'TrendingDown',
+          path: '/admin/analytics#attrition',
+          roles: [Role.ADMIN],
+          permissions: [Permission.REPORT_VIEW_ALL],
+        },
+        {
+          id: 'admin-workforce-trends',
+          title: 'Workforce Trends',
+          icon: 'TrendingUp',
+          path: '/admin/analytics#trends',
+          roles: [Role.ADMIN],
+          permissions: [Permission.REPORT_VIEW_ALL],
+        },
       ],
     },
     {
-      groupTitle: 'System & Governance',
+      groupTitle: 'System Settings',
       items: [
         {
-          id: 'admin-audit',
+          id: 'admin-audit-logs',
           title: 'Audit Logs',
           icon: 'History',
           path: '/admin/audit-logs',
           roles: [Role.ADMIN],
           permissions: [Permission.AUDIT_LOG_VIEW],
-          badge: { text: 'Live', variant: 'emerald' },
+          badge: { text: 'Stream', variant: 'emerald' },
         },
         {
           id: 'admin-settings',
@@ -127,19 +180,26 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
 
   [Role.HR]: [
     {
-      groupTitle: 'Core Operations',
+      groupTitle: 'Dashboard',
       items: [
         {
-          id: 'hr-dash',
-          title: 'HR Dashboard',
+          id: 'hr-overview',
+          title: 'HR Overview',
           icon: 'LayoutDashboard',
           path: '/hr/dashboard',
+          roles: [Role.HR],
+        },
+        {
+          id: 'hr-workforce-summary',
+          title: 'Workforce Summary',
+          icon: 'BarChart3',
+          path: '/hr/dashboard#summary',
           roles: [Role.HR],
         },
       ],
     },
     {
-      groupTitle: 'Employees',
+      groupTitle: 'Employee Management',
       items: [
         {
           id: 'hr-emp-directory',
@@ -160,10 +220,10 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
       ],
     },
     {
-      groupTitle: 'Workforce Operations',
+      groupTitle: 'Attendance & Leave',
       items: [
         {
-          id: 'hr-attendance',
+          id: 'hr-attendance-overview',
           title: 'Attendance Overview',
           icon: 'Clock',
           path: '/hr/attendance',
@@ -171,13 +231,18 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           permissions: [Permission.ATTENDANCE_VIEW_ALL],
         },
         {
-          id: 'hr-leave',
+          id: 'hr-leave-mgmt',
           title: 'Leave Management',
           icon: 'FileText',
           path: '/hr/leave',
           roles: [Role.HR],
-          badge: { text: '5 New', variant: 'rose' },
+          badge: { text: '5 Pending', variant: 'rose' },
         },
+      ],
+    },
+    {
+      groupTitle: 'Performance & Reports',
+      items: [
         {
           id: 'hr-performance',
           title: 'Performance Evaluation',
@@ -187,10 +252,10 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           permissions: [Permission.PERFORMANCE_MANAGE],
         },
         {
-          id: 'hr-payroll',
-          title: 'Payroll Reports',
-          icon: 'DollarSign',
-          path: '/hr/payroll-reports',
+          id: 'hr-reports',
+          title: 'Employee Reports',
+          icon: 'FileSpreadsheet',
+          path: '/hr/reports',
           roles: [Role.HR],
           permissions: [Permission.REPORT_VIEW],
         },
@@ -204,20 +269,20 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
       items: [
         {
           id: 'mgr-dash',
-          title: 'Manager Dashboard',
+          title: 'Department Overview',
           icon: 'LayoutDashboard',
           path: '/manager/dashboard',
           roles: [Role.MANAGER],
         },
         {
-          id: 'mgr-dept-overview',
-          title: 'Department Overview',
+          id: 'mgr-dept-employees',
+          title: 'Department Employees',
           icon: 'Building2',
           path: '/manager/team',
           roles: [Role.MANAGER],
         },
         {
-          id: 'mgr-dept-analytics',
+          id: 'mgr-analytics',
           title: 'Department Analytics',
           icon: 'BarChart3',
           path: '/manager/analytics',
@@ -226,7 +291,7 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
       ],
     },
     {
-      groupTitle: 'Operations & Approvals',
+      groupTitle: 'Team & Approvals',
       items: [
         {
           id: 'mgr-attendance',
@@ -237,7 +302,7 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           permissions: [Permission.ATTENDANCE_VIEW_TEAM],
         },
         {
-          id: 'mgr-approvals',
+          id: 'mgr-leave-approvals',
           title: 'Leave Approvals',
           icon: 'CheckCircle2',
           path: '/manager/approvals',
@@ -245,7 +310,7 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           badge: { text: '3 Review', variant: 'amber' },
         },
         {
-          id: 'mgr-perf-review',
+          id: 'mgr-performance-reviews',
           title: 'Performance Reviews',
           icon: 'TrendingUp',
           path: '/manager/performance',
@@ -262,14 +327,14 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
       items: [
         {
           id: 'tl-dash',
-          title: 'Team Dashboard',
+          title: 'Team Overview',
           icon: 'LayoutDashboard',
           path: '/team-lead/dashboard',
           roles: [Role.TEAM_LEAD],
         },
         {
           id: 'tl-tasks',
-          title: 'Task Status & Monitoring',
+          title: 'Task & Productivity',
           icon: 'ClipboardList',
           path: '/team-lead/tasks',
           roles: [Role.TEAM_LEAD],
@@ -296,7 +361,7 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
 
   [Role.EMPLOYEE]: [
     {
-      groupTitle: 'Personal Portal',
+      groupTitle: 'My Portal',
       items: [
         {
           id: 'emp-dash',
@@ -313,21 +378,21 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           roles: [Role.EMPLOYEE],
         },
         {
-          id: 'emp-att',
+          id: 'emp-attendance',
           title: 'My Attendance',
           icon: 'Clock',
           path: '/employee/attendance',
           roles: [Role.EMPLOYEE],
         },
         {
-          id: 'emp-leave',
+          id: 'emp-leave-requests',
           title: 'Leave Requests',
           icon: 'FileText',
           path: '/employee/leave',
           roles: [Role.EMPLOYEE],
         },
         {
-          id: 'emp-perf',
+          id: 'emp-performance',
           title: 'My Performance',
           icon: 'TrendingUp',
           path: '/employee/performance',

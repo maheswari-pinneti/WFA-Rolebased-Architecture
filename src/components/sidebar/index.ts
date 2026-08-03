@@ -6,6 +6,7 @@ export * from './SidebarMenu';
 export * from './MenuItem';
 export * from './MenuGroup';
 export * from './RoleMenu';
+export * from './RoleBasedMenu';
 export * from './PermissionGuard';
 export * from './SidebarFooter';
 export * from './types';
