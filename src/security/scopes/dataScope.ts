@@ -34,9 +34,27 @@ export const DEFAULT_ROLE_SCOPES: Record<Role, DataScope> = {
   [Role.EMPLOYEE]: 'SELF',
 };
 
+/**
+ * Department-Based Access Control (DBAC) Validation
+ * Evaluates whether a user has permission to access resources in a target department.
+ */
+export function validateDepartmentAccess(userDeptId: string | undefined, targetDeptId: string | undefined, userRole: Role): boolean {
+  if (userRole === Role.ADMIN || userRole === Role.HR) return true;
+  if (!userDeptId || !targetDeptId) return false;
+  if (userDeptId === targetDeptId) return true;
+  
+  // Parent Department Inheritance (e.g., 'Engineering' access to 'Engineering / Frontend')
+  if (targetDeptId.startsWith(userDeptId) || userDeptId.startsWith(targetDeptId)) {
+    return true;
+  }
+  return false;
+}
+
 export function validateDataScope(user: UserABACAttributes, resource: ResourceTarget): boolean {
   if (user.role === Role.ADMIN || user.role === Role.HR) return true;
-  if (user.role === Role.MANAGER && user.departmentId && user.departmentId === resource.departmentId) return true;
+  if (user.role === Role.MANAGER && user.departmentId) {
+    return validateDepartmentAccess(user.departmentId, resource.departmentId, user.role);
+  }
   if (user.role === Role.TEAM_LEAD && user.teamId && user.teamId === resource.teamId) return true;
   if (user.userId === resource.ownerId) return true;
   return false;
@@ -56,5 +74,9 @@ export class DataScopeEvaluator {
       default:
         return { scopeType: 'SELF', userId, level: 4 };
     }
+  }
+
+  public static canAccessDepartment(role: Role, userDept: string | undefined, targetDept: string): boolean {
+    return validateDepartmentAccess(userDept, targetDept, role);
   }
 }

@@ -26,3 +26,18 @@ export enum AuditSeverity {
   WARNING = 'WARNING',
   CRITICAL = 'CRITICAL',
 }
+
+export enum DepartmentType {
+  HUMAN_RESOURCES = 'Human Resources',
+  ENGINEERING = 'Engineering',
+  FRONTEND = 'Engineering / Frontend',
+  BACKEND = 'Engineering / Backend',
+  QA = 'Engineering / QA',
+  DEVOPS = 'Engineering / DevOps',
+  FINANCE = 'Finance',
+  SALES = 'Sales',
+  MARKETING = 'Marketing',
+  OPERATIONS = 'Operations',
+  CUSTOMER_SUPPORT = 'Customer Support',
+  ADMINISTRATION = 'Administration',
+}
