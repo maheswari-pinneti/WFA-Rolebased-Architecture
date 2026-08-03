@@ -304,7 +304,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       to={item.path}
                       onClick={() => setMobileOpen(false)}
                       title={collapsed ? item.label : undefined}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 group relative no-underline hover:no-underline text-inherit ${
                         active
                           ? 'bg-blue-600/15 border border-blue-500/50 text-blue-500 font-bold shadow-md shadow-blue-500/10'
                           : 'hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-transparent hover:border-[var(--border-color)]'

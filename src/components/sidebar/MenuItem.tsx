@@ -34,7 +34,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ item, collapsed, onSelect })
         to={item.path || '#'}
         onClick={onSelect}
         title={collapsed ? item.title : undefined}
-        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+        className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 group relative no-underline hover:no-underline text-inherit ${
           isActive
             ? 'bg-blue-600/15 border border-blue-500/50 text-blue-500 font-bold shadow-md shadow-blue-500/10'
             : 'hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-transparent hover:border-[var(--border-color)]'
