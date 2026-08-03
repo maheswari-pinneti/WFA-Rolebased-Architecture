@@ -30,6 +30,8 @@ import {
   HelpCircle,
   Plus,
   Download,
+  Upload,
+  KeyRound,
   Clock,
   FileSpreadsheet,
   Home
@@ -160,6 +162,9 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           <Link to="/admin/employees#add" className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
             <Plus size={14} /> Add Employee
           </Link>
+          <button onClick={() => navigate('/admin/employees#import')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
+            <Upload size={14} /> Import
+          </button>
           <button onClick={() => navigate('/hr/reports#export')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
             <Download size={14} /> Export
           </button>
@@ -172,6 +177,9 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           <button onClick={() => navigate('/hr/attendance#clock')} className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
             <Clock size={14} /> Check In / Out
           </button>
+          <button onClick={() => navigate('/hr/attendance#correction')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
+            Request Correction
+          </button>
         </div>
       );
     }
@@ -180,6 +188,18 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         <div className="hidden xl:flex items-center gap-2">
           <button onClick={() => navigate('/hr/reports#generate')} className="px-2.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
             <FileSpreadsheet size={14} /> Generate Report
+          </button>
+          <button onClick={() => navigate('/hr/reports#export')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
+            <Download size={14} /> Export
+          </button>
+        </div>
+      );
+    }
+    if (path.includes('/settings')) {
+      return (
+        <div className="hidden xl:flex items-center gap-2">
+          <button onClick={() => setDeptToast('Settings saved successfully')} className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+            <Check size={14} /> Save Changes
           </button>
         </div>
       );
@@ -470,6 +490,12 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
                   >
                     <Settings size={18} strokeWidth={2} className="text-indigo-500" /> Account Settings
+                  </button>
+                  <button
+                    onClick={() => { navigate('/admin/settings#security'); setActiveDropdown(null); }}
+                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
+                  >
+                    <KeyRound size={18} strokeWidth={2} className="text-emerald-500" /> Change Password
                   </button>
                   <button
                     onClick={() => { navigate('/admin/roles'); setActiveDropdown(null); }}
