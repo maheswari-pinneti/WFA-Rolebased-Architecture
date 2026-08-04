@@ -35,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Main Sidebar Container (Desktop Fixed + Mobile Drawer) */}
       <aside
         className={`fixed md:sticky top-0 left-0 h-screen bg-[var(--bg-secondary)] border-r border-[var(--border-color)] z-50 flex flex-col transition-all duration-300 shadow-xl ${
-          collapsed ? 'w-[78px]' : 'w-[280px]'
+          collapsed ? 'w-[64px]' : 'w-[220px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         {/* 1. Brand Section (Header & Logo) */}

@@ -227,20 +227,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Modern Clean Enterprise SaaS Left Sidebar (Width 264px - Spec Section 14 & 17) */}
+      {/* Modern Clean Enterprise SaaS Left Sidebar */}
       <aside
         className={`bg-[#0B1120] text-slate-100 border-r border-slate-800 flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
-          collapsed ? 'w-[72px]' : 'w-[264px]'
+          collapsed ? 'w-[64px]' : 'w-[220px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Sidebar Header Title */}
-        {!collapsed && (
-          <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-400 pl-2">
-              Navigation
-            </span>
-          </div>
-        )}
 
         {/* Sidebar Navigation Items List */}
 

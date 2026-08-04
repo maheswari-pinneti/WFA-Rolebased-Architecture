@@ -26,7 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
   return (
     <aside
       className={`h-screen sticky top-0 bg-[#0B1120] text-slate-100 border-r border-slate-800/80 flex flex-col justify-between transition-all duration-300 z-30 font-sans ${
-        collapsed ? 'w-[80px]' : 'w-[280px]'
+        collapsed ? 'w-[64px]' : 'w-[220px]'
       }`}
     >
       {/* Header Section with Brand Logo */}
