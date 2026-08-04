@@ -97,8 +97,9 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
   const handleConfirmLogout = () => {
     setShowLogoutModal(false);
+    setActiveDropdown(null);
     logout();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   // Compute Breadcrumb Trail
