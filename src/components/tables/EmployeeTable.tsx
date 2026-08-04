@@ -6,6 +6,7 @@ import { Employee } from '../../shared/types/common.types';
 import { getRoleBadgeClass, formatDate } from '../../shared/utils/helpers';
 import { Search, ChevronLeft, ChevronRight, UserPlus, Filter, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '../../shared/components/Button';
+import { useDepartmentAccess } from '../../hooks/useDepartmentAccess';
 
 export const EmployeeTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,7 +24,14 @@ export const EmployeeTable: React.FC = () => {
     dispatch(updateEmployeeStatusThunk({ id, status }));
   };
 
+  const { canAccessDepartment } = useDepartmentAccess();
+
   const filteredEmployees = employees.filter((emp) => {
+    const deptId = (emp as any).departmentId || emp.department || '';
+    const hasDbacAccess = canAccessDepartment(deptId) || canAccessDepartment(emp.department);
+
+    if (!hasDbacAccess) return false;
+
     const code = emp.employeeCode || emp.code || '';
     const desig = emp.designation || '';
     const matchesSearch =

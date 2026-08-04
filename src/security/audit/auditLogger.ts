@@ -1,16 +1,28 @@
 import { Role } from '../roles/roles';
 import { Permission } from '../permissions/permissions';
 
+export type AuditActionType =
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'ACCESS_DENIED'
+  | 'DATA_EXPORT'
+  | 'VIEW_RESTRICTED_DATA'
+  | 'UPDATE_EMPLOYEE'
+  | 'SYSTEM_POLICY_UPDATE'
+  | 'UNAUTHORIZED_ACCESS_ATTEMPT';
+
 export interface AuditLogEvent {
   id: string;
   timestamp: string;
   userId: string;
   userRole: Role;
-  action: string;
+  action: AuditActionType | string;
   permissionRequired?: Permission;
   status: 'SUCCESS' | 'DENIED' | 'FLAGGED';
   details: string;
   ipAddress: string;
+  resource?: string;
+  department?: string;
 }
 
 class AuditLogger {
@@ -31,22 +43,24 @@ class AuditLogger {
       timestamp: new Date(Date.now() - 1800000).toISOString(),
       userId: 'usr-102',
       userRole: Role.HR,
-      action: 'EMPLOYEE_RECORD_CREATE',
-      permissionRequired: Permission.EMPLOYEE_CREATE,
+      action: 'DATA_EXPORT',
+      permissionRequired: Permission.REPORT_EXPORT,
       status: 'SUCCESS',
-      details: 'Created employee profile for Alex Mercer (Frontend Team).',
+      details: 'Exported HR Department workforce records to CSV format.',
       ipAddress: '192.168.1.45',
+      department: 'HR',
     },
     {
       id: 'AUD-903',
       timestamp: new Date(Date.now() - 600000).toISOString(),
-      userId: 'usr-105',
-      userRole: Role.EMPLOYEE,
-      action: 'UNAUTHORIZED_ACCESS_ATTEMPT',
-      permissionRequired: Permission.ROLE_CREATE,
+      userId: 'Manager01',
+      userRole: Role.MANAGER,
+      action: 'ACCESS_DENIED',
+      permissionRequired: Permission.EMPLOYEE_READ,
       status: 'DENIED',
-      details: 'Employee attempted to access System Settings page.',
+      details: 'Engineering Manager attempted to access Finance Department dataset.',
       ipAddress: '10.0.0.88',
+      resource: 'Finance Department',
     },
   ];
 
@@ -57,7 +71,7 @@ class AuditLogger {
       timestamp: new Date().toISOString(),
     };
     this.logs.unshift(logItem);
-    console.log(`[SECURITY AUDIT LOG] ${logItem.status}: ${logItem.action} by ${logItem.userId} (${logItem.userRole})`);
+    console.log(`[DBAC AUDIT LOG] ${logItem.status}: ${logItem.action} by ${logItem.userId} (${logItem.userRole})`);
   }
 
   getLogs(): AuditLogEvent[] {

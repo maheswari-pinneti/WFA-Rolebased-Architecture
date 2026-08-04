@@ -8,6 +8,8 @@ export interface User {
   role: Role;
   avatar?: string;
   department: string;
+  departmentId?: string;
+  teamId?: string;
   team?: string;
   location?: string;
   title: string;

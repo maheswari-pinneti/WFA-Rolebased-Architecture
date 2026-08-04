@@ -206,7 +206,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     ],
   };
 
-  const currentCategories = roleCategorizedNavMap[role] || roleCategorizedNavMap[Role.EMPLOYEE];
+  const currentCategories = roleCategorizedNavMap[role as Role] || roleCategorizedNavMap[Role.EMPLOYEE];
 
   const getBadgeStyle = (variant: 'blue' | 'purple' | 'amber' | 'emerald' | 'rose') => {
     switch (variant) {
@@ -291,8 +291,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Scrollable Grouped Navigation (General, Analytics, Settings) */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 w-full scrollbar-thin scrollbar-thumb-[var(--border-color)]">
-          {currentCategories.map((cat, groupIdx) => {
-            const filteredItems = cat.items.filter((item) =>
+          {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
+            const filteredItems = cat.items.filter((item: NavigationItem) =>
               item.label.toLowerCase().includes(filterQuery.toLowerCase())
             );
 
@@ -308,7 +308,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 )}
 
                 {/* Clean SVG Icon Navigation Links */}
-                {filteredItems.map((item) => {
+                {filteredItems.map((item: NavigationItem) => {
                   const active = location.pathname === item.path;
 
                   return (
