@@ -106,7 +106,6 @@ export const sidebarConfig: SidebarItemConfig[] = [
     icon: 'Sliders',
     roles: ['ADMIN'],
     subItems: [
-      { name: 'Role Management', path: '/configuration#roles' },
       { name: 'Permission Management', path: '/configuration#permissions' },
       { name: 'RBAC Configuration', path: '/configuration#rbac' },
       { name: 'DBAC Rules', path: '/configuration#dbac' },

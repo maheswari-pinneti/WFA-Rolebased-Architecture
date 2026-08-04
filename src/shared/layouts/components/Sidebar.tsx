@@ -91,7 +91,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         category: 'Settings',
         items: [
           { label: 'User Management', path: '/admin/users', icon: <UserCog size={18} strokeWidth={2} className="text-cyan-400" />, badge: { text: 'Active', variant: 'blue' } },
-          { label: 'Role Management', path: '/admin/roles', icon: <ShieldCheck size={18} strokeWidth={2} className="text-purple-400" /> },
           { label: 'Audit Logs', path: '/admin/audit-logs', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
           { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
           { label: 'Configuration', path: '/admin/configuration', icon: <Layers size={18} strokeWidth={2} className="text-teal-400" /> },

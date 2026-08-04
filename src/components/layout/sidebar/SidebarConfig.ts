@@ -138,7 +138,6 @@ export const sidebarConfigData: SidebarGroupConfig[] = [
         badge: { text: 'Admin', variant: 'rose' },
         children: [
           { label: 'User Management', path: '/admin/users' },
-          { label: 'Role Management', path: '/admin/roles' },
           { label: 'Permission Management', path: '/admin/permissions' },
           { label: 'System Configuration', path: '/admin/configuration' },
           { label: 'Audit Logs', path: '/admin/audit-logs' },
