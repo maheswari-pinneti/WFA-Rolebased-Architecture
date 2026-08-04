@@ -101,15 +101,21 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     navigate(targetPath);
   };
 
-  const handleSearchSubmit = (path: string) => {
-    setSearchFocused(false);
-    setSearchQuery('');
-    navigate(path);
+  const handleDeptSelect = (dept: string) => {
+    setSelectedDept(dept);
+    setDeptToast(`Scope switched to: ${dept}`);
+    setTimeout(() => setDeptToast(null), 3000);
   };
 
   const markAllNotificationsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
+  };
+
+  const handleSearchSubmit = (path: string) => {
+    setSearchFocused(false);
+    setSearchQuery('');
+    navigate(path);
   };
 
   const handleLogoutClick = () => {
@@ -123,89 +129,20 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     navigate('/login');
   };
 
-  // Dynamic Breadcrumb Generator based on Route
-  const getBreadcrumbItems = () => {
-    const path = location.pathname;
-    if (path.includes('/admin/employees') || path.includes('/hr/employees')) {
-      return [
-        { label: 'Workforce', path: '/admin/dashboard' },
-        { label: 'Employees', path: '/admin/employees', active: true },
-      ];
-    }
-    if (path.includes('/hr/attendance') || path.includes('/employee/attendance')) {
-      return [
-        { label: 'Attendance', path: '/hr/attendance' },
-        { label: 'My Attendance', path: '/employee/attendance', active: true },
-      ];
-    }
-    if (path.includes('/hr/performance') || path.includes('/employee/performance')) {
-      return [
-        { label: 'Performance', path: '/hr/performance' },
-        { label: 'Goals & KPIs', path: '/hr/performance#kpis', active: true },
-      ];
-    }
-    if (path.includes('/hr/reports') || path.includes('/admin/analytics')) {
-      return [
-        { label: 'Reports', path: '/hr/reports' },
-        { label: 'Export Center', path: '/hr/reports#export', active: true },
-      ];
-    }
-    return [{ label: 'Dashboard', path: '/admin/dashboard', active: true }];
+  // Compute Breadcrumb Trail
+  const getBreadcrumbs = () => {
+    const segments = location.pathname.split('/').filter(Boolean);
+    if (segments.length === 0) return [{ label: 'Dashboard', path: '/' }];
+    
+    return segments.map((seg, idx) => {
+      const url = `/${segments.slice(0, idx + 1).join('/')}`;
+      const formatted = seg.charAt(0).toUpperCase() + seg.slice(1).replace('-', ' ');
+      return { label: formatted, path: url };
+    });
   };
 
-  // Dynamic Contextual Action Buttons based on Page Route
-  const getPageContextActions = () => {
-    const path = location.pathname;
-    if (path.includes('/employees')) {
-      return (
-        <div className="hidden xl:flex items-center gap-2">
-          <Link to="/admin/employees#add" className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
-            <Plus size={14} /> Add Employee
-          </Link>
-          <button onClick={() => navigate('/admin/employees#import')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
-            <Upload size={14} /> Import
-          </button>
-          <button onClick={() => navigate('/hr/reports#export')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
-            <Download size={14} /> Export
-          </button>
-        </div>
-      );
-    }
-    if (path.includes('/attendance')) {
-      return (
-        <div className="hidden xl:flex items-center gap-2">
-          <button onClick={() => navigate('/hr/attendance#clock')} className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
-            <Clock size={14} /> Check In / Out
-          </button>
-          <button onClick={() => navigate('/hr/attendance#correction')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
-            Request Correction
-          </button>
-        </div>
-      );
-    }
-    if (path.includes('/reports') || path.includes('/analytics')) {
-      return (
-        <div className="hidden xl:flex items-center gap-2">
-          <button onClick={() => navigate('/hr/reports#generate')} className="px-2.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
-            <FileSpreadsheet size={14} /> Generate Report
-          </button>
-          <button onClick={() => navigate('/hr/reports#export')} className="px-2.5 py-1.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all flex items-center gap-1">
-            <Download size={14} /> Export
-          </button>
-        </div>
-      );
-    }
-    if (path.includes('/settings')) {
-      return (
-        <div className="hidden xl:flex items-center gap-2">
-          <button onClick={() => setDeptToast('Settings saved successfully')} className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
-            <Check size={14} /> Save Changes
-          </button>
-        </div>
-      );
-    }
-    return null;
-  };
+  const breadcrumbs = getBreadcrumbs();
+  const currentPageTitle = breadcrumbs[breadcrumbs.length - 1]?.label || 'Dashboard';
 
   const filteredSearchResults = searchResultsMap.filter((item) => {
     const matchesCategory = searchCategory === 'all' || item.category === searchCategory;
@@ -214,88 +151,77 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
   });
 
   return (
-    <header className="h-[72px] px-6 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between gap-6 shadow-sm transition-colors font-sans shrink-0">
-      {/* Toast Alert for Department Scope Switch */}
+    <header className="h-[72px] sticky top-0 z-40 bg-[#0B1120] text-slate-100 border-b border-slate-800/80 px-4 lg:px-6 flex items-center justify-between shadow-xl transition-all duration-300 font-sans">
+      
+      {/* Toast Notification for Scope Change */}
       {deptToast && (
-        <div className="fixed top-20 right-6 z-50 bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-fadeIn">
-          <CheckCircle2 size={16} /> {deptToast}
+        <div className="absolute top-20 right-6 bg-slate-900 border border-blue-500/40 text-blue-300 text-xs px-4 py-2.5 rounded-2xl shadow-2xl z-50 flex items-center gap-2 animate-fadeIn font-bold">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <span>{deptToast}</span>
         </div>
       )}
 
-      {/* LEFT SECTION: Sidebar Toggle, Stackly Logo & Dynamic Breadcrumb Navigation */}
-      <div className="flex items-center gap-4 shrink-0">
+      {/* LEFT SECTION: Sidebar Toggle, Brand Logo & Breadcrumb Navigation */}
+      <div className="flex items-center gap-3 md:gap-5 min-w-0">
+        {/* Sidebar Collapse Toggle Button */}
         <button
           onClick={onToggleSidebar}
-          aria-label="Toggle Sidebar Menu"
-          className="p-2 rounded-xl text-slate-400 hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] transition-all hover:scale-105 border border-transparent hover:border-[var(--border-color)]"
-          title="Toggle Navigation Sidebar"
+          aria-label="Toggle Sidebar"
+          className="p-2 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700/80 transition-all hover:scale-105"
+          title="Toggle Left Sidebar"
         >
-          <Menu size={22} strokeWidth={2} />
+          <Menu size={20} />
         </button>
 
-        <div className="flex items-center gap-3">
-          <StacklyLogo size={30} showText={false} />
+        {/* STACKLY Brand Logo */}
+        <Link to="/" className="shrink-0 flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <StacklyLogo size={32} showText={false} />
+        </Link>
 
-          {/* Dynamic Breadcrumbs & Page Context Actions */}
-          <div className="flex items-center gap-3">
-            <nav className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-              <Link to="/" className="hover:text-blue-500 flex items-center gap-1 transition-colors">
-                <Home size={14} />
-              </Link>
-              {getBreadcrumbItems().map((crumb, idx) => (
-                <React.Fragment key={idx}>
-                  <ChevronRight size={12} className="text-slate-500 shrink-0" />
-                  {crumb.active ? (
-                    <span className="font-extrabold text-[var(--text-primary)]">{crumb.label}</span>
-                  ) : (
-                    <Link to={crumb.path} className="hover:text-blue-500 transition-colors">
-                      {crumb.label}
-                    </Link>
-                  )}
-                </React.Fragment>
-              ))}
-            </nav>
-
-            {/* Optional Page Context Actions */}
-            {getPageContextActions()}
-          </div>
+        {/* Dynamic Breadcrumbs & Page Title */}
+        <div className="hidden sm:flex flex-col text-left min-w-0">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+            <Link to="/" className="hover:text-blue-400 flex items-center gap-1">
+              <Home size={12} />
+            </Link>
+            {breadcrumbs.map((b, idx) => (
+              <React.Fragment key={b.path}>
+                <ChevronRight size={12} className="text-slate-600" />
+                <span className={`truncate max-w-[120px] ${idx === breadcrumbs.length - 1 ? 'font-bold text-slate-200' : 'hover:text-slate-300'}`}>
+                  {b.label}
+                </span>
+              </React.Fragment>
+            ))}
+          </nav>
+          <h1 className="text-sm font-extrabold text-white tracking-tight truncate max-w-[220px] lg:max-w-[320px]">
+            {currentPageTitle}
+          </h1>
         </div>
       </div>
 
-      {/* CENTER SECTION: Fixed Global Search Bar */}
-      <div className="hidden lg:flex items-center max-w-[420px] w-full relative">
-        <div className="relative w-full flex items-center">
-          <Search size={16} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+      {/* CENTER SECTION: Global Search Input */}
+      <div className="flex-1 max-w-md mx-4 relative hidden md:block">
+        <div className="relative flex items-center">
+          <Search size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onFocus={() => setSearchFocused(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && filteredSearchResults.length > 0) {
-                handleSearchSubmit(filteredSearchResults[0].path);
-              }
-            }}
-            aria-label="Global Search"
             placeholder="Search employees, reports, departments..."
-            className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-blue-500 shadow-inner transition-colors"
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-2xl bg-slate-900/90 border border-slate-800 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
           />
         </div>
 
-        {/* Search Results Dropdown & Backdrop */}
+        {/* Global Search Dropdown Overlay */}
         {searchFocused && (
           <>
-            <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setSearchFocused(false)} />
-            <div className="absolute left-0 right-0 top-full mt-2 p-4 shadow-2xl z-50 bg-slate-900 border border-slate-700/80 backdrop-blur-xl rounded-2xl space-y-3 text-slate-100 animate-fadeIn">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <Filter size={14} strokeWidth={2} /> Category Scope
-                </span>
-                <button
-                  onClick={() => setSearchFocused(false)}
-                  className="text-[10px] font-bold text-blue-400 hover:underline flex items-center gap-0.5 bg-slate-800 px-2 py-1 rounded-lg"
-                >
-                  <X size={12} /> Close
+            <div className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs" onClick={() => setSearchFocused(false)} />
+            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 p-4 shadow-2xl z-50 rounded-2xl space-y-3 text-slate-100 animate-fadeIn font-sans">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span className="text-xs font-bold text-slate-200">Global Search Results</span>
+                <button onClick={() => setSearchFocused(false)} className="text-slate-400 hover:text-white">
+                  <X size={14} />
                 </button>
               </div>
 
@@ -323,10 +249,10 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     <button
                       key={idx}
                       onClick={() => handleSearchSubmit(res.path)}
-                      className="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/50 text-xs text-slate-100 font-semibold flex items-center justify-between transition-colors shadow-sm"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-xs text-slate-100 font-semibold flex items-center justify-between transition-colors shadow-sm"
                     >
                       <span className="truncate pr-2">{res.title}</span>
-                      <span className="text-[9.5px] font-mono font-bold uppercase bg-slate-900 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 shrink-0">
+                      <span className="text-[9.5px] font-mono font-bold uppercase bg-slate-950 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 shrink-0">
                         {res.category}
                       </span>
                     </button>
@@ -339,31 +265,31 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
       </div>
 
       {/* RIGHT SECTION: Notification Bell, Messages, Theme Toggle, Help Icon & User Profile */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2.5 shrink-0">
         {/* 1. Notification Bell Icon & Dropdown */}
         <div className="relative">
           <button
             onClick={() => toggleDropdown('notif')}
             aria-label="View Notifications"
-            className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-[var(--text-primary)] transition-all hover:scale-105 relative"
+            className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm relative"
             title="Notifications"
           >
-            <Bell size={20} strokeWidth={2} />
+            <Bell size={18} strokeWidth={2} />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-[var(--bg-secondary)] animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-slate-900 animate-pulse" />
             )}
           </button>
 
           {activeDropdown === 'notif' && (
-            <div className="absolute right-0 mt-2 w-80 bg-[var(--bg-secondary)] border border-[var(--border-color)] py-3 px-4 shadow-2xl z-50 rounded-2xl space-y-3 text-[var(--text-primary)] animate-fadeIn">
-              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
-                <span className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
-                  <Sparkles size={16} strokeWidth={2} className="text-blue-500" /> Notifications
+            <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 py-3 px-4 shadow-2xl z-50 rounded-2xl space-y-3 text-slate-100 animate-fadeIn">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span className="text-xs font-extrabold text-white flex items-center gap-1.5">
+                  <Sparkles size={16} strokeWidth={2} className="text-blue-400" /> Notifications
                 </span>
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllNotificationsRead}
-                    className="text-[10px] font-bold text-blue-500 hover:underline flex items-center gap-1"
+                    className="text-[10px] font-bold text-blue-400 hover:underline flex items-center gap-1"
                   >
                     <Check size={12} /> Mark Read
                   </button>
@@ -379,8 +305,8 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     }}
                     className={`p-2.5 rounded-xl border cursor-pointer transition-colors ${
                       n.read
-                        ? 'bg-[var(--bg-tertiary)]/50 border-[var(--border-color)] text-[var(--text-muted)]'
-                        : 'bg-blue-500/10 border-blue-500/30 text-[var(--text-primary)] font-semibold'
+                        ? 'bg-slate-950/50 border-slate-800 text-slate-400'
+                        : 'bg-blue-500/10 border-blue-500/30 text-slate-100 font-semibold'
                     }`}
                   >
                     <div className="flex justify-between items-start">
@@ -399,66 +325,72 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         <button
           onClick={() => toggleDropdown('messages')}
           aria-label="View Messages"
-          className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-[var(--text-primary)] transition-all hover:scale-105 relative hidden sm:block"
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm hidden sm:block"
           title="Team Messages"
         >
-          <MessageSquare size={20} strokeWidth={2} />
+          <MessageSquare size={18} strokeWidth={2} />
         </button>
 
         {/* 3. Theme Toggle (Light / Dark Navy) */}
         <button
           onClick={toggleTheme}
           aria-label="Toggle Light or Dark Theme"
-          className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-[var(--text-primary)] transition-all hover:scale-105"
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm"
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
         >
-          {theme === 'dark' ? <Sun size={20} strokeWidth={2} className="text-[#F59E0B]" /> : <Moon size={20} strokeWidth={2} className="text-[#2563EB]" />}
+          {theme === 'dark' ? <Sun size={18} strokeWidth={2} className="text-amber-400" /> : <Moon size={18} strokeWidth={2} className="text-blue-400" />}
         </button>
 
         {/* 4. Help Center & IT Support Desk Icon */}
         <button
           onClick={onOpenHelp}
           aria-label="Help & IT Desk Support"
-          className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-slate-400 hover:text-[var(--text-primary)] transition-all hover:scale-105 hidden md:block"
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm hidden md:block"
           title="24/7 Enterprise Help & IT Support"
         >
-          <HelpCircle size={20} strokeWidth={2} />
+          <HelpCircle size={18} strokeWidth={2} />
         </button>
 
         {/* 5. User Profile Avatar & Dropdown */}
         {user && (
-          <div className="relative border-l border-[var(--border-color)] pl-3">
+          <div className="relative border-l border-slate-800 pl-3 ml-1">
             <button
               onClick={() => toggleDropdown('profile')}
               aria-label="User Profile Menu"
-              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-[var(--bg-tertiary)] transition-colors"
+              className="flex items-center gap-2.5 p-1.5 rounded-2xl hover:bg-slate-800/80 transition-colors"
             >
-              <div className="relative">
+              <div className="relative shrink-0">
                 <img
                   src={user.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
                   alt={user.name}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shrink-0 shadow-md"
+                  className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shadow-md"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[var(--bg-secondary)]" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-900" />
               </div>
-              <div className="hidden xl:flex flex-col text-left">
-                <span className="text-xs font-bold text-[var(--text-primary)] leading-tight">{user.name || 'Maheswari Pinneti'}</span>
-                <span className="text-[10px] text-slate-400 leading-none mt-0.5">{ROLE_LABELS[role]}</span>
+              
+              {/* Employee Name & Role Block with Clear Flex Spacing */}
+              <div className="hidden md:flex flex-col text-left justify-center min-w-0 pr-1">
+                <span className="text-xs font-black text-slate-100 leading-tight tracking-tight truncate max-w-[130px]">
+                  {user.name || 'Sarah Connor'}
+                </span>
+                <span className="text-[10px] font-bold text-blue-400 leading-tight truncate max-w-[130px] mt-0.5">
+                  {ROLE_LABELS[role]}
+                </span>
               </div>
-              <ChevronDown size={14} strokeWidth={2} className="text-slate-400 hidden sm:block" />
+              <ChevronDown size={14} strokeWidth={2} className="text-slate-400 hidden sm:block shrink-0" />
             </button>
 
-            {/* Profile Dropdown */}
+            {/* User Profile Dropdown Menu */}
             {activeDropdown === 'profile' && (
-              <div className="absolute right-0 mt-2 w-64 bg-[var(--bg-secondary)] border border-[var(--border-color)] py-2 shadow-2xl z-50 text-xs rounded-2xl text-[var(--text-primary)] animate-fadeIn">
-                <div className="px-4 py-3 border-b border-[var(--border-color)]">
-                  <p className="font-bold text-sm text-[var(--text-primary)]">{user.name}</p>
-                  <p className="text-[11px] text-slate-400">{user.email}</p>
-                  <div className="mt-2 flex items-center justify-between">
+              <div className="absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-800 p-2.5 shadow-2xl z-50 rounded-2xl text-xs text-slate-100 animate-fadeIn space-y-1 font-sans">
+                <div className="px-3.5 py-3 border-b border-slate-800 space-y-1">
+                  <p className="font-black text-sm text-white">{user.name}</p>
+                  <p className="text-[11px] text-slate-400 font-mono truncate">{user.email}</p>
+                  <div className="mt-2 flex items-center justify-between pt-1">
                     <span className={`badge ${getRoleBadgeClass(role)}`}>{ROLE_LABELS[role]}</span>
                     <button
                       onClick={() => setShowPermissionsPreview(!showPermissionsPreview)}
-                      className="text-[10px] font-bold text-blue-500 hover:underline flex items-center gap-1"
+                      className="text-[10px] font-bold text-blue-400 hover:underline flex items-center gap-1"
                     >
                       <Layers size={12} /> {showPermissionsPreview ? 'Hide Flags' : 'Permissions'}
                     </button>
@@ -466,11 +398,11 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                 </div>
 
                 {showPermissionsPreview && (
-                  <div className="p-3 bg-[var(--bg-primary)] border-b border-[var(--border-color)] text-[10px] space-y-1.5 max-h-36 overflow-y-auto">
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[10px] space-y-1.5 max-h-36 overflow-y-auto">
                     <p className="font-extrabold text-slate-400 uppercase tracking-wider">Active Permissions ({permissions.length})</p>
                     <div className="flex flex-wrap gap-1">
                       {permissions.map((p, idx) => (
-                        <span key={idx} className="bg-blue-500/10 text-blue-500 border border-blue-500/20 px-1.5 py-0.5 rounded font-mono">
+                        <span key={idx} className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-mono">
                           {p}
                         </span>
                       ))}
@@ -478,39 +410,39 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                   </div>
                 )}
 
-                <div className="py-1.5 space-y-0.5 font-medium">
+                <div className="py-1 space-y-0.5 font-medium">
                   <button
                     onClick={() => { navigate('/employee/profile'); setActiveDropdown(null); }}
-                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
+                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
                   >
-                    <UserIcon size={18} strokeWidth={2} className="text-blue-500" /> My Profile
+                    <UserIcon size={16} strokeWidth={2} className="text-blue-400" /> My Profile
                   </button>
                   <button
                     onClick={() => { navigate('/admin/settings'); setActiveDropdown(null); }}
-                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
+                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
                   >
-                    <Settings size={18} strokeWidth={2} className="text-indigo-500" /> Account Settings
+                    <Settings size={16} strokeWidth={2} className="text-indigo-400" /> Account Settings
                   </button>
                   <button
                     onClick={() => { navigate('/admin/settings#security'); setActiveDropdown(null); }}
-                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
+                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
                   >
-                    <KeyRound size={18} strokeWidth={2} className="text-emerald-500" /> Change Password
+                    <KeyRound size={16} strokeWidth={2} className="text-emerald-400" /> Change Password
                   </button>
                   <button
                     onClick={() => { navigate('/admin/roles'); setActiveDropdown(null); }}
-                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-tertiary)] flex items-center gap-2.5 text-[var(--text-primary)]"
+                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
                   >
-                    <Shield size={18} strokeWidth={2} className="text-amber-500" /> Security
+                    <Shield size={16} strokeWidth={2} className="text-amber-400" /> Security
                   </button>
                 </div>
 
-                <div className="border-t border-[var(--border-color)] pt-1.5">
+                <div className="border-t border-slate-800 pt-1">
                   <button
                     onClick={handleLogoutClick}
-                    className="w-full text-left px-4 py-2 hover:bg-rose-500/10 text-rose-500 flex items-center gap-2.5 font-bold"
+                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-rose-500/10 text-rose-400 flex items-center gap-2.5 font-bold transition-colors"
                   >
-                    <LogOut size={18} strokeWidth={2} /> Logout
+                    <LogOut size={16} strokeWidth={2} /> Logout
                   </button>
                 </div>
               </div>
