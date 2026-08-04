@@ -101,7 +101,6 @@ export const sidebarConfigData: SidebarGroupConfig[] = [
         children: [
           { label: 'Departments', path: '/admin/departments' },
           { label: 'Teams', path: '/manager/team' },
-          { label: 'Locations', path: '/admin/locations' },
           { label: 'Organization Hierarchy', path: '/admin/departments#hierarchy' },
         ],
       },

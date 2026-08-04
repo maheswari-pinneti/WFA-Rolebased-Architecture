@@ -44,13 +44,6 @@ export const roleBasedMenuConfigurations: Record<Role, MenuGroupConfig[]> = {
           roles: [Role.ADMIN],
         },
         {
-          id: 'admin-[workforce]-locations',
-          title: 'Locations',
-          icon: 'MapPin',
-          path: '/admin/locations',
-          roles: [Role.ADMIN],
-        },
-        {
           id: 'admin-[workforce]-org-chart',
           title: 'Organization Chart',
           icon: 'Network',

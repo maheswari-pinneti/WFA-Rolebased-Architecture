@@ -72,13 +72,6 @@ export const sidebarConfig: SidebarItemConfig[] = [
     ],
   },
   {
-    id: 'locations',
-    name: 'Location Management',
-    path: '/locations',
-    icon: 'MapPin',
-    roles: ['ADMIN', 'HR_MANAGER'],
-  },
-  {
     id: 'audit-logs',
     name: 'Audit Logs',
     path: '/audit-logs',

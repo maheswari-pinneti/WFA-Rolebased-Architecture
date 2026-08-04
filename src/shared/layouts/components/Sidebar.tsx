@@ -74,7 +74,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
           { label: 'Employee Directory', path: '/admin/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
           { label: 'Departments', path: '/admin/departments', icon: <Building2 size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Office Locations', path: '/admin/locations', icon: <MapPin size={18} strokeWidth={2} className="text-amber-400" /> },
         ],
       },
       {
