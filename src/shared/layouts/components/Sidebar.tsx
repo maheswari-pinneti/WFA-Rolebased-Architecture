@@ -64,7 +64,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { role } = useAuth();
   const location = useLocation();
-  const [filterQuery, setFilterQuery] = useState('');
 
   // Clean Navigation Structure
   const roleCategorizedNavMap: Record<Role, NavigationCategory[]> = {
@@ -244,39 +243,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
-        {/* Quick Search Navigation Input */}
-        {!collapsed && (
-          <div className="px-3.5 pt-3.5 pb-1">
-            <div className="relative flex items-center">
-              <Search size={14} className="absolute left-3 text-slate-400 pointer-events-none z-10" />
-              <input
-                type="text"
-                placeholder="Quick search navigation..."
-                value={filterQuery}
-                onChange={(e) => setFilterQuery(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 text-xs text-slate-100 placeholder-slate-400 rounded-xl pl-8 pr-7 py-2 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
-              />
-              {filterQuery && (
-                <button
-                  onClick={() => setFilterQuery('')}
-                  className="absolute right-2 text-slate-400 hover:text-white p-0.5 rounded"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Sidebar Navigation Items List */}
 
         {/* Clean Uninterrupted Navigation List (No Harsh Text Headers) */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1 w-full scrollbar-thin scrollbar-thumb-slate-800">
           {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
-            const filteredItems = cat.items.filter((item: NavigationItem) =>
-              item.label.toLowerCase().includes(filterQuery.toLowerCase())
-            );
-
-            if (filterQuery && filteredItems.length === 0) return null;
-
             return (
               <React.Fragment key={groupIdx}>
                 {/* Subtle Divider Line Between Logical Groups */}
@@ -285,7 +256,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 )}
 
                 {/* Clean Navigation Links */}
-                {filteredItems.map((item: NavigationItem) => {
+                {cat.items.map((item: NavigationItem) => {
                   const active = location.pathname === item.path;
 
                   return (
