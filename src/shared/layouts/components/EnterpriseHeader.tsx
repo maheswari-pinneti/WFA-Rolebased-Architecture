@@ -364,7 +364,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             <button
               onClick={() => toggleDropdown('profile')}
               aria-label="User Profile Menu"
-              className="flex items-center gap-1.5 focus:outline-none group cursor-pointer"
+              className="flex items-center gap-2.5 focus:outline-none group cursor-pointer p-1 rounded-xl hover:bg-slate-800/50 transition-colors"
               title={`${user.name} (${ROLE_LABELS[role]})`}
             >
               <div className="relative shrink-0">
@@ -375,7 +375,15 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                 />
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-950" />
               </div>
-              <ChevronDown size={12} className="text-slate-400 group-hover:text-white transition-colors" />
+              <div className="hidden sm:flex flex-col text-left">
+                <span className="text-xs font-bold text-slate-100 group-hover:text-blue-400 transition-colors leading-none">
+                  {user.name}
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">
+                  {ROLE_LABELS[role]}
+                </span>
+              </div>
+              <ChevronDown size={14} className="text-slate-400 group-hover:text-white transition-colors" />
             </button>
 
             {/* User Profile Dropdown Menu */}

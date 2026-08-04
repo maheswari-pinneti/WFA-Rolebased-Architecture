@@ -309,9 +309,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             );
           })}
         </nav>
-
-        {/* Bottom User Profile Card */}
-        <UserProfile collapsed={collapsed} />
       </aside>
     </>
   );
