@@ -135,21 +135,8 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </div>
       )}
 
-      {/* LEFT SECTION: Sidebar Toggle, Logo & Breadcrumb Navigation */}
+      {/* LEFT SECTION: Logo & Breadcrumb Navigation */}
       <div className="flex items-center gap-3 md:gap-4 shrink-0 min-w-0">
-        {/* Sidebar Toggle Button */}
-        <button
-          onClick={onToggleSidebar}
-          aria-label="Toggle Sidebar"
-          className={`p-2 rounded-xl border transition-all cursor-pointer ${
-            isDark
-              ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800'
-              : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
-          }`}
-          title="Toggle Left Sidebar"
-        >
-          <Menu size={18} />
-        </button>
 
         {/* STACKLY Brand Logo */}
         <Link to="/" className="shrink-0 flex items-center hover:opacity-90 transition-opacity">
