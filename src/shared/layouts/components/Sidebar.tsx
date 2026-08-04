@@ -228,10 +228,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Modern Clean Enterprise SaaS Left Sidebar (Width 260px) */}
+      {/* Modern Clean Enterprise SaaS Left Sidebar (Width 264px - Spec Section 14 & 17) */}
       <aside
         className={`bg-[#0B1120] text-slate-100 border-r border-slate-800 flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
-          collapsed ? 'w-[72px]' : 'w-[260px]'
+          collapsed ? 'w-[72px]' : 'w-[264px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         {/* Sidebar Header Title */}
