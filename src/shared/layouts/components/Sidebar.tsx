@@ -61,6 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setCollapsed,
   mobileOpen,
   setMobileOpen,
+  onOpenSupport,
 }) => {
   const { role } = useAuth();
   const location = useLocation();
@@ -233,11 +234,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           collapsed ? 'w-[64px]' : 'w-[220px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
+        {/* Jaydon Frankie Style User Profile Card Near Top */}
+        <div className="p-3">
+          <UserProfile collapsed={collapsed} />
+        </div>
 
         {/* Sidebar Navigation Items List */}
-
-        {/* Clean Uninterrupted Navigation List (No Harsh Text Headers) */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1 w-full scrollbar-thin scrollbar-thumb-slate-800">
+        <nav className="flex-1 overflow-y-auto px-3 py-1 space-y-1 w-full scrollbar-thin scrollbar-thumb-slate-800">
           {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
             return (
               <React.Fragment key={groupIdx}>
@@ -301,6 +304,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
             );
           })}
         </nav>
+
+        {/* Bottom Upgrade to Pro CTA Card */}
+        {!collapsed && (
+          <div className="p-3 border-t border-slate-800/80">
+            <div className="p-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 text-center space-y-2 relative overflow-hidden shadow-lg">
+              <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mx-auto border border-blue-500/30">
+                <Zap size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-black text-white">Get more?</p>
+                <p className="text-[10px] text-slate-400 font-medium">Stackly Enterprise Plan</p>
+              </div>
+              <button
+                type="button"
+                onClick={onOpenSupport}
+                className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-[11px] shadow-md shadow-blue-500/20 transition-all border-0 cursor-pointer"
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+        )}
       </aside>
     </>
   );

@@ -6,6 +6,8 @@ import { Permission } from '../../../security/permissions/permissions';
 import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
 
+import { MinimalKpiCard } from '../../../components/ui/MinimalKpiCard';
+
 // 6 Distinct Recharts Modules (Each uses a completely different chart type)
 import { WorkforceGrowthLine } from '../../analytics/charts/WorkforceGrowthLine'; // 1. Dual Area Gradient Line Chart
 import { AttendanceOverviewBar } from '../../analytics/charts/AttendanceOverviewBar'; // 2. Vertical Stacked Bar Chart
@@ -107,239 +109,129 @@ export const AdminDashboard: React.FC = () => {
         {/* Global Filter Bar */}
         <AdvancedFilterBar onFilterChange={() => {}} />
 
-        {/* 10 EXECUTIVE KPI METRICS CARDS GRID (DISTINCT METRICS) */}
+        {/* EXECUTIVE WORKFORCE KPI METRICS (EXACTLY 8 CARDS - 4 COLS X 2 ROWS) */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-400">
-              EXECUTIVE WORKFORCE KPI METRICS (10 KEY INDICATORS)
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+              EXECUTIVE WORKFORCE KPI METRICS (8 KEY INDICATORS)
             </h3>
             <span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
-              LIVE STREAM
+              LIVE METRICS
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            
-            {/* KPI 1: Total Employees */}
-            <div 
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* KPI 1 */}
+            <MinimalKpiCard
+              title="Total Headcount"
+              value="15,420"
+              icon={<Users size={26} />}
+              iconBgColor="emerald"
+              trend="+12.4% than last month"
+              trendType="positive"
               onClick={() => openDrillDown('Total Employee Headcount', '15,420 Active Records', 'Global workforce roster', [
                 { label: 'Full-time Permanent', value: 13850 },
                 { label: 'Contractors & Consultants', value: 1570 },
               ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Users size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +12.4% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">15,420</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Total Headcount</p>
-              </div>
-            </div>
+            />
 
-            {/* KPI 2: Active Duty Rate */}
-            <div 
+            {/* KPI 2 */}
+            <MinimalKpiCard
+              title="Active Duty Rate"
+              value="14,850"
+              icon={<ShieldCheck size={26} />}
+              iconBgColor="blue"
+              trend="+96.3% active shift"
+              trendType="positive"
               onClick={() => openDrillDown('Active Duty Status', '14,850 Clocked In', 'Real-time shift roster', [
                 { label: 'In-Office Campuses', value: 11200 },
                 { label: 'Remote WFH', value: 3650 },
               ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <ShieldCheck size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +96.3% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">14,850</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Active Duty Rate</p>
-              </div>
-            </div>
+            />
 
-            {/* KPI 3: Attendance Rate */}
-            <div 
+            {/* KPI 3 */}
+            <MinimalKpiCard
+              title="Attendance Rate"
+              value="96.5%"
+              icon={<Clock size={26} />}
+              iconBgColor="amber"
+              trend="+1.5% compliance"
+              trendType="positive"
               onClick={() => openDrillDown('Attendance Compliance Rate', '96.5%', 'Weekly shift adherence', [
                 { label: 'On-Time Clock Ins', value: '94.2%' },
                 { label: 'Approved Remote WFH', value: '2.3%' },
               ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Clock size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +1.5% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">96.5%</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Attendance Compliance</p>
-              </div>
-            </div>
+            />
 
-            {/* KPI 4: Employee Turnover */}
-            <div 
+            {/* KPI 4 */}
+            <MinimalKpiCard
+              title="Annual Attrition"
+              value="4.2%"
+              icon={<TrendingDown size={26} />}
+              iconBgColor="rose"
+              trend="-0.8% than last year"
+              trendType="positive"
               onClick={() => openDrillDown('Employee Turnover Attrition', '4.2% Rate', 'Annual attrition index', [
                 { label: 'Voluntary Resignations', value: '3.1%' },
                 { label: 'Involuntary Departures', value: '1.1%' },
               ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <TrendingDown size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  -0.8% <ArrowDownRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">4.2%</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Annual Attrition</p>
-              </div>
-            </div>
+            />
 
-            {/* KPI 5: Avg Performance Score */}
-            <div 
-              onClick={() => openDrillDown('Performance Score Index', '87% Average', 'Quarterly KPI score', [
-                { label: 'Exceeding Expectations', value: '58%' },
-                { label: 'Meeting Targets', value: '38%' },
-              ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Award size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +3.2% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">87%</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Avg Performance KPI</p>
-              </div>
-            </div>
-
-            {/* KPI 6: Open Hiring Requisitions */}
-            <div 
-              onClick={() => openDrillDown('Active Job Requisitions', '124 Roles', 'Hiring pipeline', [
-                { label: 'Engineering Roles', value: 64 },
-                { label: 'Sales & Growth', value: 32 },
-              ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Briefcase size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +8.4% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">124</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Open Requisitions</p>
-              </div>
-            </div>
-
-            {/* KPI 7: Department Divisions */}
-            <div 
-              onClick={() => openDrillDown('Department Divisions', '28 Divisions', 'Organizational structure', [
-                { label: 'Engineering & Technology', value: '5,800 Staff' },
-                { label: 'Sales & Marketing', value: '4,200 Staff' },
-              ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Building2 size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-slate-400">
-                  0.0%
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">28</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Active Divisions</p>
-              </div>
-            </div>
-
-            {/* KPI 8: Skill & Compliance Matrix */}
-            <div 
-              onClick={() => openDrillDown('Training & Compliance', '92% Completed', 'Learning compliance', [
-                { label: 'Security & Compliance Badges', value: '96%' },
-                { label: 'Cloud Architecture Skills', value: '88%' },
-              ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Target size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +5.6% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">92%</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Skill Compliance</p>
-              </div>
-            </div>
-
-            {/* KPI 9: Monthly Payroll Expense */}
-            <div 
+            {/* KPI 5 */}
+            <MinimalKpiCard
+              title="Monthly Payroll"
+              value="$4.8M"
+              icon={<DollarSign size={26} />}
+              iconBgColor="purple"
+              trend="+4.35% budget allocation"
+              trendType="positive"
               onClick={() => openDrillDown('Monthly Enterprise Payroll', '$4.8M Total Budget', 'Monthly compensation', [
                 { label: 'Base Salaries', value: '$4.1M' },
                 { label: 'Bonuses & Perks', value: '$700K' },
               ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <DollarSign size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +4.35% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">$4.8M</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Monthly Payroll</p>
-              </div>
-            </div>
+            />
 
-            {/* KPI 10: Security & Audit Audit Score */}
-            <div 
+            {/* KPI 6 */}
+            <MinimalKpiCard
+              title="Productivity Score"
+              value="94.8%"
+              icon={<Award size={26} />}
+              iconBgColor="cyan"
+              trend="+3.2% performance"
+              trendType="positive"
+              onClick={() => openDrillDown('Performance Score Index', '87% Average', 'Quarterly KPI score', [
+                { label: 'Exceeding Expectations', value: '58%' },
+                { label: 'Meeting Targets', value: '38%' },
+              ])}
+            />
+
+            {/* KPI 7 */}
+            <MinimalKpiCard
+              title="Open Vacancies"
+              value="124"
+              icon={<Briefcase size={26} />}
+              iconBgColor="indigo"
+              trend="+8.4% open requisitions"
+              trendType="positive"
+              onClick={() => openDrillDown('Active Job Requisitions', '124 Roles', 'Hiring pipeline', [
+                { label: 'Engineering Roles', value: 64 },
+                { label: 'Sales & Growth', value: 32 },
+              ])}
+            />
+
+            {/* KPI 8 */}
+            <MinimalKpiCard
+              title="Audit Compliance"
+              value="99.8%"
+              icon={<Layers size={26} />}
+              iconBgColor="teal"
+              trend="100% Zero-Trust Pass"
+              trendType="positive"
               onClick={() => openDrillDown('Security & Audit Score', '99.8% Pass Rate', 'Automated security compliance', [
                 { label: 'Zero Trust ABAC Policy', value: '100% Compliant' },
                 { label: 'DBAC Scope Isolation', value: '100% Passed' },
               ])}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Layers size={20} />
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                  +0.2% <ArrowUpRight size={13} />
-                </span>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-white tracking-tight">99.8%</h4>
-                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Audit Compliance</p>
-              </div>
-            </div>
-
+            />
           </div>
         </div>
 

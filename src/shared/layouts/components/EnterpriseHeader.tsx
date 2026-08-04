@@ -236,6 +236,20 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
       {/* RIGHT SECTION: Quick Actions, Theme, Notifications & User Profile Menu */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         
+        {/* Language Flag Selector */}
+        <button
+          type="button"
+          aria-label="Select Language"
+          className={`p-2 rounded-xl border transition-all cursor-pointer text-sm flex items-center justify-center ${
+            isDark
+              ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:bg-slate-800'
+              : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+          }`}
+          title="Language: English (UK)"
+        >
+          🇬🇧
+        </button>
+
         {/* 1. Notifications Center */}
         <div className="relative">
           <button
