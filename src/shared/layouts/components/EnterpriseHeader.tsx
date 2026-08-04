@@ -167,7 +167,11 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         <button
           onClick={onToggleSidebar}
           aria-label="Toggle Sidebar"
-          className="p-2 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700/80 transition-all hover:scale-105"
+          className={`p-2 rounded-xl transition-all shadow-sm border ${
+            theme === 'dark'
+              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
+              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          }`}
           title="Toggle Left Sidebar"
         >
           <Menu size={20} />
@@ -271,12 +275,16 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           <button
             onClick={() => toggleDropdown('notif')}
             aria-label="View Notifications"
-            className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm relative"
+            className={`p-2 rounded-xl transition-all shadow-sm relative border ${
+              theme === 'dark'
+                ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
+                : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+            }`}
             title="Notifications"
           >
             <Bell size={18} strokeWidth={2} />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-slate-900 animate-pulse" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-slate-900 animate-pulse" />
             )}
           </button>
 
@@ -325,17 +333,25 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         <button
           onClick={() => toggleDropdown('messages')}
           aria-label="View Messages"
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm hidden sm:block"
+          className={`p-2 rounded-xl transition-all shadow-sm hidden sm:block border ${
+            theme === 'dark'
+              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
+              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          }`}
           title="Team Messages"
         >
           <MessageSquare size={18} strokeWidth={2} />
         </button>
 
-        {/* 3. Theme Toggle (Light / Dark Navy) */}
+        {/* 3. Theme Toggle (Light / Dark) */}
         <button
           onClick={toggleTheme}
           aria-label="Toggle Light or Dark Theme"
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm"
+          className={`p-2 rounded-xl transition-all shadow-sm border ${
+            theme === 'dark'
+              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
+              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          }`}
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
         >
           {theme === 'dark' ? <Sun size={18} strokeWidth={2} className="text-amber-400" /> : <Moon size={18} strokeWidth={2} className="text-blue-400" />}
@@ -345,7 +361,11 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         <button
           onClick={onOpenHelp}
           aria-label="Help & IT Desk Support"
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-sm hidden md:block"
+          className={`p-2 rounded-xl transition-all shadow-sm hidden md:block border ${
+            theme === 'dark'
+              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
+              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          }`}
           title="24/7 Enterprise Help & IT Support"
         >
           <HelpCircle size={18} strokeWidth={2} />
