@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { LogOut, X, ShieldAlert } from 'lucide-react';
 import { StacklyLogo } from '../../components/common/StacklyLogo';
 
@@ -15,11 +16,15 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn font-sans">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-md p-6 rounded-3xl shadow-2xl space-y-5 text-slate-100 relative">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn font-sans">
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="bg-slate-900 border border-slate-800 w-full max-w-md p-6 rounded-3xl shadow-2xl space-y-5 text-slate-100 relative"
+      >
         {/* Close Icon Button */}
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
         >
@@ -54,20 +59,23 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
         {/* Side-by-Side Action Buttons Grid */}
         <div className="grid grid-cols-2 gap-3 pt-2">
           <button
+            type="button"
             onClick={onClose}
-            className="w-full py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 text-xs font-bold text-slate-300 hover:bg-slate-700 hover:text-white transition-all text-center"
+            className="w-full py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold text-slate-200 hover:bg-slate-700 hover:text-white transition-all text-center shadow-md"
           >
             Cancel
           </button>
 
           <button
+            type="button"
             onClick={onConfirmLogout}
-            className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold shadow-md shadow-rose-500/20 transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold shadow-lg shadow-rose-500/25 transition-all flex items-center justify-center gap-2"
           >
             <LogOut size={16} /> Logout
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

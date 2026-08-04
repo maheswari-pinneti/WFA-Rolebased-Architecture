@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { ROLE_LABELS } from '../../security/roles/roles';
-import { User, Settings, LogOut, ChevronDown, Circle } from 'lucide-react';
+import { User, Settings, LogOut, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutModal } from '../../auth/components/LogoutModal';
 
@@ -14,6 +14,17 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (!user) return null;
 
@@ -24,9 +35,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
   };
 
   return (
-    <div className="p-3 border-b border-[var(--border-color)] relative font-sans">
+    <div ref={dropdownRef} className="p-3 border-t border-slate-800/80 relative font-sans">
+      {/* Profile Card Trigger */}
       <div
-        onClick={() => setDropdownOpen(!dropdownOpen)}
+        onClick={() => setDropdownOpen((prev) => !prev)}
         className={`flex items-center gap-3 p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800/80 cursor-pointer transition-all ${
           collapsed ? 'justify-center p-1.5' : ''
         }`}
@@ -35,57 +47,65 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
           <img
             src={user.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
             alt={user.name}
-            className="w-10 h-10 rounded-full object-cover border-2 border-blue-500 shadow-md"
+            className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shadow-md"
           />
-          <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-900 shadow-sm" />
+          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-900 shadow-sm" />
         </div>
 
         {!collapsed && (
           <div className="flex-1 min-w-0 space-y-0.5">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-black text-white truncate">{user.name || 'John Doe'}</p>
-              <span className="flex items-center gap-1 text-[9.5px] font-bold text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
-              </span>
+              <p className="text-xs font-black text-white truncate">{user.name || 'David Sterling'}</p>
+              <span className="text-[9.5px] font-bold text-emerald-400">Active</span>
             </div>
-            <p className="text-[10px] font-bold text-blue-400 truncate">{user.title || ROLE_LABELS[role] || 'HR Manager'}</p>
+            <p className="text-[10px] font-bold text-blue-400 truncate">{user.title || ROLE_LABELS[role] || 'Department Manager'}</p>
             <p className="text-[9.5px] font-medium text-slate-400 truncate">
-              {user.department || 'Human Resources'}
+              {user.department || 'Engineering'}
             </p>
           </div>
         )}
 
-        {!collapsed && <ChevronDown size={14} className="text-slate-400 shrink-0" />}
+        {!collapsed && (
+          <ChevronUp
+            size={14}
+            className={`text-slate-400 shrink-0 transition-transform duration-200 ${
+              dropdownOpen ? 'rotate-180 text-blue-400' : ''
+            }`}
+          />
+        )}
       </div>
 
-      {/* Profile Dropdown Menu */}
+      {/* Upward Opening Profile Drill-down Popup Menu */}
       {dropdownOpen && (
-        <div className="absolute left-3 right-3 top-full mt-2 bg-slate-900 border border-slate-700/80 p-2 shadow-2xl z-50 rounded-2xl space-y-1 text-xs text-slate-100 animate-fadeIn">
+        <div className="absolute left-3 right-3 bottom-full mb-2 bg-slate-900 border border-slate-700/90 p-2 shadow-2xl z-50 rounded-2xl space-y-1 text-xs text-slate-100 animate-fadeIn">
           <button
+            type="button"
             onClick={() => {
               setDropdownOpen(false);
-              navigate('/profile');
+              navigate('/admin/profile');
             }}
-            className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2 font-medium"
+            className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2 font-medium text-slate-200 hover:text-white transition-colors"
           >
             <User size={14} className="text-blue-400" /> View Profile
           </button>
           <button
+            type="button"
             onClick={() => {
               setDropdownOpen(false);
-              navigate('/settings');
+              navigate('/admin/settings');
             }}
-            className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2 font-medium"
+            className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2 font-medium text-slate-200 hover:text-white transition-colors"
           >
-            <Settings size={14} className="text-indigo-400" /> Settings
+            <Settings size={14} className="text-indigo-400" /> System Settings
           </button>
           <div className="border-t border-slate-800 pt-1">
             <button
+              type="button"
               onClick={() => {
                 setDropdownOpen(false);
                 setShowLogoutModal(true);
               }}
-              className="w-full text-left px-3 py-2 rounded-xl hover:bg-rose-500/10 text-rose-400 font-bold flex items-center gap-2"
+              className="w-full text-left px-3 py-2 rounded-xl hover:bg-rose-500/15 text-rose-400 font-bold flex items-center gap-2 transition-colors"
             >
               <LogOut size={14} /> Logout
             </button>
@@ -93,7 +113,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
         </div>
       )}
 
-      {/* Logout Confirmation Modal */}
+      {/* Portaled Fullscreen Logout Modal */}
       <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
