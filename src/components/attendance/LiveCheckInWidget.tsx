@@ -27,7 +27,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
 
   // Office Timer
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: any;
     if (isCheckedIn && !isOnBreak) {
       interval = setInterval(() => {
         setTimerSeconds((prev) => prev + 1);
@@ -38,7 +38,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
 
   // Break Timer
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: any;
     if (isOnBreak) {
       interval = setInterval(() => {
         setBreakSeconds((prev) => prev + 1);
