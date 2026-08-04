@@ -1,34 +1,27 @@
-export type Department =
-  | "HR"
-  | "Engineering"
-  | "Finance"
-  | "Marketing"
-  | "Operations";
-
-export interface DepartmentStructure {
+export interface Department {
   id: string;
-  name: Department;
+  name: string;
 }
 
-export const departments: DepartmentStructure[] = [
+export const departments: Department[] = [
   {
-    id: "D001",
-    name: "HR",
+    id: "HR001",
+    name: "Human Resources",
   },
   {
-    id: "D002",
+    id: "ENG001",
     name: "Engineering",
   },
   {
-    id: "D003",
+    id: "FIN001",
     name: "Finance",
   },
   {
-    id: "D004",
+    id: "MKT001",
     name: "Marketing",
   },
   {
-    id: "D005",
+    id: "OPS001",
     name: "Operations",
   },
 ];

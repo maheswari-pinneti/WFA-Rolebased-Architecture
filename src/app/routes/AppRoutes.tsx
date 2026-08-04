@@ -56,6 +56,7 @@ import { PayslipsPage } from '../../features/employee/pages/PayslipsPage';
 
 // Error Pages
 import { NotFoundPage, AccessDeniedPage, ServerErrorPage } from '../../features/error';
+import { Unauthorized } from '../../pages/Unauthorized';
 
 const DefaultHomeRedirect: React.FC = () => {
   const { role } = useAuth();
@@ -133,6 +134,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/404" element={<NotFoundPage />} />
                 <Route path="/403" element={<AccessDeniedPage />} />
                 <Route path="/500" element={<ServerErrorPage />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
 
                 {/* Legacy Root Paths Redirects */}
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

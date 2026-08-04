@@ -4,58 +4,38 @@ import { RootState } from "../app/store";
 export const useDepartmentAccess = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const canAccessDepartment = (departmentIdOrName: string): boolean => {
+  const hasDepartmentAccess = (departmentId: string): boolean => {
     if (!user) return false;
 
-    const userRole = String(user.role).toUpperCase();
+    const role = String(user.role).toLowerCase();
 
-    // 1. Admin holds global organization access
-    if (userRole === "ADMIN") {
+    if (role === "admin" || role === "hr") {
       return true;
     }
 
-    // 2. HR access to HR department (D001 or "HR")
-    if (userRole === "HR" || userRole === "HR_MANAGER") {
-      return (
-        departmentIdOrName === "D001" ||
-        departmentIdOrName === "HR" ||
-        departmentIdOrName === "Human Resources"
-      );
+    if (role === "manager" || role === "team lead" || role === "team_lead") {
+      return user.departmentId === departmentId;
     }
 
-    // 3. Manager access to assigned department (departmentId or department name match)
-    if (userRole === "MANAGER" || userRole === "TEAM_MANAGER") {
-      if (user.departmentId && departmentIdOrName === user.departmentId) {
-        return true;
-      }
-      if (user.department && departmentIdOrName === user.department) {
-        return true;
-      }
-      return false;
+    if (role === "employee") {
+      return user.departmentId === departmentId;
     }
 
-    // 4. Team Lead access to team/department
-    if (userRole === "TEAM_LEAD") {
-      if (user.departmentId && departmentIdOrName === user.departmentId) {
-        return true;
-      }
-      if (user.department && departmentIdOrName === user.department) {
-        return true;
-      }
-      return false;
-    }
+    return user.departmentId === departmentId;
+  };
 
-    // 5. Employee self access only
-    if (userRole === "EMPLOYEE") {
-      return false;
-    }
-
-    return false;
+  const canAccessDepartment = (departmentIdOrName: string): boolean => {
+    if (!user) return false;
+    if (user.departmentId && user.departmentId === departmentIdOrName) return true;
+    if (user.department && user.department === departmentIdOrName) return true;
+    return hasDepartmentAccess(departmentIdOrName);
   };
 
   return {
+    user,
+    hasDepartmentAccess,
     canAccessDepartment,
     userDepartment: user?.department,
-    userDepartmentId: user?.departmentId || "D001",
+    userDepartmentId: user?.departmentId || "HR001",
   };
 };
