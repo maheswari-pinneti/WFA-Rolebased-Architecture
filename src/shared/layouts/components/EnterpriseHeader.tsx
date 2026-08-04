@@ -174,82 +174,89 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </div>
       </div>
 
-      {/* CENTER SECTION: Ultra-Compact Global Search Input */}
-      <div className="relative max-w-[170px] lg:max-w-[190px] w-full mx-2 hidden md:block">
-        <div className="relative flex items-center">
-          <Search size={13} className="absolute left-2.5 text-slate-400 pointer-events-none z-10 shrink-0" />
-          <input
-            type="text"
-            value={searchQuery}
-            onFocus={() => setSearchFocused(true)}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            className={`w-full pl-7 pr-11 py-1 text-[11px] rounded-lg transition-all border outline-none ${
-              isDark
-                ? 'bg-slate-900/90 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500'
-                : 'bg-slate-100 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-blue-500'
-            }`}
-          />
-          <kbd className={`hidden lg:inline-flex absolute right-1.5 items-center px-1 py-0.2 text-[8px] font-mono font-bold rounded border pointer-events-none ${
-            isDark ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-200 text-slate-600 border-slate-300'
-          }`}>
-            Ctrl K
-          </kbd>
-        </div>
-
-        {/* Global Search Dropdown Overlay */}
-        {searchFocused && (
-          <>
-            <div className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs" onClick={() => setSearchFocused(false)} />
-            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 p-3 shadow-2xl z-50 rounded-2xl space-y-2 text-slate-100 animate-fadeIn font-sans">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                <span className="text-xs font-bold text-slate-200">Global Search Results</span>
-                <button onClick={() => setSearchFocused(false)} className="text-slate-400 hover:text-white">
-                  <X size={14} />
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-1">
-                {(['all', 'employees', 'departments', 'reports', 'security'] as const).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSearchCategory(cat)}
-                    className={`px-2.5 py-1 text-[11px] rounded-lg font-bold capitalize transition-all ${
-                      searchCategory === cat
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              <div className="pt-1 border-t border-slate-800 max-h-56 overflow-y-auto space-y-1">
-                {filteredSearchResults.length === 0 ? (
-                  <p className="text-xs text-slate-400 py-3 text-center">No matching results found</p>
-                ) : (
-                  filteredSearchResults.map((res, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSearchSubmit(res.path)}
-                      className="w-full text-left px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-xs text-slate-100 font-semibold flex items-center justify-between transition-colors shadow-sm"
-                    >
-                      <span className="truncate pr-2">{res.title}</span>
-                      <span className="text-[9px] font-mono font-bold uppercase bg-slate-950 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30 shrink-0">
-                        {res.category}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* RIGHT SECTION: Notification Bell, Messages, Theme Toggle, Help Icon & User Profile */}
+      {/* RIGHT SECTION: Search Button Trigger, Notifications, Messages, Theme Toggle, Help Icon & User Profile */}
       <div className="flex items-center gap-2 shrink-0">
+        {/* 0. Search Icon Trigger Button */}
+        <div className="relative">
+          <button
+            onClick={() => setSearchFocused(true)}
+            aria-label="Open Global Search"
+            className={`p-2 rounded-xl border transition-all flex items-center gap-2 ${
+              isDark
+                ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800'
+                : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+            }`}
+            title="Global Search (Ctrl + K)"
+          >
+            <Search size={18} />
+            <span className="text-xs font-medium text-slate-400 hidden lg:inline">Search</span>
+            <kbd className={`hidden xl:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-bold rounded border ${
+              isDark ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-200 text-slate-600 border-slate-300'
+            }`}>
+              Ctrl K
+            </kbd>
+          </button>
+
+          {/* Global Search Modal Overlay */}
+          {searchFocused && (
+            <>
+              <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs" onClick={() => setSearchFocused(false)} />
+              <div className="fixed top-20 left-1/2 -translate-x-1/2 w-full max-w-lg bg-slate-900 border border-slate-800 p-4 shadow-2xl z-50 rounded-2xl space-y-3 text-slate-100 animate-fadeIn font-sans">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    <Search size={16} className="text-blue-400 shrink-0" />
+                    <input
+                      type="text"
+                      autoFocus
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search employees, departments, reports..."
+                      className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-400 outline-none"
+                    />
+                  </div>
+                  <button onClick={() => setSearchFocused(false)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {(['all', 'employees', 'departments', 'reports', 'security'] as const).map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSearchCategory(cat)}
+                      className={`px-3 py-1 text-xs rounded-xl font-bold capitalize transition-all ${
+                        searchCategory === cat
+                          ? 'bg-blue-600 text-white shadow-md'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="pt-2 border-t border-slate-800 max-h-64 overflow-y-auto space-y-1.5">
+                  {filteredSearchResults.length === 0 ? (
+                    <p className="text-xs text-slate-400 py-4 text-center">No matching results found</p>
+                  ) : (
+                    filteredSearchResults.map((res, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleSearchSubmit(res.path)}
+                        className="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-xs text-slate-100 font-semibold flex items-center justify-between transition-colors shadow-sm"
+                      >
+                        <span className="truncate pr-2">{res.title}</span>
+                        <span className="text-[9.5px] font-mono font-bold uppercase bg-slate-950 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 shrink-0">
+                          {res.category}
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
         {/* 1. Notification Bell */}
         <div className="relative">
           <button
