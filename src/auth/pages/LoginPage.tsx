@@ -160,9 +160,9 @@ export const LoginPage: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => handleDemoRoleSelect('john.doe@thestackly.com')}
+              onClick={() => handleDemoRoleSelect('employee@thestackly.com')}
               className={`py-2 text-xs font-bold rounded-xl transition-all border-0 cursor-pointer ${
-                email === 'john.doe@thestackly.com'
+                email === 'employee@thestackly.com'
                   ? 'bg-amber-600 text-white shadow-md'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
               }`}

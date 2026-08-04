@@ -6,12 +6,11 @@ import { PERMISSION_MATRIX } from '../../security/policies/permissionMatrix';
 import usersData from '../../mocks/data/users.json';
 
 const initialSession = authService.getStoredSession();
-const defaultUser = (usersData as User[])[0]; // Admin by default for seamless initial view
 
 const initialState: AuthState = {
-  user: initialSession ? initialSession.user : defaultUser,
-  token: initialSession ? initialSession.token : 'default-demo-token',
-  isAuthenticated: true,
+  user: initialSession ? initialSession.user : null,
+  token: initialSession ? initialSession.token : null,
+  isAuthenticated: Boolean(initialSession),
   isLoading: false,
   error: null,
 };
