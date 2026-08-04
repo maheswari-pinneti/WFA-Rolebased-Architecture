@@ -4,6 +4,7 @@ import { ProtectedRoute } from '../../security/guards/ProtectedRoute';
 import { RoleGuard } from '../../security/guards/RoleGuard';
 import { MainLayout } from '../../shared/layouts/MainLayout';
 import { LoginPage } from '../../auth/pages/LoginPage';
+import { SignUpPage } from '../../auth/pages/SignUpPage';
 import { LogoutPage } from '../../auth/pages/LogoutPage';
 import { Role, ROLE_HOME_PATHS } from '../../security/roles/roles';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -66,6 +67,7 @@ export const AppRoutes: React.FC = () => {
     <Routes>
       {/* Public Auth Routes */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
       <Route path="/logout" element={<LogoutPage />} />
       <Route path="/verify-email" element={<LoginPage />} />
       <Route path="/forgot-password" element={<LoginPage />} />

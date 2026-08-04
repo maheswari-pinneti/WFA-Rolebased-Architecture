@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROLE_HOME_PATHS } from '../../security/roles/roles';
 import { StacklyLogo } from '../../components/common/StacklyLogo';
@@ -9,7 +9,7 @@ import {
   ArrowRight,
   KeyRound,
   ShieldCheck,
-  Sparkles
+  UserPlus
 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
@@ -82,27 +82,22 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-[#0B1120] text-slate-100 font-sans relative overflow-hidden">
-      {/* Background Ambient Orbs */}
-      <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Ambient Glow */}
+      <div className="absolute -top-32 -left-32 w-[450px] h-[450px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-[450px] h-[450px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* CENTERED AUTHENTICATION CARD */}
-      <div className="max-w-lg w-full space-y-6 bg-slate-900 border border-slate-800 p-8 sm:p-10 rounded-3xl shadow-2xl relative z-10 backdrop-blur-xl">
+      {/* PERFECTLY CENTERED PROPER MAX-WIDTH AUTH CARD */}
+      <div className="w-full max-w-[460px] mx-auto space-y-6 bg-slate-900 border border-slate-800 p-7 sm:p-9 rounded-3xl shadow-2xl relative z-10 backdrop-blur-xl">
         
         {/* Brand Header */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <StacklyLogo size={36} />
-            <span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/30">
-              SECURE AUTH
-            </span>
-          </div>
+        <div className="space-y-3 text-center flex flex-col items-center">
+          <StacklyLogo size={36} />
           <div>
-            <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Welcome Back
+            <h3 className="text-2xl font-black text-white tracking-tight">
+              Sign In to Workforce
             </h3>
-            <p className="text-xs text-slate-400 mt-1 font-medium">
-              Sign in with your official company credentials to access your dashboard.
+            <p className="text-xs text-slate-400 mt-1 font-medium max-w-xs mx-auto">
+              Enter your official corporate credentials to access your dashboard.
             </p>
           </div>
         </div>
@@ -135,7 +130,7 @@ export const LoginPage: React.FC = () => {
                 borderColor: email === 'admin@thestackly.com' ? '#3B82F6' : '#334155',
                 color: '#FFFFFF'
               }}
-              className="py-2.5 px-3 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-md"
+              className="py-2 px-2 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-sm"
             >
               Admin
             </button>
@@ -148,7 +143,7 @@ export const LoginPage: React.FC = () => {
                 borderColor: email === 'hr@thestackly.com' ? '#A855F7' : '#334155',
                 color: '#FFFFFF'
               }}
-              className="py-2.5 px-3 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-md"
+              className="py-2 px-2 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-sm"
             >
               HR
             </button>
@@ -161,7 +156,7 @@ export const LoginPage: React.FC = () => {
                 borderColor: email === 'manager@thestackly.com' ? '#10B981' : '#334155',
                 color: '#FFFFFF'
               }}
-              className="py-2.5 px-3 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-md"
+              className="py-2 px-2 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-sm"
             >
               Manager
             </button>
@@ -174,7 +169,7 @@ export const LoginPage: React.FC = () => {
                 borderColor: email === 'john.doe@thestackly.com' ? '#F59E0B' : '#334155',
                 color: '#FFFFFF'
               }}
-              className="py-2.5 px-3 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-md"
+              className="py-2 px-2 rounded-xl text-xs font-extrabold border transition-all text-center cursor-pointer shadow-sm"
             >
               Employee
             </button>
@@ -201,7 +196,7 @@ export const LoginPage: React.FC = () => {
                   borderColor: '#334155',
                   color: '#FFFFFF'
                 }}
-                className="w-full rounded-xl pl-10 pr-4 py-3 text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
+                className="w-full rounded-xl pl-10 pr-4 py-2.5 text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
               />
             </div>
           </div>
@@ -237,7 +232,7 @@ export const LoginPage: React.FC = () => {
                   borderColor: '#334155',
                   color: '#FFFFFF'
                 }}
-                className="w-full rounded-xl pl-10 pr-4 py-3 text-xs font-mono placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors shadow-inner tracking-widest"
+                className="w-full rounded-xl pl-10 pr-4 py-2.5 text-xs font-mono placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors shadow-inner tracking-widest"
               />
             </div>
           </div>
@@ -281,13 +276,17 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        {/* Quick Domain Hint */}
-        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 text-center font-mono space-y-1">
-          <div>
-            Demo OTP: <strong className="text-blue-400">849201</strong> • Domain: <strong className="text-emerald-400">@thestackly.com</strong>
+        {/* Account Registration Link & Demo Info */}
+        <div className="pt-2 border-t border-slate-800/80 flex flex-col items-center gap-3 text-center">
+          <div className="text-xs text-slate-400">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-blue-400 hover:underline font-bold inline-flex items-center gap-1">
+              <UserPlus size={13} /> Sign Up
+            </Link>
           </div>
-          <div className="text-[10px] text-slate-500 flex items-center justify-center gap-1">
-            <ShieldCheck size={12} className="text-emerald-400" /> 256-Bit SSL Encrypted Enterprise Access
+
+          <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800/80 text-[11px] text-slate-400 font-mono w-full">
+            Demo OTP: <strong className="text-blue-400">849201</strong> • Domain: <strong className="text-emerald-400">@thestackly.com</strong>
           </div>
         </div>
 
