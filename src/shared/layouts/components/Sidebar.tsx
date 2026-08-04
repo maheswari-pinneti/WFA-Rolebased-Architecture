@@ -235,36 +235,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           collapsed ? 'w-[72px]' : 'w-[260px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Sidebar Controls Header */}
-        <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
-          {!collapsed ? (
+        {/* Sidebar Header Title */}
+        {!collapsed && (
+          <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-slate-400 pl-2">
-              Navigation Menu
+              Navigation
             </span>
-          ) : (
-            <span className="w-full text-center text-[10px] font-bold text-slate-400">
-              WFA
-            </span>
-          )}
-          <div>
-            {/* Mobile Close Button &times; */}
-            <button
-              onClick={() => setMobileOpen(false)}
-              className="md:hidden p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-all border border-slate-700/80"
-              title="Close Drawer"
-            >
-              <X size={16} />
-            </button>
-            {/* Desktop Collapse Toggle */}
-            <button
-              onClick={() => setCollapsed((prev) => !prev)}
-              className="hidden md:block p-1.5 rounded-xl bg-slate-800/80 text-slate-400 hover:text-white transition-all border border-slate-700/80"
-              title={collapsed ? 'Expand Sidebar (260px)' : 'Collapse Sidebar'}
-            >
-              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </button>
           </div>
-        </div>
+        )}
 
         {/* Quick Search Navigation Input */}
         {!collapsed && (
