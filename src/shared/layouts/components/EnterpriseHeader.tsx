@@ -203,18 +203,25 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </div>
       </div>
 
-      {/* CENTER SECTION: Global Search Input */}
-      <div className="flex-1 max-w-md mx-4 relative hidden md:block">
+      {/* CENTER SECTION: Compact Global Search Input */}
+      <div className="relative max-w-[220px] lg:max-w-[260px] w-full mx-2 hidden md:block">
         <div className="relative flex items-center">
-          <Search size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+          <Search size={14} className="absolute left-3 text-slate-400 pointer-events-none z-10 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onFocus={() => setSearchFocused(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search employees, reports, departments..."
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-2xl bg-slate-900/90 border border-slate-800 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
+            placeholder="Search workforce..."
+            className={`w-full pl-8 pr-14 py-1.5 text-xs rounded-xl transition-all shadow-inner border ${
+              theme === 'dark'
+                ? 'bg-slate-900/90 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500'
+                : 'bg-slate-100 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-blue-500'
+            }`}
           />
+          <kbd className="hidden lg:inline-flex absolute right-2 items-center px-1.5 py-0.5 text-[9px] font-mono font-extrabold bg-slate-800/80 text-slate-400 rounded border border-slate-700/80 pointer-events-none">
+            Ctrl K
+          </kbd>
         </div>
 
         {/* Global Search Dropdown Overlay */}
