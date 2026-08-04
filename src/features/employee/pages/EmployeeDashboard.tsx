@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
@@ -6,39 +6,18 @@ import { KPICard } from '../../../components/cards/KPICard';
 import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
 
+// Attendance System Components
+import { LiveCheckInWidget } from '../../../components/attendance/LiveCheckInWidget';
+import { AttendanceCalendarView } from '../../../components/attendance/AttendanceCalendarView';
+
 // Custom Employee Charts
 import { WorkforceTrendLine } from '../../analytics/charts/WorkforceTrendLine';
 
-import { Clock, Play, Square, Calendar, Star, FileText, Compass, CheckCircle2, DollarSign, Target, HeartHandshake } from 'lucide-react';
+import { Clock, Calendar, FileText, Compass, DollarSign, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const EmployeeDashboard: React.FC = () => {
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
-  const [isClockedIn, setIsClockedIn] = useState(true);
-  const [timerSeconds, setTimerSeconds] = useState(25200); // 7 hours
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isClockedIn) {
-      interval = setInterval(() => {
-        setTimerSeconds((prev) => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isClockedIn]);
-
-  const formatHoursMinutes = (totalSec: number) => {
-    const hrs = Math.floor(totalSec / 3600);
-    const mins = Math.floor((totalSec % 3600) / 60);
-    const secs = totalSec % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const myRequests = [
-    { id: 'REQ-501', title: 'Vacation Leave (3 Days)', date: 'Aug 10 - Aug 13', status: 'PENDING' },
-    { id: 'REQ-490', title: 'Remote Work Week', date: 'Jul 15 - Jul 20', status: 'APPROVED' },
-    { id: 'REQ-482', title: 'Ergonomic Monitor Expense', date: 'Jun 28', status: 'APPROVED' },
-  ];
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
     setDrillDownData({
@@ -52,9 +31,10 @@ export const EmployeeDashboard: React.FC = () => {
 
   return (
     <RoleGuard allowedRoles={[Role.EMPLOYEE, Role.TEAM_LEAD, Role.MANAGER, Role.HR, Role.ADMIN]} requiredPermission={Permission.PROFILE_VIEW}>
-      <div className="space-y-6 animate-fadeIn">
+      <div className="space-y-6 animate-fadeIn font-sans pb-10">
+        
         {/* Employee Header Banner */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-slate-900 to-teal-950/40 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+        <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/50 via-slate-900 to-teal-950/40 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
           <div className="flex items-center gap-4">
             <img
               src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150"
@@ -81,10 +61,13 @@ export const EmployeeDashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* LIVE CHECK-IN / CHECK-OUT WIDGET & TIME TRACKER */}
+        <LiveCheckInWidget employeeName="Alex Mercer" department="Engineering & Technology" />
+
         {/* Advanced Filter Bar */}
         <AdvancedFilterBar onFilterChange={() => {}} />
 
-        {/* 8 Reusable Employee KPI Cards */}
+        {/* 4 Employee Attendance & Performance KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="My Shift Attendance"
@@ -95,179 +78,59 @@ export const EmployeeDashboard: React.FC = () => {
             icon={<Clock size={20} />}
             accentColor="emerald"
             onClick={() => openDrillDown('My Shift Attendance Log', '98.5%', 'Personal monthly shift clock-ins', [
-              { label: 'Total Hours Worked', value: '168 Hours' },
+              { label: 'Total Hours Worked', value: '176 Hours' },
               { label: 'On-Time Clock Ins', value: 21 },
             ])}
           />
           <KPICard
-            title="Leave Balance"
-            value="14 Days PTO"
-            change={0.0}
-            trend="neutral"
-            subtitle="Annual allocation"
-            icon={<Calendar size={20} />}
-            accentColor="cyan"
-            onClick={() => openDrillDown('My Annual PTO Leave Balance', '14 Days PTO Remaining', 'Accrued vacation and sick leave', [
-              { label: 'Annual Paid Leave', value: '10 Days' },
-              { label: 'Sick / Personal', value: '4 Days' },
-            ])}
-          />
-          <KPICard
-            title="Performance Score"
-            value="96 / 100"
-            change={3.2}
+            title="Hours in Office"
+            value="176 hrs"
+            change={4.2}
             trend="up"
-            subtitle="Q2 Assessment"
-            icon={<Star size={20} />}
-            accentColor="purple"
-            onClick={() => openDrillDown('My Q2 Performance Score', '96 / 100 Score', 'Quarterly developer performance score', [
-              { label: 'Code Quality Rating', value: '98%' },
-              { label: 'Task Delivery Speed', value: '94%' },
+            subtitle="August 2026 accrued"
+            icon={<Calendar size={20} />}
+            accentColor="blue"
+            onClick={() => openDrillDown('Office Hours Logged', '176 Hours', 'Monthly accrued office time', [
+              { label: 'Average Daily Hours', value: '8.8 Hours/Day' },
+              { label: 'Overtime Accrued', value: '12 Hours' },
             ])}
           />
           <KPICard
-            title="Recent Payslip"
-            value="$8,450.00"
-            change={0.0}
+            title="Paid Time Off (PTO)"
+            value="18 Days"
+            change={0}
             trend="neutral"
-            subtitle="July 2026 Processed"
+            subtitle="Available leave balance"
+            icon={<FileText size={20} />}
+            accentColor="purple"
+            onClick={() => openDrillDown('Leave Balance Breakdown', '18 Days', 'PTO & sick leave balance', [
+              { label: 'Annual Paid Leave', value: '14 Days' },
+              { label: 'Casual & Sick Leave', value: '4 Days' },
+            ])}
+          />
+          <KPICard
+            title="Monthly Payroll Net"
+            value="$8,450"
+            change={2.5}
+            trend="up"
+            subtitle="Estimated August payout"
             icon={<DollarSign size={20} />}
             accentColor="amber"
-            onClick={() => openDrillDown('July 2026 Monthly Payslip', '$8,450.00 Net Salary', 'Personal payroll statement details', [
-              { label: 'Base Gross Salary', value: '$9,200.00' },
-              { label: 'Tax Deductions', value: '$1,150.00' },
-            ])}
-          />
-          <KPICard
-            title="Active Goals"
-            value="4 Objectives"
-            change={25.0}
-            trend="up"
-            subtitle="2 Completed Q2"
-            icon={<Target size={20} />}
-            accentColor="rose"
-            onClick={() => openDrillDown('My Development Goals', '4 Active Goals', 'Annual career development objectives', [
-              { label: 'Goal 1: Master ABAC Security Engine', value: 'Completed' },
-            ])}
-          />
-          <KPICard
-            title="Completed Tasks"
-            value="28 Shipped"
-            change={14.0}
-            trend="up"
-            subtitle="Sprint story points"
-            icon={<CheckCircle2 size={20} />}
-            accentColor="emerald"
-            onClick={() => openDrillDown('My Completed Tasks', '28 Delivered', 'Merged PRs and shipped modules', [
-              { label: 'Pull Requests Merged', value: 18 },
-            ])}
-          />
-          <KPICard
-            title="Training Credits"
-            value="12 Hours"
-            change={4.0}
-            trend="up"
-            subtitle="Security certs"
-            icon={<Compass size={20} />}
-            accentColor="blue"
-            onClick={() => openDrillDown('My Training Credits', '12 Hours', 'Completed learning modules', [
-              { label: 'Cybersecurity Cert', value: 'Passed' },
-            ])}
-          />
-          <KPICard
-            title="Peer Rating"
-            value="4.9 / 5.0"
-            change={0.2}
-            trend="up"
-            subtitle="High peer feedback"
-            icon={<HeartHandshake size={20} />}
-            accentColor="cyan"
-            onClick={() => openDrillDown('My Peer Feedback Score', '4.9 / 5.0 Score', '360 peer evaluation score', [
-              { label: 'Peer Score', value: '4.9 / 5.0' },
+            onClick={() => openDrillDown('Monthly Salary Statement', '$8,450 Net', 'Payroll breakdown', [
+              { label: 'Base Gross Salary', value: '$9,200' },
+              { label: 'Deductions & Tax', value: '-$750' },
             ])}
           />
         </div>
 
-        {/* Section 1: Interactive Shift Punch Clock & My Requests Tracker */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Shift Punch Clock */}
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Clock size={18} className="text-emerald-400" /> Interactive Shift Punch Clock & Time Tracker
-            </h3>
+        {/* INTERACTIVE MONTHLY ATTENDANCE CALENDAR VIEW */}
+        <AttendanceCalendarView />
 
-            <div className="p-6 rounded-2xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-center space-y-4">
-              <span className="badge badge-info text-xs uppercase font-mono font-bold">
-                {isClockedIn ? 'ON DUTY • CLOCKED IN' : 'OFF DUTY'}
-              </span>
-              <p className="text-4xl font-black font-mono tracking-tight text-[var(--text-primary)]">
-                {formatHoursMinutes(timerSeconds)}
-              </p>
-              <p className="text-xs text-slate-400">Shift Started: Today at 09:00 AM</p>
+        {/* Employee Personal Growth Chart */}
+        <WorkforceTrendLine />
 
-              <button
-                onClick={() => setIsClockedIn(!isClockedIn)}
-                className={`px-6 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 mx-auto transition-all shadow-md ${
-                  isClockedIn
-                    ? 'bg-rose-600 hover:bg-rose-500 text-white'
-                    : 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                }`}
-              >
-                {isClockedIn ? (
-                  <>
-                    <Square size={16} /> Clock Out for the Day
-                  </>
-                ) : (
-                  <>
-                    <Play size={16} /> Clock In Now
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* My Submitted Requests Status */}
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-                <FileText size={18} className="text-amber-400" /> My Requests Status Tracker
-              </h3>
-              <Link to="/employee/leave" className="text-xs font-bold text-blue-400 hover:underline">
-                View All
-              </Link>
-            </div>
-
-            <div className="space-y-3">
-              {myRequests.map((r) => (
-                <div key={r.id} className="p-3.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-mono text-[10px] text-slate-400">{r.id}</span>
-                    <h4 className="font-bold text-sm text-[var(--text-primary)]">{r.title}</h4>
-                    <p className="text-xs text-slate-400">{r.date}</p>
-                  </div>
-                  <span className={`badge ${r.status === 'APPROVED' ? 'badge-success' : 'badge-info'} text-[10px] uppercase font-bold`}>
-                    {r.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Section 2: Personal Performance Score Trend Line */}
-        <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-          <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-            <Star size={18} className="text-purple-400" /> My Individual Performance Score & Target Output Trend
-          </h3>
-          <WorkforceTrendLine />
-        </div>
-
-        {/* Drill-Down Modal */}
-        <DrillDownModal
-          isOpen={drillDownData !== null}
-          onClose={() => setDrillDownData(null)}
-          data={drillDownData}
-        />
+        {/* Drill Down Modal */}
+        <DrillDownModal isOpen={!!drillDownData} data={drillDownData} onClose={() => setDrillDownData(null)} />
       </div>
     </RoleGuard>
   );
