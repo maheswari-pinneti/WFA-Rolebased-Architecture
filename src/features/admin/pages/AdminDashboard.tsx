@@ -3,11 +3,10 @@ import { useAuth } from '../../../auth/hooks/useAuth';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
-import { KPICard } from '../../../components/cards/KPICard';
 import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
 
-// 7 Interactive SVG Recharts
+// Recharts Modules
 import { WorkforceGrowthLine } from '../../analytics/charts/WorkforceGrowthLine';
 import { DepartmentDistribution } from '../../analytics/charts/DepartmentDistribution';
 import { AttendanceAnalysisArea } from '../../analytics/charts/AttendanceAnalysisArea';
@@ -17,13 +16,11 @@ import { SalaryAnalyticsStackedBar } from '../../analytics/charts/SalaryAnalytic
 import { EmployeeEngagementRadar } from '../../analytics/charts/EmployeeEngagementRadar';
 
 import {
-  ShieldCheck,
   Users,
   UserPlus,
   Clock,
   FileSpreadsheet,
   Building2,
-  MapPin,
   TrendingUp,
   Award,
   Calendar,
@@ -34,13 +31,19 @@ import {
   ArrowRight,
   TrendingDown,
   Briefcase,
-  Target
+  Target,
+  Eye,
+  ShoppingCart,
+  ShoppingBag,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
+  const [timeRange, setTimeRange] = useState<'Day' | 'Week' | 'Month'>('Month');
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
     setDrillDownData({
@@ -70,8 +73,9 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN]} requiredPermission={Permission.SYSTEM_CONFIG}>
-      <div className="space-y-6 animate-fadeIn font-sans">
-        {/* Dynamic Human Greeting & Quick Actions Header */}
+      <div className="space-y-6 animate-fadeIn font-sans pb-10">
+        
+        {/* TailAdmin Hero Greeting Banner */}
         <div className="p-6 lg:p-8 rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-800 to-slate-950 text-white border border-blue-500/30 shadow-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
           <div className="space-y-2 z-10">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-xs font-bold backdrop-blur-md border border-white/20">
@@ -81,7 +85,7 @@ export const AdminDashboard: React.FC = () => {
               {getGreeting()}, {firstName} 👋
             </h2>
             <p className="text-xs text-blue-100 font-medium">
-              Department: <span className="font-bold text-white">{user?.department || 'Executive Governance'}</span> • Scope: <span className="font-bold text-amber-300">System Administrator</span>
+              Department: <span className="font-bold text-white">{user?.department || 'Executive Governance'}</span> • Role: <span className="font-bold text-amber-300">System Administrator</span>
             </p>
           </div>
 
@@ -102,152 +106,203 @@ export const AdminDashboard: React.FC = () => {
         {/* Global Filter Bar */}
         <AdvancedFilterBar onFilterChange={() => {}} />
 
-        {/* 8 Executive KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <KPICard
-            title="Total Employees"
-            value="15,420"
-            change={12.4}
-            trend="up"
-            subtitle="20,000 Total Headcount Roster"
-            icon={<Users size={20} />}
-            accentColor="blue"
+        {/* TAILADMIN STYLE TOP 4 KPI METRIC CARDS ROW */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          
+          {/* Card 1: Total Employees */}
+          <div 
             onClick={() => openDrillDown('Total Employee Headcount', '15,420 Active Records', 'Global workforce roster', [
               { label: 'Full-time Permanent', value: 13850 },
               { label: 'Contractors & Consultants', value: 1570 },
             ])}
-          />
-          <KPICard
-            title="Active Employees"
-            value="14,850"
-            change={96.3}
-            trend="up"
-            subtitle="Currently online & clocked in"
-            icon={<ShieldCheck size={20} />}
-            accentColor="emerald"
-            onClick={() => openDrillDown('Active Duty Status', '14,850 Clocked In', 'Real-time shift roster', [
-              { label: 'In-Office Campuses', value: 11200 },
-              { label: 'Remote WFH', value: 3650 },
-            ])}
-          />
-          <KPICard
-            title="Attendance Rate"
-            value="96.5%"
-            change={1.5}
-            trend="up"
-            subtitle="Weekly enterprise average"
-            icon={<Clock size={20} />}
-            accentColor="amber"
+            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Eye size={22} />
+              </div>
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                0.43% <ArrowUpRight size={14} />
+              </span>
+            </div>
+            <div>
+              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">$3.456K</h4>
+              <p className="text-xs font-semibold text-slate-400 mt-1">Total Workforce Views</p>
+            </div>
+          </div>
+
+          {/* Card 2: Total Profit / Attendance Rate */}
+          <div 
             onClick={() => openDrillDown('Attendance Compliance Rate', '96.5%', 'Weekly shift adherence', [
               { label: 'On-Time Clock Ins', value: '94.2%' },
               { label: 'Approved Remote WFH', value: '2.3%' },
             ])}
-          />
-          <KPICard
-            title="Employee Turnover"
-            value="4.2%"
-            change={-0.8}
-            trend="down"
-            subtitle="Annual attrition rate"
-            icon={<TrendingDown size={20} />}
-            accentColor="purple"
-            onClick={() => openDrillDown('Employee Turnover Attrition', '4.2% Rate', 'Annual attrition index', [
-              { label: 'Voluntary Resignations', value: '3.1%' },
-              { label: 'Involuntary Departures', value: '1.1%' },
-            ])}
-          />
-          <KPICard
-            title="Average Performance Score"
-            value="87%"
-            change={3.2}
-            trend="up"
-            subtitle="Quarterly KPI rating index"
-            icon={<Award size={20} />}
-            accentColor="blue"
+            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ShoppingCart size={22} />
+              </div>
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                4.35% <ArrowUpRight size={14} />
+              </span>
+            </div>
+            <div>
+              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">$45,2K</h4>
+              <p className="text-xs font-semibold text-slate-400 mt-1">Total Attendance Revenue</p>
+            </div>
+          </div>
+
+          {/* Card 3: Total Product / Productivity Index */}
+          <div 
             onClick={() => openDrillDown('Performance Score Index', '87% Average', 'Quarterly KPI score', [
               { label: 'Exceeding Expectations', value: '58%' },
               { label: 'Meeting Targets', value: '38%' },
             ])}
-          />
-          <KPICard
-            title="Open Positions"
-            value="124"
-            change={8.4}
-            trend="up"
-            subtitle="Active hiring requisitions"
-            icon={<Briefcase size={20} />}
-            accentColor="emerald"
+            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ShoppingBag size={22} />
+              </div>
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                2.59% <ArrowUpRight size={14} />
+              </span>
+            </div>
+            <div>
+              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">2.450</h4>
+              <p className="text-xs font-semibold text-slate-400 mt-1">Total Productivity Tasks</p>
+            </div>
+          </div>
+
+          {/* Card 4: Total Users / Headcount */}
+          <div 
             onClick={() => openDrillDown('Active Job Requisitions', '124 Roles', 'Hiring pipeline', [
               { label: 'Engineering Roles', value: 64 },
               { label: 'Sales & Growth', value: 32 },
-              { label: 'Product & Design', value: 28 },
             ])}
-          />
-          <KPICard
-            title="Departments"
-            value="28"
-            change={0.0}
-            trend="neutral"
-            subtitle="Active functional divisions"
-            icon={<Building2 size={20} />}
-            accentColor="purple"
-            onClick={() => openDrillDown('Department Divisions', '28 Divisions', 'Organizational structure', [
-              { label: 'Engineering & Technology', value: '5,800 Staff' },
-              { label: 'Sales & Marketing', value: '4,200 Staff' },
-            ])}
-          />
-          <KPICard
-            title="Training Completion"
-            value="92%"
-            change={5.6}
-            trend="up"
-            subtitle="Skill development compliance"
-            icon={<Target size={20} />}
-            accentColor="amber"
-            onClick={() => openDrillDown('Training & Compliance', '92% Completed', 'Learning compliance', [
-              { label: 'Security & Compliance Badges', value: '96%' },
-              { label: 'Cloud Architecture Skills', value: '88%' },
-            ])}
-          />
+            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users size={22} />
+              </div>
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-sky-400">
+                0.95% <ArrowDownRight size={14} />
+              </span>
+            </div>
+            <div>
+              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">3.456</h4>
+              <p className="text-xs font-semibold text-slate-400 mt-1">Total Active Users</p>
+            </div>
+          </div>
+
         </div>
 
-        {/* 7 Interactive Analytics SVG Recharts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <WorkforceGrowthLine />
-          <DepartmentDistribution />
-          <AttendanceAnalysisArea />
-          <AttendanceOverviewBar />
-          <SalaryAnalyticsStackedBar />
-          <EmployeeEngagementRadar />
-          <PerformanceAreaChart />
+        {/* TAILADMIN MIDDLE MAIN CHART GRID: 8 COLUMNS (LEFT AREA CHART) + 4 COLUMNS (RIGHT BAR CHART) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* LEFT 8 COLUMNS: Total Revenue & Workforce Growth Area Chart */}
+          <div className="lg:col-span-8 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-blue-400">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Total Revenue
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-cyan-400">
+                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" /> Total Sales
+                  </span>
+                </div>
+                <p className="text-[11px] font-mono text-slate-400 mt-1">12.04.2026 - 12.05.2026</p>
+              </div>
+
+              {/* Day / Week / Month Toggle Pills */}
+              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
+                {(['Day', 'Week', 'Month'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => setTimeRange(mode)}
+                    className={`px-3 py-1 text-xs font-extrabold rounded-lg transition-all ${
+                      timeRange === mode
+                        ? 'bg-slate-800 text-white shadow-md'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {mode}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <WorkforceGrowthLine />
+          </div>
+
+          {/* RIGHT 4 COLUMNS: Profit This Week / Department Productivity Stacked Bar Chart */}
+          <div className="lg:col-span-4 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4 flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+              <div>
+                <h3 className="text-base font-extrabold text-white">Profit this week</h3>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="flex items-center gap-1 text-[11px] font-bold text-blue-400">
+                    <span className="w-2 h-2 rounded-full bg-blue-600" /> Sales
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] font-bold text-cyan-400">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400" /> Revenue
+                  </span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+                This Week ∨
+              </span>
+            </div>
+
+            <div className="flex-1 flex items-center justify-center min-h-[260px]">
+              <AttendanceOverviewBar />
+            </div>
+          </div>
+
         </div>
 
-        {/* Recent Activity Timeline & Upcoming Events */}
+        {/* TAILADMIN BOTTOM GRID: Department Distribution & Performance Radar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Left 6 Columns: Department Distribution */}
+          <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
+            <DepartmentDistribution />
+          </div>
+
+          {/* Right 6 Columns: Employee Engagement & Performance Radar */}
+          <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
+            <EmployeeEngagementRadar />
+          </div>
+
+        </div>
+
+        {/* Recent Enterprise Activity Stream & Celebrations */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity Timeline */}
-          <div className="lg:col-span-2 glass-panel p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
-              <h3 className="text-base font-extrabold text-[var(--text-primary)] flex items-center gap-2">
+          <div className="lg:col-span-2 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
                 <Activity size={18} className="text-blue-500" /> Recent Enterprise Activity
               </h3>
-              <Link to="/audit-logs" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1">
-                Audit Log Stream <ArrowRight size={14} />
+              <Link to="/audit-logs" className="text-xs font-bold text-blue-400 hover:underline flex items-center gap-1">
+                Audit Stream <ArrowRight size={14} />
               </Link>
             </div>
 
             <div className="space-y-3 text-xs">
               {[
-                { title: 'New employee joined Engineering team', time: '10m ago', user: 'Alex Mercer', badge: 'Onboarding', color: 'text-emerald-500 bg-emerald-500/10' },
-                { title: 'Attendance marked for 14,850 employees', time: '1h ago', user: 'System Automated', badge: 'Attendance', color: 'text-blue-500 bg-blue-500/10' },
-                { title: 'Leave request approved for Sarah Connor', time: '2h ago', user: 'Elena Rostova (HR)', badge: 'Approval', color: 'text-purple-500 bg-purple-500/10' },
-                { title: 'Quarterly Performance KPI scores updated', time: '3h ago', user: 'David Sterling', badge: 'Performance', color: 'text-amber-500 bg-amber-500/10' },
-                { title: 'Role security permission matrix modified', time: '5h ago', user: 'System Admin', badge: 'Security', color: 'text-rose-500 bg-rose-500/10' },
+                { title: 'New employee joined Engineering team', time: '10m ago', user: 'Alex Mercer', badge: 'Onboarding', color: 'text-emerald-400 bg-emerald-500/10' },
+                { title: 'Attendance marked for 14,850 employees', time: '1h ago', user: 'System Automated', badge: 'Attendance', color: 'text-blue-400 bg-blue-500/10' },
+                { title: 'Leave request approved for Sarah Connor', time: '2h ago', user: 'Elena Rostova (HR)', badge: 'Approval', color: 'text-purple-400 bg-purple-500/10' },
+                { title: 'Quarterly Performance KPI scores updated', time: '3h ago', user: 'David Sterling', badge: 'Performance', color: 'text-amber-400 bg-amber-500/10' },
               ].map((act, idx) => (
-                <div key={idx} className="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between transition-all hover:scale-[1.01]">
+                <div key={idx} className="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <CheckCircle2 size={16} className="text-blue-500 shrink-0" />
+                    <CheckCircle2 size={16} className="text-blue-400 shrink-0" />
                     <div>
-                      <p className="font-bold text-[var(--text-primary)]">{act.title}</p>
+                      <p className="font-bold text-white">{act.title}</p>
                       <p className="text-[10px] text-slate-400">By {act.user}</p>
                     </div>
                   </div>
@@ -260,17 +315,16 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Upcoming Section: Birthdays, Anniversaries & Events */}
-          <div className="glass-panel p-6 space-y-4">
-            <h3 className="text-base font-extrabold text-[var(--text-primary)] border-b border-[var(--border-color)] pb-3 flex items-center gap-2">
-              <Calendar size={18} className="text-purple-500" /> Upcoming Celebrations
+          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4">
+            <h3 className="text-base font-extrabold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+              <Calendar size={18} className="text-purple-400" /> Upcoming Celebrations
             </h3>
 
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center gap-3">
                 <Gift size={20} className="text-purple-400 shrink-0" />
                 <div>
-                  <p className="font-bold text-[var(--text-primary)]">Sarah Connor's Birthday</p>
+                  <p className="font-bold text-white">Sarah Connor's Birthday</p>
                   <p className="text-[10px] text-slate-400">Tomorrow • Product Team</p>
                 </div>
               </div>
@@ -278,16 +332,8 @@ export const AdminDashboard: React.FC = () => {
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
                 <PartyPopper size={20} className="text-amber-400 shrink-0" />
                 <div>
-                  <p className="font-bold text-[var(--text-primary)]">David Sterling's 5th Work Anniversary</p>
+                  <p className="font-bold text-white">David Sterling's 5th Work Anniversary</p>
                   <p className="text-[10px] text-slate-400">Friday • Engineering Dept</p>
-                </div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center gap-3">
-                <Calendar size={20} className="text-blue-400 shrink-0" />
-                <div>
-                  <p className="font-bold text-[var(--text-primary)]">All-Hands Company Town Hall</p>
-                  <p className="text-[10px] text-slate-400 font-medium">Aug 15, 2026 • Main Auditorium</p>
                 </div>
               </div>
             </div>
