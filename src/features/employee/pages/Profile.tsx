@@ -86,7 +86,7 @@ export const Profile: React.FC = () => {
                 <Mail size={18} className="text-blue-500 shrink-0" />
                 <div>
                   <p className="text-[10px] text-slate-400 font-bold uppercase">Official Email</p>
-                  <p className="font-bold text-[var(--text-primary)]">{user?.email || 'maheswari@stackly.com'}</p>
+                  <p className="font-bold text-[var(--text-primary)]">{user?.email || 'maheswari@thestackly.com'}</p>
                 </div>
               </div>
 
