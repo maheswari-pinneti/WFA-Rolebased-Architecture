@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../../auth/store/authSlice';
 import adminReducer from '../../features/admin/store/adminSlice';
 import hrReducer from '../../features/hr/store/hrSlice';
+import themeReducer from '../../store/themeSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     admin: adminReducer,
     hr: hrReducer,
+    theme: themeReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
