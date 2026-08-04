@@ -1,0 +1,249 @@
+/* Theme 2: Minimal Kit UI Styles */
+body.theme-minimal {
+  background-color: #f9fafb;
+  color: #212b36;
+}
+
+.minimal-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Light Floating Sidebar */
+.minimal-sidebar {
+  width: 280px;
+  background: #ffffff;
+  border-right: 1px dashed rgba(145, 158, 171, 0.2);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+}
+
+.minimal-sidebar-logo {
+  padding-left: 12px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 20px;
+  color: #007bff;
+}
+
+/* User Card Widget */
+.minimal-user-card {
+  background: #f4f6f8;
+  padding: 12px 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.minimal-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.minimal-user-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #212b36;
+}
+
+/* Pill Navigation */
+.minimal-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.minimal-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #637381;
+  font-weight: 600;
+  font-size: 14px;
+  transition: var(--transition-smooth);
+}
+
+.minimal-nav-item:hover {
+  background: rgba(145, 158, 171, 0.08);
+}
+
+.minimal-nav-item.active {
+  color: #007bff;
+  background: rgba(0, 123, 255, 0.08);
+  font-weight: 800;
+}
+
+/* Bottom Upgrade Card Widget */
+.minimal-upgrade-card {
+  margin-top: auto;
+  background: #f4f6f8;
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.minimal-upgrade-card img {
+  width: 70px;
+  height: 70px;
+}
+
+.minimal-upgrade-btn {
+  background: #212b36;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  width: 100%;
+}
+
+/* Main Workspace */
+.minimal-content {
+  flex: 1;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0;
+}
+
+/* Minimal Header Bar */
+.minimal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.minimal-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: #637381;
+  font-size: 14px;
+}
+
+.minimal-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.minimal-flag {
+  font-size: 20px;
+}
+
+.minimal-notif-icon {
+  position: relative;
+  font-size: 18px;
+  color: #637381;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff4842;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pastel 3D KPI Cards Row */
+.minimal-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.minimal-kpi-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 24px;
+  box-shadow: 0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.minimal-kpi-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.kpi-pastel-green { background: #e8f5e9; color: #2e7d32; }
+.kpi-pastel-blue { background: #e3f2fd; color: #1565c0; }
+.kpi-pastel-yellow { background: #fff8e1; color: #f57f17; }
+.kpi-pastel-red { background: #ffebee; color: #c62828; }
+
+.minimal-kpi-val {
+  font-size: 32px;
+  font-weight: 900;
+  color: #212b36;
+}
+
+.minimal-kpi-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #637381;
+  margin-top: 4px;
+}
+
+/* Mixed Bar+Line & Pie Chart Grid */
+.minimal-charts-grid {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: 24px;
+}
+
+.minimal-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12);
+}
+
+.minimal-card-header {
+  margin-bottom: 24px;
+}
+
+.minimal-card-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #212b36;
+}
+
+.minimal-card-sub {
+  font-size: 13px;
+  color: #637381;
+  margin-top: 4px;
+}
