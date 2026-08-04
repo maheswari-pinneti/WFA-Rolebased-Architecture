@@ -351,33 +351,24 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           <HelpCircle size={18} strokeWidth={2} />
         </button>
 
-        {/* 5. User Profile Avatar & Dropdown */}
+        {/* 5. User Profile Small Compact Drill-Down Button */}
         {user && (
-          <div className="relative border-l border-slate-800 pl-3 ml-1">
+          <div className="relative border-l border-slate-800/80 pl-3 ml-1">
             <button
               onClick={() => toggleDropdown('profile')}
               aria-label="User Profile Menu"
-              className="flex items-center gap-2.5 p-1.5 rounded-2xl hover:bg-slate-800/80 transition-colors"
+              className="flex items-center gap-2 p-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800/90 transition-all shadow-sm"
+              title={`${user.name} (${ROLE_LABELS[role]})`}
             >
               <div className="relative shrink-0">
                 <img
                   src={user.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
                   alt={user.name}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shadow-md"
+                  className="w-7 h-7 rounded-full object-cover border border-blue-500/60 shadow-sm"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-900" />
+                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-900" />
               </div>
-              
-              {/* Employee Name & Role Block with Clear Flex Spacing */}
-              <div className="hidden md:flex flex-col text-left justify-center min-w-0 pr-1">
-                <span className="text-xs font-black text-slate-100 leading-tight tracking-tight truncate max-w-[130px]">
-                  {user.name || 'Sarah Connor'}
-                </span>
-                <span className="text-[10px] font-bold text-blue-400 leading-tight truncate max-w-[130px] mt-0.5">
-                  {ROLE_LABELS[role]}
-                </span>
-              </div>
-              <ChevronDown size={14} strokeWidth={2} className="text-slate-400 hidden sm:block shrink-0" />
+              <ChevronDown size={14} strokeWidth={2} className="text-slate-400 hover:text-white pr-1 shrink-0" />
             </button>
 
             {/* User Profile Dropdown Menu */}
