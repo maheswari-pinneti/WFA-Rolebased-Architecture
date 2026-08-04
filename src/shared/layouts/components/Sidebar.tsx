@@ -227,30 +227,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Drawer Overlay Backdrop */}
+      {/* Mobile Off-Canvas Drawer Overlay Backdrop */}
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
+          aria-label="Close Off-Canvas Drawer"
           className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-30 md:hidden transition-opacity"
         />
       )}
 
-      {/* Modern Responsive SaaS Left Sidebar (Width 260px) */}
+      {/* Modern Responsive SaaS Off-Canvas & Collapsible Sidebar (Width 260px) */}
       <aside
         className={`bg-[var(--bg-secondary)] text-[var(--text-primary)] border-r border-[var(--border-color)] flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
           collapsed ? 'w-[72px]' : 'w-[260px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Top Company Logo Area & Collapse Toggle */}
+        {/* Top Company Logo Area, Collapse Toggle & Mobile Close Button */}
         <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between">
           <StacklyLogo size={32} showText={!collapsed} />
-          <button
-            onClick={() => setCollapsed((prev) => !prev)}
-            className="p-1.5 rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all border border-[var(--border-color)]"
-            title={collapsed ? 'Expand Sidebar (260px)' : 'Collapse Sidebar'}
-          >
-            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </button>
+          <div className="flex items-center gap-1">
+            {/* Mobile Close Button &times; */}
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="md:hidden p-1.5 rounded-xl bg-[var(--bg-tertiary)] text-slate-400 hover:text-[var(--text-primary)] transition-all border border-[var(--border-color)]"
+              title="Close Off-Canvas Drawer"
+            >
+              <X size={16} />
+            </button>
+            {/* Desktop / Tablet Collapse Toggle */}
+            <button
+              onClick={() => setCollapsed((prev) => !prev)}
+              className="hidden md:block p-1.5 rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all border border-[var(--border-color)]"
+              title={collapsed ? 'Expand Sidebar (260px)' : 'Collapse Sidebar'}
+            >
+              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Quick Search Input */}
