@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { Role } from '../../../security/roles/roles';
+import { StacklyLogo } from '../../../components/common/StacklyLogo';
+import { UserProfile } from '../../../components/sidebar/UserProfile';
 import {
   LayoutDashboard,
   Users,
@@ -32,7 +34,8 @@ import {
   PieChart,
   LifeBuoy,
   Contact,
-  HelpCircle
+  HelpCircle,
+  FolderKanban
 } from 'lucide-react';
 
 interface NavigationItem {
@@ -46,7 +49,7 @@ interface NavigationItem {
 }
 
 interface NavigationCategory {
-  category: string;
+  category: 'General' | 'Analytics' | 'Settings';
   items: NavigationItem[];
 }
 
@@ -69,37 +72,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const location = useLocation();
   const [filterQuery, setFilterQuery] = useState('');
 
-  // Human Enterprise Business Navigation Icons
+  // Grouped Navigation Sections: General, Analytics, Settings
   const roleCategorizedNavMap: Record<Role, NavigationCategory[]> = {
     [Role.ADMIN]: [
       {
-        category: 'Main Overview',
+        category: 'General',
         items: [
           { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Analytics', path: '/admin/analytics', icon: <PieChart size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Employee Directory', path: '/admin/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Departments', path: '/admin/departments', icon: <Building2 size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Office Locations', path: '/admin/locations', icon: <MapPin size={18} strokeWidth={2} className="text-amber-400" /> },
         ],
       },
       {
-        category: 'Access & Security',
+        category: 'Analytics',
+        items: [
+          { label: 'Workforce Analytics', path: '/admin/analytics', icon: <PieChart size={18} strokeWidth={2} className="text-cyan-400" />, badge: { text: 'Live', variant: 'emerald' } },
+          { label: 'Attendance Analytics', path: '/hr/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" />, badge: { text: '3 Alert', variant: 'rose' } },
+          { label: 'Performance Analytics', path: '/hr/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Reports & Export', path: '/admin/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-blue-400" /> },
+        ],
+      },
+      {
+        category: 'Settings',
         items: [
           { label: 'User Management', path: '/admin/users', icon: <UserCog size={18} strokeWidth={2} className="text-cyan-400" />, badge: { text: 'Active', variant: 'blue' } },
           { label: 'Role Management', path: '/admin/roles', icon: <ShieldCheck size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Permissions', path: '/admin/permissions', icon: <Lock size={18} strokeWidth={2} className="text-indigo-400" /> },
-          { label: 'Employee Control', path: '/admin/employees', icon: <UserCheck size={18} strokeWidth={2} className="text-emerald-400" /> },
-        ],
-      },
-      {
-        category: 'Organization Infrastructure',
-        items: [
-          { label: 'Departments', path: '/admin/departments', icon: <Building2 size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Locations', path: '/admin/locations', icon: <MapPin size={18} strokeWidth={2} className="text-amber-400" /> },
-        ],
-      },
-      {
-        category: 'System Governance',
-        items: [
-          { label: 'Reports', path: '/admin/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Audit Logs', path: '/admin/audit-logs', icon: <History size={18} strokeWidth={2} className="text-rose-400" />, badge: { text: 'Live', variant: 'emerald' } },
+          { label: 'Audit Logs', path: '/admin/audit-logs', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
           { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
           { label: 'Configuration', path: '/admin/configuration', icon: <Layers size={18} strokeWidth={2} className="text-teal-400" /> },
         ],
@@ -108,85 +107,100 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     [Role.HR]: [
       {
-        category: 'Core HR Ops',
+        category: 'General',
         items: [
           { label: 'HR Dashboard', path: '/hr/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Employee Management', path: '/hr/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Employee Directory', path: '/hr/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
           { label: 'Recruitment', path: '/hr/recruitment', icon: <Briefcase size={18} strokeWidth={2} className="text-amber-400" />, badge: { text: 'Hiring', variant: 'purple' } },
         ],
       },
       {
-        category: 'Workforce Operations',
+        category: 'Analytics',
         items: [
-          { label: 'Attendance', path: '/hr/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Leave Management', path: '/hr/leave', icon: <FileText size={18} strokeWidth={2} className="text-blue-400" />, badge: { text: '5 New', variant: 'rose' } },
-          { label: 'Performance', path: '/hr/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Attendance Analytics', path: '/hr/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Performance Analytics', path: '/hr/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Workforce Analytics', path: '/hr/workforce-analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
+          { label: 'HR Reports', path: '/hr/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-amber-400" /> },
         ],
       },
       {
-        category: 'Finance & Ledger',
+        category: 'Settings',
         items: [
-          { label: 'Payroll Reports', path: '/hr/payroll-reports', icon: <DollarSign size={18} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Workforce Analytics', path: '/hr/workforce-analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
-          { label: 'HR Reports', path: '/hr/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Leave Requests', path: '/hr/leave', icon: <FileText size={18} strokeWidth={2} className="text-blue-400" />, badge: { text: '5 New', variant: 'rose' } },
+          { label: 'Payroll Ledger', path: '/hr/payroll-reports', icon: <DollarSign size={18} strokeWidth={2} className="text-emerald-400" /> },
         ],
       },
     ],
 
     [Role.MANAGER]: [
       {
-        category: 'Department Scope Hub',
+        category: 'General',
         items: [
           { label: 'Manager Dashboard', path: '/manager/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Team Overview', path: '/manager/team', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Team Directory', path: '/manager/team', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+        ],
+      },
+      {
+        category: 'Analytics',
+        items: [
           { label: 'Team Analytics', path: '/manager/analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
-        ],
-      },
-      {
-        category: 'Operations & Approvals',
-        items: [
-          { label: 'Attendance', path: '/manager/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Leave Approval', path: '/manager/approvals', icon: <CheckCircle2 size={18} strokeWidth={2} className="text-teal-400" />, badge: { text: '3 Review', variant: 'amber' } },
-          { label: 'Performance Review', path: '/manager/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
-        ],
-      },
-      {
-        category: 'Reports & Velocity',
-        items: [
+          { label: 'Productivity Metrics', path: '/manager/productivity', icon: <Zap size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Performance Reviews', path: '/manager/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
           { label: 'Team Reports', path: '/manager/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-amber-400" /> },
-          { label: 'Productivity', path: '/manager/productivity', icon: <Zap size={18} strokeWidth={2} className="text-amber-400" /> },
+        ],
+      },
+      {
+        category: 'Settings',
+        items: [
+          { label: 'Attendance Roster', path: '/manager/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Leave Approvals', path: '/manager/approvals', icon: <CheckCircle2 size={18} strokeWidth={2} className="text-teal-400" />, badge: { text: '3 Review', variant: 'amber' } },
         ],
       },
     ],
 
     [Role.TEAM_LEAD]: [
       {
-        category: 'Lead Operations',
+        category: 'General',
         items: [
-          { label: 'Team Dashboard', path: '/team-lead/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-teal-400" /> },
+          { label: 'Team Lead Dashboard', path: '/team-lead/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-teal-400" /> },
           { label: 'Task Monitoring', path: '/team-lead/tasks', icon: <ClipboardList size={18} strokeWidth={2} className="text-rose-400" />, badge: { text: '8 Active', variant: 'rose' } },
         ],
       },
       {
-        category: 'Sprint Tracking',
+        category: 'Analytics',
         items: [
-          { label: 'Attendance Tracking', path: '/team-lead/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
           { label: 'Productivity Analytics', path: '/team-lead/productivity', icon: <BarChart3 size={18} strokeWidth={2} className="text-amber-400" /> },
           { label: 'Team Performance', path: '/team-lead/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+        ],
+      },
+      {
+        category: 'Settings',
+        items: [
+          { label: 'Attendance Tracking', path: '/team-lead/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
         ],
       },
     ],
 
     [Role.EMPLOYEE]: [
       {
-        category: 'Personal Workspace',
+        category: 'General',
         items: [
           { label: 'My Dashboard', path: '/employee/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
           { label: 'My Profile', path: '/employee/profile', icon: <User size={18} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'My Attendance', path: '/employee/attendance', icon: <Clock size={18} strokeWidth={2} className="text-amber-400" /> },
+        ],
+      },
+      {
+        category: 'Analytics',
+        items: [
           { label: 'My Performance', path: '/employee/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
           { label: 'My Goals', path: '/employee/goals', icon: <FileText size={18} strokeWidth={2} className="text-cyan-400" /> },
-          { label: 'Payslips', path: '/employee/payslips', icon: <DollarSign size={18} strokeWidth={2} className="text-emerald-400" /> },
+        ],
+      },
+      {
+        category: 'Settings',
+        items: [
+          { label: 'My Attendance', path: '/employee/attendance', icon: <Clock size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'My Payslips', path: '/employee/payslips', icon: <DollarSign size={18} strokeWidth={2} className="text-emerald-400" /> },
         ],
       },
     ],
@@ -221,44 +235,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Dark Enterprise Sidebar Navigation */}
+      {/* Modern Responsive SaaS Left Sidebar (Width 260px) */}
       <aside
-        className={`bg-[#0B1120] text-slate-100 border-r border-slate-800/80 flex flex-col shrink-0 fixed md:sticky top-[102px] h-[calc(100vh-102px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
-          collapsed ? 'w-[80px]' : 'w-[280px]'
+        className={`bg-[var(--bg-secondary)] text-[var(--text-primary)] border-r border-[var(--border-color)] flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
+          collapsed ? 'w-[72px]' : 'w-[260px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Sidebar Header & Collapse Toggle */}
-        <div className="p-3.5 border-b border-slate-800 flex items-center justify-between">
-          {!collapsed && (
-            <span className="text-[11px] font-extrabold tracking-wider text-slate-400 uppercase px-2">
-              Navigation Menu
-            </span>
-          )}
+        {/* Top Company Logo Area & Collapse Toggle */}
+        <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between">
+          <StacklyLogo size={32} showText={!collapsed} />
           <button
             onClick={() => setCollapsed((prev) => !prev)}
-            className="p-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 transition-all border border-slate-800 mx-auto md:mx-0 shadow-sm"
-            title={collapsed ? 'Expand Navigation Sidebar' : 'Collapse Sidebar'}
+            className="p-1.5 rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all border border-[var(--border-color)]"
+            title={collapsed ? 'Expand Sidebar (260px)' : 'Collapse Sidebar'}
           >
             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
         </div>
 
-        {/* Quick Filter Search Input */}
+        {/* Quick Search Input */}
         {!collapsed && (
-          <div className="px-3 pt-3 pb-1">
+          <div className="px-3.5 pt-3.5 pb-1">
             <div className="relative flex items-center">
               <Search size={14} className="absolute left-3 text-slate-400 pointer-events-none z-10" />
               <input
                 type="text"
-                placeholder="Filter links..."
+                placeholder="Quick search navigation..."
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 rounded-xl pl-8 pr-7 py-2 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
+                className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-slate-400 rounded-xl pl-8 pr-7 py-2 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
               />
               {filterQuery && (
                 <button
                   onClick={() => setFilterQuery('')}
-                  className="absolute right-2 text-slate-400 hover:text-white p-0.5 rounded"
+                  className="absolute right-2 text-slate-400 hover:text-[var(--text-primary)] p-0.5 rounded"
                 >
                   <X size={12} />
                 </button>
@@ -267,8 +277,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
-        {/* Scrollable Navigation List */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 w-full scrollbar-thin scrollbar-thumb-slate-800">
+        {/* Scrollable Grouped Navigation (General, Analytics, Settings) */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 w-full scrollbar-thin scrollbar-thumb-[var(--border-color)]">
           {currentCategories.map((cat, groupIdx) => {
             const filteredItems = cat.items.filter((item) =>
               item.label.toLowerCase().includes(filterQuery.toLowerCase())
@@ -278,14 +288,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             return (
               <div key={groupIdx} className="space-y-1">
-                {/* Category Header Label */}
+                {/* Grouped Section Header Label */}
                 {!collapsed && (
-                  <div className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
                     {cat.category}
                   </div>
                 )}
 
-                {/* Navigation Links */}
+                {/* Clean SVG Icon Navigation Links */}
                 {filteredItems.map((item) => {
                   const active = location.pathname === item.path;
 
@@ -297,8 +307,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       title={collapsed ? item.label : undefined}
                       className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all duration-200 group relative no-underline text-inherit ${
                         active
-                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold shadow-lg shadow-blue-500/25 border border-blue-500/40'
-                          : 'text-slate-300 hover:bg-slate-900 hover:text-white border border-transparent hover:border-slate-800'
+                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-black shadow-lg shadow-blue-500/25 border border-blue-500/40'
+                          : 'hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-transparent hover:border-[var(--border-color)]'
                       } ${collapsed ? 'justify-center px-0' : ''}`}
                     >
                       <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">
@@ -306,15 +316,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </span>
 
                       {!collapsed && (
-                        <span className="font-bold text-xs tracking-tight truncate flex-1 min-w-0">
+                        <span className="font-extrabold text-xs tracking-tight truncate flex-1 min-w-0">
                           {item.label}
                         </span>
                       )}
 
-                      {/* Badge if present */}
+                      {/* Unread Badge Counter */}
                       {!collapsed && item.badge && (
                         <span
-                          className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md border ml-auto shrink-0 ${getBadgeStyle(
+                          className={`px-1.5 py-0.5 text-[10px] font-extrabold rounded-md border ml-auto shrink-0 ${getBadgeStyle(
                             item.badge.variant
                           )}`}
                         >
@@ -322,9 +332,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         </span>
                       )}
 
-                      {/* Collapsed Tooltip */}
+                      {/* Collapsed Hover Tooltip */}
                       {collapsed && (
-                        <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-900 text-slate-100 border border-slate-700 shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2">
+                        <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2">
                           {item.label}
                           {item.badge && (
                             <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${getBadgeStyle(item.badge.variant)}`}>
@@ -341,29 +351,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
-        {/* Company Help & Support Option at Bottom */}
-        <div className="p-3 border-t border-slate-800 w-full">
-          <button
-            onClick={onOpenSupport}
-            title="Company Help & Support"
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl w-full text-left bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 transition-all group relative ${
-              collapsed ? 'justify-center px-0' : ''
-            }`}
-          >
-            <LifeBuoy size={18} strokeWidth={2} className="shrink-0 transition-transform group-hover:rotate-45 duration-300" />
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-xs text-white">Help & Support</div>
-                <div className="text-[10px] text-slate-400 truncate">24/7 Enterprise IT Desk</div>
-              </div>
-            )}
-            {collapsed && (
-              <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-900 text-slate-100 border border-slate-700 shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all z-50 whitespace-nowrap">
-                Help & Support
-              </span>
-            )}
-          </button>
-        </div>
+        {/* Bottom User Profile Card with Avatar & Dropdown Menu */}
+        <UserProfile collapsed={collapsed} />
       </aside>
     </>
   );
