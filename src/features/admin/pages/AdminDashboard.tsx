@@ -7,16 +7,18 @@ import { KPICard } from '../../../components/cards/KPICard';
 import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
 
-// Interactive SVG Recharts
+// 7 Interactive SVG Recharts
 import { WorkforceGrowthLine } from '../../analytics/charts/WorkforceGrowthLine';
 import { DepartmentDistribution } from '../../analytics/charts/DepartmentDistribution';
-import { AttendanceOverviewBar } from '../../analytics/charts/AttendanceOverviewBar';
+import { AttendanceAnalysisArea } from '../../analytics/charts/AttendanceAnalysisArea';
 import { PerformanceAreaChart } from '../../analytics/charts/PerformanceAreaChart';
+import { AttendanceOverviewBar } from '../../analytics/charts/AttendanceOverviewBar';
+import { SalaryAnalyticsStackedBar } from '../../analytics/charts/SalaryAnalyticsStackedBar';
+import { EmployeeEngagementRadar } from '../../analytics/charts/EmployeeEngagementRadar';
 
 import {
   ShieldCheck,
   Users,
-  Lock,
   UserPlus,
   Clock,
   FileSpreadsheet,
@@ -29,7 +31,10 @@ import {
   PartyPopper,
   CheckCircle2,
   Activity,
-  ArrowRight
+  ArrowRight,
+  TrendingDown,
+  Briefcase,
+  Target
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -67,9 +72,9 @@ export const AdminDashboard: React.FC = () => {
     <RoleGuard allowedRoles={[Role.ADMIN]} requiredPermission={Permission.SYSTEM_CONFIG}>
       <div className="space-y-6 animate-fadeIn font-sans">
         {/* Dynamic Human Greeting & Quick Actions Header */}
-        <div className="p-6 lg:p-8 rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-800 to-slate-900 text-white border border-blue-500/30 shadow-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="p-6 lg:p-8 rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-800 to-slate-950 text-white border border-blue-500/30 shadow-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
           <div className="space-y-2 z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold backdrop-blur-md border border-white/20">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-xs font-bold backdrop-blur-md border border-white/20">
               <Calendar size={14} className="text-blue-300" /> {currentDateFormatted}
             </div>
             <h2 className="text-2xl lg:text-3xl font-black tracking-tight">
@@ -82,188 +87,138 @@ export const AdminDashboard: React.FC = () => {
 
           {/* Quick Actions Buttons */}
           <div className="flex flex-wrap items-center gap-2.5 z-10">
-            <Link to="/admin/employees" className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2">
+            <Link to="/employees#add" className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2">
               <UserPlus size={16} /> Add Employee
             </Link>
-            <Link to="/hr/attendance" className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold border border-white/20 backdrop-blur-md transition-all flex items-center gap-2">
+            <Link to="/attendance" className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold border border-white/20 backdrop-blur-md transition-all flex items-center gap-2">
               <Clock size={16} /> View Attendance
             </Link>
-            <Link to="/admin/analytics" className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-extrabold shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2">
+            <Link to="/reports" className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-extrabold shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2">
               <FileSpreadsheet size={16} /> Generate Report
             </Link>
           </div>
         </div>
 
-        {/* Filter Bar */}
+        {/* Global Filter Bar */}
         <AdvancedFilterBar onFilterChange={() => {}} />
 
-        {/* 8 Modern Enterprise KPI Cards */}
+        {/* 8 Executive KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="Total Employees"
-            value="1,248"
+            value="15,420"
             change={12.4}
             trend="up"
-            subtitle="Global enterprise workforce"
+            subtitle="20,000 Total Headcount Roster"
             icon={<Users size={20} />}
             accentColor="blue"
-            onClick={() => openDrillDown('Total Employee Roster', '1,248 Employees', 'Active organizational headcount', [
-              { label: 'Full-time Permanent', value: 1080 },
-              { label: 'Contractors', value: 168 },
+            onClick={() => openDrillDown('Total Employee Headcount', '15,420 Active Records', 'Global workforce roster', [
+              { label: 'Full-time Permanent', value: 13850 },
+              { label: 'Contractors & Consultants', value: 1570 },
             ])}
           />
           <KPICard
             title="Active Employees"
-            value="1,210"
-            change={97.0}
+            value="14,850"
+            change={96.3}
             trend="up"
             subtitle="Currently online & clocked in"
             icon={<ShieldCheck size={20} />}
             accentColor="emerald"
-            onClick={() => openDrillDown('Active Duty Status', '1,210 Active', 'Real-time clock-in roster', [
-              { label: 'In-Office', value: 920 },
-              { label: 'Remote WFH', value: 290 },
-            ])}
-          />
-          <KPICard
-            title="New Joiners"
-            value="42"
-            change={15.2}
-            trend="up"
-            subtitle="Joined in last 30 days"
-            icon={<UserPlus size={20} />}
-            accentColor="purple"
-            onClick={() => openDrillDown('New Hires Onboarding', '42 New Joiners', 'Recent onboarding cohort', [
-              { label: 'Engineering', value: 18 },
-              { label: 'Sales & Growth', value: 14 },
-              { label: 'Product & Design', value: 10 },
+            onClick={() => openDrillDown('Active Duty Status', '14,850 Clocked In', 'Real-time shift roster', [
+              { label: 'In-Office Campuses', value: 11200 },
+              { label: 'Remote WFH', value: 3650 },
             ])}
           />
           <KPICard
             title="Attendance Rate"
-            value="96.8%"
-            change={1.2}
+            value="96.5%"
+            change={1.5}
             trend="up"
             subtitle="Weekly enterprise average"
             icon={<Clock size={20} />}
             accentColor="amber"
-            onClick={() => openDrillDown('Attendance Compliance', '96.8%', 'Weekly shift adherence', [
+            onClick={() => openDrillDown('Attendance Compliance Rate', '96.5%', 'Weekly shift adherence', [
               { label: 'On-Time Clock Ins', value: '94.2%' },
-              { label: 'Authorized WFH', value: '2.6%' },
+              { label: 'Approved Remote WFH', value: '2.3%' },
             ])}
           />
           <KPICard
-            title="Performance Score"
-            value="94.2 / 100"
-            change={3.8}
+            title="Employee Turnover"
+            value="4.2%"
+            change={-0.8}
+            trend="down"
+            subtitle="Annual attrition rate"
+            icon={<TrendingDown size={20} />}
+            accentColor="purple"
+            onClick={() => openDrillDown('Employee Turnover Attrition', '4.2% Rate', 'Annual attrition index', [
+              { label: 'Voluntary Resignations', value: '3.1%' },
+              { label: 'Involuntary Departures', value: '1.1%' },
+            ])}
+          />
+          <KPICard
+            title="Average Performance Score"
+            value="87%"
+            change={3.2}
             trend="up"
-            subtitle="Quarterly KPI rating"
+            subtitle="Quarterly KPI rating index"
             icon={<Award size={20} />}
             accentColor="blue"
-            onClick={() => openDrillDown('Performance Metric Rating', '94.2 Score', 'Enterprise KPI score', [
-              { label: 'Exceeding Target', value: '62%' },
-              { label: 'Meeting Target', value: '34%' },
+            onClick={() => openDrillDown('Performance Score Index', '87% Average', 'Quarterly KPI score', [
+              { label: 'Exceeding Expectations', value: '58%' },
+              { label: 'Meeting Targets', value: '38%' },
+            ])}
+          />
+          <KPICard
+            title="Open Positions"
+            value="124"
+            change={8.4}
+            trend="up"
+            subtitle="Active hiring requisitions"
+            icon={<Briefcase size={20} />}
+            accentColor="emerald"
+            onClick={() => openDrillDown('Active Job Requisitions', '124 Roles', 'Hiring pipeline', [
+              { label: 'Engineering Roles', value: 64 },
+              { label: 'Sales & Growth', value: 32 },
+              { label: 'Product & Design', value: 28 },
             ])}
           />
           <KPICard
             title="Departments"
-            value="12 Divisions"
+            value="28"
             change={0.0}
             trend="neutral"
-            subtitle="Active functional units"
+            subtitle="Active functional divisions"
             icon={<Building2 size={20} />}
             accentColor="purple"
-            onClick={() => openDrillDown('Department Breakdown', '12 Divisions', 'Organizational structure', [
-              { label: 'Engineering', value: '450 Staff' },
-              { label: 'Sales & Growth', value: '320 Staff' },
+            onClick={() => openDrillDown('Department Divisions', '28 Divisions', 'Organizational structure', [
+              { label: 'Engineering & Technology', value: '5,800 Staff' },
+              { label: 'Sales & Marketing', value: '4,200 Staff' },
             ])}
           />
           <KPICard
-            title="Locations"
-            value="8 Offices"
-            change={2.0}
+            title="Training Completion"
+            value="92%"
+            change={5.6}
             trend="up"
-            subtitle="Global tech campuses"
-            icon={<MapPin size={20} />}
-            accentColor="emerald"
-            onClick={() => openDrillDown('Global Campus Locations', '8 Sites', 'Office locations', [
-              { label: 'New York HQ', value: '520 Staff' },
-              { label: 'London Office', value: '310 Staff' },
-            ])}
-          />
-          <KPICard
-            title="Employee Growth"
-            value="+27.3%"
-            change={4.5}
-            trend="up"
-            subtitle="Year-over-year scaling"
-            icon={<TrendingUp size={20} />}
+            subtitle="Skill development compliance"
+            icon={<Target size={20} />}
             accentColor="amber"
-            onClick={() => openDrillDown('YoY Headcount Scaling', '+27.3%', 'Annual growth trend', [
-              { label: 'Q1 Growth', value: '+8.2%' },
-              { label: 'Q2 Growth', value: '+19.1%' },
-            ])}
-          />
-          <KPICard
-            title="Open Requisitions"
-            value="24 Roles"
-            change={6.2}
-            trend="up"
-            subtitle="Hiring pipeline active"
-            icon={<Activity size={20} />}
-            accentColor="blue"
-            onClick={() => openDrillDown('Active Hiring Requisitions', '24 Positions', 'Open job requisitions', [
-              { label: 'Senior Engineers', value: 12 },
-              { label: 'Product Managers', value: 6 },
-              { label: 'Sales Executives', value: 6 },
-            ])}
-          />
-          <KPICard
-            title="Payroll Expenditure"
-            value="$4.8M / mo"
-            change={3.1}
-            trend="up"
-            subtitle="Monthly compensation budget"
-            icon={<Building2 size={20} />}
-            accentColor="emerald"
-            onClick={() => openDrillDown('Monthly Compensation Budget', '$4.8M', 'Total monthly payroll', [
-              { label: 'Base Salaries', value: '$3.9M' },
-              { label: 'Benefits & Taxes', value: '$900K' },
-            ])}
-          />
-          <KPICard
-            title="Retention Rate"
-            value="94.6%"
-            change={2.4}
-            trend="up"
-            subtitle="Low annual attrition"
-            icon={<ShieldCheck size={20} />}
-            accentColor="purple"
-            onClick={() => openDrillDown('Employee Retention Index', '94.6%', 'Workforce retention rate', [
-              { label: 'Engineering Retention', value: '96.2%' },
-              { label: 'Sales Retention', value: '92.4%' },
-            ])}
-          />
-          <KPICard
-            title="Training Certifications"
-            value="842 Badges"
-            change={18.4}
-            trend="up"
-            subtitle="Skill development completed"
-            icon={<Award size={20} />}
-            accentColor="amber"
-            onClick={() => openDrillDown('Skill Certification Badges', '842 Earned', 'Learning & development metrics', [
-              { label: 'Cloud Architecture', value: 340 },
-              { label: 'Security & Compliance', value: 502 },
+            onClick={() => openDrillDown('Training & Compliance', '92% Completed', 'Learning compliance', [
+              { label: 'Security & Compliance Badges', value: '96%' },
+              { label: 'Cloud Architecture Skills', value: '88%' },
             ])}
           />
         </div>
 
-        {/* 4 Interactive SVG Recharts Section */}
+        {/* 7 Interactive Analytics SVG Recharts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <WorkforceGrowthLine />
           <DepartmentDistribution />
+          <AttendanceAnalysisArea />
           <AttendanceOverviewBar />
+          <SalaryAnalyticsStackedBar />
+          <EmployeeEngagementRadar />
           <PerformanceAreaChart />
         </div>
 
@@ -275,7 +230,7 @@ export const AdminDashboard: React.FC = () => {
               <h3 className="text-base font-extrabold text-[var(--text-primary)] flex items-center gap-2">
                 <Activity size={18} className="text-blue-500" /> Recent Enterprise Activity
               </h3>
-              <Link to="/admin/audit-logs" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1">
+              <Link to="/audit-logs" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1">
                 Audit Log Stream <ArrowRight size={14} />
               </Link>
             </div>
@@ -283,7 +238,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="space-y-3 text-xs">
               {[
                 { title: 'New employee joined Engineering team', time: '10m ago', user: 'Alex Mercer', badge: 'Onboarding', color: 'text-emerald-500 bg-emerald-500/10' },
-                { title: 'Attendance marked for 1,210 employees', time: '1h ago', user: 'System Automated', badge: 'Attendance', color: 'text-blue-500 bg-blue-500/10' },
+                { title: 'Attendance marked for 14,850 employees', time: '1h ago', user: 'System Automated', badge: 'Attendance', color: 'text-blue-500 bg-blue-500/10' },
                 { title: 'Leave request approved for Sarah Connor', time: '2h ago', user: 'Elena Rostova (HR)', badge: 'Approval', color: 'text-purple-500 bg-purple-500/10' },
                 { title: 'Quarterly Performance KPI scores updated', time: '3h ago', user: 'David Sterling', badge: 'Performance', color: 'text-amber-500 bg-amber-500/10' },
                 { title: 'Role security permission matrix modified', time: '5h ago', user: 'System Admin', badge: 'Security', color: 'text-rose-500 bg-rose-500/10' },
@@ -332,7 +287,7 @@ export const AdminDashboard: React.FC = () => {
                 <Calendar size={20} className="text-blue-400 shrink-0" />
                 <div>
                   <p className="font-bold text-[var(--text-primary)]">All-Hands Company Town Hall</p>
-                  <p className="text-[10px] text-slate-400">Aug 15, 2026 • Main Auditorium</p>
+                  <p className="text-[10px] text-slate-400 font-medium">Aug 15, 2026 • Main Auditorium</p>
                 </div>
               </div>
             </div>
