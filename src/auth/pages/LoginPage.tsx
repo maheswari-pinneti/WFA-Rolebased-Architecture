@@ -121,11 +121,11 @@ export const LoginPage: React.FC = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-4 gap-1 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+          <div className="grid grid-cols-5 gap-1 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
             <button
               type="button"
               onClick={() => handleDemoRoleSelect('admin@thestackly.com')}
-              className={`py-2 text-xs font-bold rounded-xl transition-all border-0 cursor-pointer ${
+              className={`py-2 text-[11px] font-bold rounded-xl transition-all border-0 cursor-pointer ${
                 email === 'admin@thestackly.com'
                   ? 'bg-blue-600 text-white shadow-md'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
@@ -137,7 +137,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="button"
               onClick={() => handleDemoRoleSelect('hr@thestackly.com')}
-              className={`py-2 text-xs font-bold rounded-xl transition-all border-0 cursor-pointer ${
+              className={`py-2 text-[11px] font-bold rounded-xl transition-all border-0 cursor-pointer ${
                 email === 'hr@thestackly.com'
                   ? 'bg-purple-600 text-white shadow-md'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
@@ -149,7 +149,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="button"
               onClick={() => handleDemoRoleSelect('manager@thestackly.com')}
-              className={`py-2 text-xs font-bold rounded-xl transition-all border-0 cursor-pointer ${
+              className={`py-2 text-[11px] font-bold rounded-xl transition-all border-0 cursor-pointer ${
                 email === 'manager@thestackly.com'
                   ? 'bg-emerald-600 text-white shadow-md'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
@@ -160,8 +160,20 @@ export const LoginPage: React.FC = () => {
 
             <button
               type="button"
+              onClick={() => handleDemoRoleSelect('lead@thestackly.com')}
+              className={`py-2 text-[11px] font-bold rounded-xl transition-all border-0 cursor-pointer ${
+                email === 'lead@thestackly.com'
+                  ? 'bg-teal-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
+              }`}
+            >
+              Team Lead
+            </button>
+
+            <button
+              type="button"
               onClick={() => handleDemoRoleSelect('employee@thestackly.com')}
-              className={`py-2 text-xs font-bold rounded-xl transition-all border-0 cursor-pointer ${
+              className={`py-2 text-[11px] font-bold rounded-xl transition-all border-0 cursor-pointer ${
                 email === 'employee@thestackly.com'
                   ? 'bg-amber-600 text-white shadow-md'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
