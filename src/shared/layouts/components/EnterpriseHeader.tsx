@@ -371,24 +371,28 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           <HelpCircle size={18} strokeWidth={2} />
         </button>
 
-        {/* 5. User Profile Small Compact Drill-Down Button */}
+        {/* 5. Compact Theme-Aware User Profile Drill-Down Button */}
         {user && (
           <div className="relative border-l border-slate-800/80 pl-3 ml-1">
             <button
               onClick={() => toggleDropdown('profile')}
               aria-label="User Profile Menu"
-              className="flex items-center gap-2 p-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800/90 transition-all shadow-sm"
+              className={`flex items-center gap-1.5 p-1 rounded-full transition-all border shadow-sm ${
+                theme === 'dark'
+                  ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
+                  : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+              }`}
               title={`${user.name} (${ROLE_LABELS[role]})`}
             >
               <div className="relative shrink-0">
                 <img
                   src={user.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
                   alt={user.name}
-                  className="w-7 h-7 rounded-full object-cover border border-blue-500/60 shadow-sm"
+                  className="w-7 h-7 rounded-full object-cover border border-blue-500/80 shadow-sm"
                 />
                 <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-900" />
               </div>
-              <ChevronDown size={14} strokeWidth={2} className="text-slate-400 hover:text-white pr-1 shrink-0" />
+              <ChevronDown size={12} strokeWidth={2.5} className="text-slate-400 hover:text-white pr-0.5 shrink-0" />
             </button>
 
             {/* User Profile Dropdown Menu */}
