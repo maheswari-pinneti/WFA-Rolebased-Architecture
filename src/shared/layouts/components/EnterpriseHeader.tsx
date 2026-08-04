@@ -175,7 +175,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
         {/* STACKLY Brand Logo */}
         <Link to="/" className="shrink-0 flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <StacklyLogo size={32} showText={false} />
+          <StacklyLogo size={32} showText={true} />
         </Link>
 
         {/* Dynamic Breadcrumbs & Page Title */}

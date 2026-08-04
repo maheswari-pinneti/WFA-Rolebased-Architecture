@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { Role } from '../../../security/roles/roles';
-import { StacklyLogo } from '../../../components/common/StacklyLogo';
 import { UserProfile } from '../../../components/sidebar/UserProfile';
 import {
   LayoutDashboard,
@@ -237,9 +236,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
           collapsed ? 'w-[72px]' : 'w-[260px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Top Company Logo Area & Collapse Toggle */}
-        <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
-          <StacklyLogo size={28} showText={!collapsed} />
+        {/* Sidebar Controls Header */}
+        <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
+          {!collapsed ? (
+            <span className="text-xs font-black uppercase tracking-wider text-slate-400 pl-2">
+              Navigation Menu
+            </span>
+          ) : (
+            <span className="w-full text-center text-[10px] font-bold text-slate-400">
+              WFA
+            </span>
+          )}
           <div>
             {/* Mobile Close Button &times; */}
             <button
