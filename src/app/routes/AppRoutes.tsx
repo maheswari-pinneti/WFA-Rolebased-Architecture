@@ -54,6 +54,9 @@ import { EmployeeRequestsPage } from '../../features/employee/pages/EmployeeRequ
 import { MyGoalsPage } from '../../features/employee/pages/MyGoalsPage';
 import { PayslipsPage } from '../../features/employee/pages/PayslipsPage';
 
+// Error Pages
+import { NotFoundPage, AccessDeniedPage, ServerErrorPage } from '../../features/error';
+
 const DefaultHomeRedirect: React.FC = () => {
   const { role } = useAuth();
   const target = ROLE_HOME_PATHS[role] || '/employee/dashboard';
@@ -126,6 +129,11 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/employee/goals" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]}><MyGoalsPage /></RoleGuard>} />
                 <Route path="/employee/payslips" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]}><PayslipsPage /></RoleGuard>} />
 
+                {/* Dedicated Error Pages Routes */}
+                <Route path="/404" element={<NotFoundPage />} />
+                <Route path="/403" element={<AccessDeniedPage />} />
+                <Route path="/500" element={<ServerErrorPage />} />
+
                 {/* Legacy Root Paths Redirects */}
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/hr" element={<Navigate to="/hr/dashboard" replace />} />
@@ -135,7 +143,7 @@ export const AppRoutes: React.FC = () => {
 
                 {/* Default Route Fallback */}
                 <Route path="/" element={<DefaultHomeRedirect />} />
-                <Route path="*" element={<DefaultHomeRedirect />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </MainLayout>
           </ProtectedRoute>
