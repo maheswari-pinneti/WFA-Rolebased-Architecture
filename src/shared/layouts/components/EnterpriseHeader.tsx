@@ -174,23 +174,23 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </div>
       </div>
 
-      {/* CENTER SECTION: Compact Global Search Input */}
-      <div className="relative max-w-[220px] lg:max-w-[260px] w-full mx-2 hidden md:block">
+      {/* CENTER SECTION: Ultra-Compact Global Search Input */}
+      <div className="relative max-w-[170px] lg:max-w-[190px] w-full mx-2 hidden md:block">
         <div className="relative flex items-center">
-          <Search size={14} className="absolute left-3 text-slate-400 pointer-events-none z-10 shrink-0" />
+          <Search size={13} className="absolute left-2.5 text-slate-400 pointer-events-none z-10 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onFocus={() => setSearchFocused(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search workforce..."
-            className={`w-full pl-8 pr-14 py-1.5 text-xs rounded-xl transition-all border outline-none ${
+            placeholder="Search..."
+            className={`w-full pl-7 pr-11 py-1 text-[11px] rounded-lg transition-all border outline-none ${
               isDark
                 ? 'bg-slate-900/90 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500'
                 : 'bg-slate-100 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-blue-500'
             }`}
           />
-          <kbd className={`hidden lg:inline-flex absolute right-2 items-center px-1.5 py-0.5 text-[9px] font-mono font-bold rounded border pointer-events-none ${
+          <kbd className={`hidden lg:inline-flex absolute right-1.5 items-center px-1 py-0.2 text-[8px] font-mono font-bold rounded border pointer-events-none ${
             isDark ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-200 text-slate-600 border-slate-300'
           }`}>
             Ctrl K
