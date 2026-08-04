@@ -3,6 +3,7 @@ import authReducer from '../../auth/store/authSlice';
 import adminReducer from '../../features/admin/store/adminSlice';
 import hrReducer from '../../features/hr/store/hrSlice';
 import themeReducer from '../../store/themeSlice';
+import sidebarReducer from '../../store/sidebarSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     admin: adminReducer,
     hr: hrReducer,
     theme: themeReducer,
+    sidebar: sidebarReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

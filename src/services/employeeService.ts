@@ -1,3 +1,1 @@
-import { employeeApi } from '../api/endpoints/employee.api';
-export const employeeService = employeeApi;
-export default employeeService;
+export { employeeApi as employeeService } from '../api/endpoints/employee.api';

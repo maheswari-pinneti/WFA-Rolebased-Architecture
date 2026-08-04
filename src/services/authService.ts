@@ -1,3 +1,1 @@
-import { authApi } from '../api/endpoints/auth.api';
-export const authService = authApi;
-export default authService;
+export { authService } from '../auth/services/auth.service';
