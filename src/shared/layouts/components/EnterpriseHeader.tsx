@@ -18,23 +18,14 @@ import {
   LogOut,
   ChevronDown,
   Sparkles,
-  CheckCircle2,
-  Filter,
-  Layers,
-  Building2,
-  ShieldCheck,
   ChevronRight,
   Check,
   X,
   MessageSquare,
   HelpCircle,
-  Plus,
-  Download,
-  Upload,
-  KeyRound,
-  Clock,
-  FileSpreadsheet,
-  Home
+  Home,
+  CheckCircle2,
+  Layers
 } from 'lucide-react';
 
 interface EnterpriseHeaderProps {
@@ -43,17 +34,17 @@ interface EnterpriseHeaderProps {
 }
 
 export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSidebar, onOpenHelp }) => {
-  const { user, logout, switchRole, role, permissions } = useAuth();
+  const { user, role, switchRole, logout, permissions } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Search & Drill-Down Filters
+  // Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchCategory, setSearchCategory] = useState<'all' | 'employees' | 'departments' | 'reports' | 'security'>('all');
 
-  // Notifications & Messages State
+  // Notifications State
   const [unreadCount, setUnreadCount] = useState(3);
   const [notifications, setNotifications] = useState([
     { id: '1', title: 'Attendance Alert: 3 Late Clock-Ins', subtitle: 'HR Operations', time: '5m ago', type: 'warning', path: '/hr/attendance', read: false },
@@ -61,11 +52,10 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     { id: '3', title: 'System Security Audit Completed', subtitle: 'Compliance Stream', time: '2h ago', type: 'success', path: '/admin/audit-logs', read: false },
   ]);
 
-  // Dropdown States
+  // Dropdowns State
   const [activeDropdown, setActiveDropdown] = useState<'profile' | 'role' | 'notif' | 'messages' | null>(null);
 
-  // Scope State
-  const [selectedDept, setSelectedDept] = useState<string>('Global Operations');
+  // Scope & Modal States
   const [showPermissionsPreview, setShowPermissionsPreview] = useState(false);
   const [deptToast, setDeptToast] = useState<string | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -94,19 +84,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     setActiveDropdown((prev) => (prev === name ? null : name));
   };
 
-  const handleRoleChange = (newRole: Role) => {
-    switchRole(newRole);
-    setActiveDropdown(null);
-    const targetPath = ROLE_HOME_PATHS[newRole] || '/employee/dashboard';
-    navigate(targetPath);
-  };
-
-  const handleDeptSelect = (dept: string) => {
-    setSelectedDept(dept);
-    setDeptToast(`Scope switched to: ${dept}`);
-    setTimeout(() => setDeptToast(null), 3000);
-  };
-
   const markAllNotificationsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
@@ -116,11 +93,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     setSearchFocused(false);
     setSearchQuery('');
     navigate(path);
-  };
-
-  const handleLogoutClick = () => {
-    setActiveDropdown(null);
-    setShowLogoutModal(true);
   };
 
   const handleConfirmLogout = () => {
@@ -142,64 +114,63 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
   };
 
   const breadcrumbs = getBreadcrumbs();
-  const currentPageTitle = breadcrumbs[breadcrumbs.length - 1]?.label || 'Dashboard';
 
   const filteredSearchResults = searchResultsMap.filter((item) => {
     const matchesCategory = searchCategory === 'all' || item.category === searchCategory;
-    const matchesQuery = !searchQuery || item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesQuery = item.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesQuery;
   });
 
+  const isDark = theme === 'dark';
+
   return (
-    <header className="h-[72px] sticky top-0 z-40 bg-[#0B1120] text-slate-100 border-b border-slate-800/80 px-4 lg:px-6 flex items-center justify-between shadow-xl transition-all duration-300 font-sans">
-      
+    <header className={`h-16 px-4 flex items-center justify-between sticky top-0 z-40 transition-colors border-b ${
+      isDark ? 'bg-[#0B1120] border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+    }`}>
       {/* Toast Notification for Scope Change */}
       {deptToast && (
-        <div className="absolute top-20 right-6 bg-slate-900 border border-blue-500/40 text-blue-300 text-xs px-4 py-2.5 rounded-2xl shadow-2xl z-50 flex items-center gap-2 animate-fadeIn font-bold">
+        <div className="absolute top-18 right-6 bg-slate-900 border border-blue-500/40 text-blue-300 text-xs px-4 py-2 rounded-xl shadow-2xl z-50 flex items-center gap-2 font-bold animate-fadeIn">
           <CheckCircle2 size={16} className="text-emerald-400" />
           <span>{deptToast}</span>
         </div>
       )}
 
-      {/* LEFT SECTION: Sidebar Toggle, Brand Logo & Breadcrumb Navigation */}
-      <div className="flex items-center gap-3 md:gap-5 min-w-0">
-        {/* Sidebar Collapse Toggle Button */}
+      {/* LEFT SECTION: Sidebar Toggle, Logo & Breadcrumb Navigation */}
+      <div className="flex items-center gap-3 md:gap-4 min-w-0">
+        {/* Sidebar Toggle Button */}
         <button
           onClick={onToggleSidebar}
           aria-label="Toggle Sidebar"
-          className={`p-2 rounded-xl transition-all shadow-sm border ${
-            theme === 'dark'
-              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
-              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          className={`p-2 rounded-xl border transition-all ${
+            isDark
+              ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800'
+              : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
           }`}
           title="Toggle Left Sidebar"
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
 
         {/* STACKLY Brand Logo */}
-        <Link to="/" className="shrink-0 flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <StacklyLogo size={32} showText={true} />
+        <Link to="/" className="shrink-0 flex items-center hover:opacity-90 transition-opacity">
+          <StacklyLogo size={28} />
         </Link>
 
-        {/* Dynamic Breadcrumbs & Page Title */}
-        <div className="hidden sm:flex flex-col text-left min-w-0">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-            <Link to="/" className="hover:text-blue-400 flex items-center gap-1">
-              <Home size={12} />
-            </Link>
-            {breadcrumbs.map((b, idx) => (
-              <React.Fragment key={b.path}>
-                <ChevronRight size={12} className="text-slate-600" />
-                <span className={`truncate max-w-[120px] ${idx === breadcrumbs.length - 1 ? 'font-bold text-slate-200' : 'hover:text-slate-300'}`}>
-                  {b.label}
-                </span>
-              </React.Fragment>
-            ))}
-          </nav>
-          <h1 className="text-sm font-extrabold text-white tracking-tight truncate max-w-[220px] lg:max-w-[320px]">
-            {currentPageTitle}
-          </h1>
+        {/* Dynamic Breadcrumbs */}
+        <div className="hidden sm:flex items-center gap-1.5 text-xs min-w-0 pl-2 border-l border-slate-800/80">
+          <Link to="/" className="text-slate-400 hover:text-blue-400 flex items-center gap-1">
+            <Home size={13} />
+          </Link>
+          {breadcrumbs.map((b, idx) => (
+            <React.Fragment key={b.path}>
+              <ChevronRight size={12} className="text-slate-500" />
+              <span className={`truncate max-w-[140px] ${
+                idx === breadcrumbs.length - 1 ? 'font-bold text-blue-400' : 'text-slate-400 hover:text-slate-200'
+              }`}>
+                {b.label}
+              </span>
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
@@ -213,13 +184,15 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             onFocus={() => setSearchFocused(true)}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search workforce..."
-            className={`w-full pl-8 pr-14 py-1.5 text-xs rounded-xl transition-all shadow-inner border ${
-              theme === 'dark'
+            className={`w-full pl-8 pr-14 py-1.5 text-xs rounded-xl transition-all border outline-none ${
+              isDark
                 ? 'bg-slate-900/90 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500'
                 : 'bg-slate-100 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-blue-500'
             }`}
           />
-          <kbd className="hidden lg:inline-flex absolute right-2 items-center px-1.5 py-0.5 text-[9px] font-mono font-extrabold bg-slate-800/80 text-slate-400 rounded border border-slate-700/80 pointer-events-none">
+          <kbd className={`hidden lg:inline-flex absolute right-2 items-center px-1.5 py-0.5 text-[9px] font-mono font-bold rounded border pointer-events-none ${
+            isDark ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-200 text-slate-600 border-slate-300'
+          }`}>
             Ctrl K
           </kbd>
         </div>
@@ -228,20 +201,20 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         {searchFocused && (
           <>
             <div className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs" onClick={() => setSearchFocused(false)} />
-            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 p-4 shadow-2xl z-50 rounded-2xl space-y-3 text-slate-100 animate-fadeIn font-sans">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 p-3 shadow-2xl z-50 rounded-2xl space-y-2 text-slate-100 animate-fadeIn font-sans">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
                 <span className="text-xs font-bold text-slate-200">Global Search Results</span>
                 <button onClick={() => setSearchFocused(false)} className="text-slate-400 hover:text-white">
                   <X size={14} />
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {(['all', 'employees', 'departments', 'reports', 'security'] as const).map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSearchCategory(cat)}
-                    className={`px-3 py-1.5 text-xs rounded-xl font-bold capitalize transition-all ${
+                    className={`px-2.5 py-1 text-[11px] rounded-lg font-bold capitalize transition-all ${
                       searchCategory === cat
                         ? 'bg-blue-600 text-white shadow-md'
                         : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
@@ -252,7 +225,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                 ))}
               </div>
 
-              <div className="pt-2 border-t border-slate-800 max-h-60 overflow-y-auto space-y-1.5">
+              <div className="pt-1 border-t border-slate-800 max-h-56 overflow-y-auto space-y-1">
                 {filteredSearchResults.length === 0 ? (
                   <p className="text-xs text-slate-400 py-3 text-center">No matching results found</p>
                 ) : (
@@ -260,10 +233,10 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     <button
                       key={idx}
                       onClick={() => handleSearchSubmit(res.path)}
-                      className="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-xs text-slate-100 font-semibold flex items-center justify-between transition-colors shadow-sm"
+                      className="w-full text-left px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 text-xs text-slate-100 font-semibold flex items-center justify-between transition-colors shadow-sm"
                     >
                       <span className="truncate pr-2">{res.title}</span>
-                      <span className="text-[9.5px] font-mono font-bold uppercase bg-slate-950 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 shrink-0">
+                      <span className="text-[9px] font-mono font-bold uppercase bg-slate-950 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30 shrink-0">
                         {res.category}
                       </span>
                     </button>
@@ -276,20 +249,20 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
       </div>
 
       {/* RIGHT SECTION: Notification Bell, Messages, Theme Toggle, Help Icon & User Profile */}
-      <div className="flex items-center gap-2.5 shrink-0">
-        {/* 1. Notification Bell Icon & Dropdown */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* 1. Notification Bell */}
         <div className="relative">
           <button
             onClick={() => toggleDropdown('notif')}
             aria-label="View Notifications"
-            className={`p-2 rounded-xl transition-all shadow-sm relative border ${
-              theme === 'dark'
-                ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
-                : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+            className={`p-2 rounded-xl border transition-all relative ${
+              isDark
+                ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800'
+                : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
             }`}
             title="Notifications"
           >
-            <Bell size={18} strokeWidth={2} />
+            <Bell size={18} />
             {unreadCount > 0 && (
               <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-slate-900 animate-pulse" />
             )}
@@ -299,7 +272,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 py-3 px-4 shadow-2xl z-50 rounded-2xl space-y-3 text-slate-100 animate-fadeIn">
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span className="text-xs font-extrabold text-white flex items-center gap-1.5">
-                  <Sparkles size={16} strokeWidth={2} className="text-blue-400" /> Notifications
+                  <Sparkles size={16} className="text-blue-400" /> Notifications
                 </span>
                 {unreadCount > 0 && (
                   <button
@@ -336,77 +309,73 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           )}
         </div>
 
-        {/* 2. Messages Icon Dropdown */}
+        {/* 2. Messages Icon */}
         <button
           onClick={() => toggleDropdown('messages')}
           aria-label="View Messages"
-          className={`p-2 rounded-xl transition-all shadow-sm hidden sm:block border ${
-            theme === 'dark'
-              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
-              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          className={`p-2 rounded-xl border transition-all hidden sm:block ${
+            isDark
+              ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800'
+              : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
           }`}
           title="Team Messages"
         >
-          <MessageSquare size={18} strokeWidth={2} />
+          <MessageSquare size={18} />
         </button>
 
-        {/* 3. Theme Toggle (Light / Dark) */}
+        {/* 3. Theme Toggle */}
         <button
           onClick={toggleTheme}
           aria-label="Toggle Light or Dark Theme"
-          className={`p-2 rounded-xl transition-all shadow-sm border ${
-            theme === 'dark'
-              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
-              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          className={`p-2 rounded-xl border transition-all ${
+            isDark
+              ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800'
+              : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
           }`}
-          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+          title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
         >
-          {theme === 'dark' ? <Sun size={18} strokeWidth={2} className="text-amber-400" /> : <Moon size={18} strokeWidth={2} className="text-blue-400" />}
+          {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-blue-400" />}
         </button>
 
-        {/* 4. Help Center & IT Support Desk Icon */}
+        {/* 4. Help Icon */}
         <button
           onClick={onOpenHelp}
           aria-label="Help & IT Desk Support"
-          className={`p-2 rounded-xl transition-all shadow-sm hidden md:block border ${
-            theme === 'dark'
-              ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
-              : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
+          className={`p-2 rounded-xl border transition-all hidden md:block ${
+            isDark
+              ? 'bg-slate-900/90 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800'
+              : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
           }`}
-          title="24/7 Enterprise Help & IT Support"
+          title="24/7 Enterprise Help Desk"
         >
-          <HelpCircle size={18} strokeWidth={2} />
+          <HelpCircle size={18} />
         </button>
 
-        {/* 5. Compact Theme-Aware User Profile Drill-Down Button */}
+        {/* 5. Sleek Compact User Profile Avatar Button */}
         {user && (
-          <div className="relative border-l border-slate-800/80 pl-3 ml-1">
+          <div className="relative border-l border-slate-800/80 pl-2.5 ml-1">
             <button
               onClick={() => toggleDropdown('profile')}
               aria-label="User Profile Menu"
-              className={`flex items-center gap-1.5 p-1 rounded-full transition-all border shadow-sm ${
-                theme === 'dark'
-                  ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
-                  : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 hover:text-slate-900'
-              }`}
+              className="flex items-center gap-1.5 focus:outline-none group cursor-pointer"
               title={`${user.name} (${ROLE_LABELS[role]})`}
             >
               <div className="relative shrink-0">
                 <img
                   src={user.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
                   alt={user.name}
-                  className="w-7 h-7 rounded-full object-cover border border-blue-500/80 shadow-sm"
+                  className="w-8 h-8 rounded-full object-cover border-2 border-blue-500/80 group-hover:border-blue-400 transition-all shadow-md"
                 />
-                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-900" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-950" />
               </div>
-              <ChevronDown size={12} strokeWidth={2.5} className="text-slate-400 hover:text-white pr-0.5 shrink-0" />
+              <ChevronDown size={12} className="text-slate-400 group-hover:text-white transition-colors" />
             </button>
 
             {/* User Profile Dropdown Menu */}
             {activeDropdown === 'profile' && (
-              <div className="absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-800 p-2.5 shadow-2xl z-50 rounded-2xl text-xs text-slate-100 animate-fadeIn space-y-1 font-sans">
-                <div className="px-3.5 py-3 border-b border-slate-800 space-y-1">
-                  <p className="font-black text-sm text-white">{user.name}</p>
+              <div className="absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-800 p-3 shadow-2xl z-50 rounded-2xl text-xs text-slate-100 animate-fadeIn space-y-2 font-sans">
+                <div className="px-2 py-1.5 border-b border-slate-800 space-y-1">
+                  <p className="font-extrabold text-sm text-white">{user.name}</p>
                   <p className="text-[11px] text-slate-400 font-mono truncate">{user.email}</p>
                   <div className="mt-2 flex items-center justify-between pt-1">
                     <span className={`badge ${getRoleBadgeClass(role)}`}>{ROLE_LABELS[role]}</span>
@@ -414,13 +383,13 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                       onClick={() => setShowPermissionsPreview(!showPermissionsPreview)}
                       className="text-[10px] font-bold text-blue-400 hover:underline flex items-center gap-1"
                     >
-                      <Layers size={12} /> {showPermissionsPreview ? 'Hide Flags' : 'Permissions'}
+                      <Layers size={12} /> {showPermissionsPreview ? 'Hide' : 'Permissions'}
                     </button>
                   </div>
                 </div>
 
                 {showPermissionsPreview && (
-                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[10px] space-y-1.5 max-h-36 overflow-y-auto">
+                  <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-[10px] space-y-1 max-h-36 overflow-y-auto">
                     <p className="font-extrabold text-slate-400 uppercase tracking-wider">Active Permissions ({permissions.length})</p>
                     <div className="flex flex-wrap gap-1">
                       {permissions.map((p, idx) => (
@@ -435,36 +404,30 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                 <div className="py-1 space-y-0.5 font-medium">
                   <button
                     onClick={() => { navigate('/employee/profile'); setActiveDropdown(null); }}
-                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2 text-slate-200 transition-colors"
                   >
-                    <UserIcon size={16} strokeWidth={2} className="text-blue-400" /> My Profile
+                    <UserIcon size={16} className="text-blue-400" /> View Profile
                   </button>
                   <button
                     onClick={() => { navigate('/admin/settings'); setActiveDropdown(null); }}
-                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2 text-slate-200 transition-colors"
                   >
-                    <Settings size={16} strokeWidth={2} className="text-indigo-400" /> Account Settings
+                    <Settings size={16} className="text-indigo-400" /> Account Settings
                   </button>
                   <button
-                    onClick={() => { navigate('/admin/settings#security'); setActiveDropdown(null); }}
-                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
+                    onClick={() => { navigate('/admin/users'); setActiveDropdown(null); }}
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2 text-slate-200 transition-colors"
                   >
-                    <KeyRound size={16} strokeWidth={2} className="text-emerald-400" /> Change Password
-                  </button>
-                  <button
-                    onClick={() => { navigate('/admin/roles'); setActiveDropdown(null); }}
-                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 hover:text-white transition-colors"
-                  >
-                    <Shield size={16} strokeWidth={2} className="text-amber-400" /> Security
+                    <Shield size={16} className="text-purple-400" /> Access Control Matrix
                   </button>
                 </div>
 
-                <div className="border-t border-slate-800 pt-1">
+                <div className="pt-2 border-t border-slate-800">
                   <button
-                    onClick={handleLogoutClick}
-                    className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-rose-500/10 text-rose-400 flex items-center gap-2.5 font-bold transition-colors"
+                    onClick={() => { setActiveDropdown(null); setShowLogoutModal(true); }}
+                    className="w-full text-left px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 flex items-center gap-2 font-bold transition-colors"
                   >
-                    <LogOut size={16} strokeWidth={2} /> Logout
+                    <LogOut size={16} /> Log Out
                   </button>
                 </div>
               </div>
