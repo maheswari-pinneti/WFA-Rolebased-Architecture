@@ -282,56 +282,59 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           />
         </div>
 
-        {/* Search Results Dropdown */}
+        {/* Search Results Dropdown & Backdrop */}
         {searchFocused && (
-          <div className="absolute left-0 right-0 top-full mt-2 p-4 shadow-2xl z-50 bg-[var(--bg-secondary)] border border-[var(--border-color)] backdrop-blur-xl rounded-2xl space-y-3 text-[var(--text-primary)] animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2.5">
-              <span className="text-xs font-bold text-[var(--text-muted)] flex items-center gap-1.5">
-                <Filter size={14} strokeWidth={2} /> Category Scope
-              </span>
-              <button
-                onClick={() => setSearchFocused(false)}
-                className="text-[10px] font-bold text-blue-500 hover:underline flex items-center gap-0.5"
-              >
-                <X size={12} /> Close
-              </button>
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-              {(['all', 'employees', 'departments', 'reports', 'security'] as const).map((cat) => (
+          <>
+            <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setSearchFocused(false)} />
+            <div className="absolute left-0 right-0 top-full mt-2 p-4 shadow-2xl z-50 bg-slate-900 border border-slate-700/80 backdrop-blur-xl rounded-2xl space-y-3 text-slate-100 animate-fadeIn">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Filter size={14} strokeWidth={2} /> Category Scope
+                </span>
                 <button
-                  key={cat}
-                  onClick={() => setSearchCategory(cat)}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-bold capitalize transition-colors ${
-                    searchCategory === cat
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                  }`}
+                  onClick={() => setSearchFocused(false)}
+                  className="text-[10px] font-bold text-blue-400 hover:underline flex items-center gap-0.5 bg-slate-800 px-2 py-1 rounded-lg"
                 >
-                  {cat}
+                  <X size={12} /> Close
                 </button>
-              ))}
-            </div>
+              </div>
 
-            <div className="pt-2 border-t border-[var(--border-color)] max-h-60 overflow-y-auto space-y-1">
-              {filteredSearchResults.length === 0 ? (
-                <p className="text-xs text-slate-400 py-2 text-center">No matching results found</p>
-              ) : (
-                filteredSearchResults.map((res, idx) => (
+              <div className="flex flex-wrap gap-1.5">
+                {(['all', 'employees', 'departments', 'reports', 'security'] as const).map((cat) => (
                   <button
-                    key={idx}
-                    onClick={() => handleSearchSubmit(res.path)}
-                    className="w-full text-left px-3 py-2 rounded-xl bg-[var(--bg-tertiary)]/60 hover:bg-[var(--bg-tertiary)] text-xs text-[var(--text-primary)] font-medium flex items-center justify-between transition-colors"
+                    key={cat}
+                    onClick={() => setSearchCategory(cat)}
+                    className={`px-3 py-1.5 text-xs rounded-xl font-bold capitalize transition-all ${
+                      searchCategory === cat
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
+                    }`}
                   >
-                    <span>{res.title}</span>
-                    <span className="text-[10px] font-mono uppercase bg-[var(--bg-primary)] text-slate-400 px-1.5 py-0.5 rounded border border-[var(--border-color)]">
-                      {res.category}
-                    </span>
+                    {cat}
                   </button>
-                ))
-              )}
+                ))}
+              </div>
+
+              <div className="pt-2 border-t border-slate-800 max-h-60 overflow-y-auto space-y-1.5">
+                {filteredSearchResults.length === 0 ? (
+                  <p className="text-xs text-slate-400 py-3 text-center">No matching results found</p>
+                ) : (
+                  filteredSearchResults.map((res, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSearchSubmit(res.path)}
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/50 text-xs text-slate-100 font-semibold flex items-center justify-between transition-colors shadow-sm"
+                    >
+                      <span className="truncate pr-2">{res.title}</span>
+                      <span className="text-[9.5px] font-mono font-bold uppercase bg-slate-900 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 shrink-0">
+                        {res.category}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 
