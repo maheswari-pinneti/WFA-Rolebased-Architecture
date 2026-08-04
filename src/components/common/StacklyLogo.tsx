@@ -8,13 +8,13 @@ interface StacklyLogoProps {
 }
 
 export const StacklyLogo: React.FC<StacklyLogoProps> = ({
-  size = 32,
+  size = 28,
   showText = true,
   className = '',
   useImg = false,
 }) => {
   return (
-    <div className={`inline-flex items-center gap-3 ${className}`}>
+    <div className={`inline-flex items-center gap-2.5 ${className}`}>
       {useImg ? (
         <img
           src="/assets/images/logo.png"
@@ -22,15 +22,14 @@ export const StacklyLogo: React.FC<StacklyLogoProps> = ({
           style={{ height: size, width: 'auto' }}
           className="shrink-0 object-contain drop-shadow-sm"
           onError={(e) => {
-            // Fallback to SVG ribbon logo if PNG fails
             (e.target as HTMLElement).style.display = 'none';
           }}
         />
       ) : (
-        /* Official STACKLY Mint-Teal & Deep Navy Ribbon SVG Icon */
+        /* Official STACKLY Mint-Teal & Deep Navy Dual-Ribbon SVG Icon */
         <svg
           width={size}
-          height={size * 1.25}
+          height={size * 1.1}
           viewBox="0 0 100 125"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -60,12 +59,12 @@ export const StacklyLogo: React.FC<StacklyLogoProps> = ({
       )}
 
       {showText && (
-        <div className="flex flex-col text-left">
-          <span className="text-xl font-black tracking-widest leading-none font-sans text-[var(--text-primary)]">
+        <div className="flex items-center gap-2 text-left">
+          <span className="text-lg font-black tracking-widest leading-none font-sans text-[var(--text-primary)]">
             STACKLY
           </span>
-          <span className="text-[10px] font-extrabold text-[#34D399] uppercase tracking-widest mt-1">
-            Workforce Analytics
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+            WFA
           </span>
         </div>
       )}

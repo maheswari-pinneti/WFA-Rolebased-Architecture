@@ -31,14 +31,10 @@ import {
   X,
   ClipboardList,
   UserCog,
-  PieChart,
-  LifeBuoy,
-  Contact,
-  HelpCircle,
-  FolderKanban
+  PieChart
 } from 'lucide-react';
 
-interface NavigationItem {
+export interface NavigationItem {
   label: string;
   path: string;
   icon: React.ReactNode;
@@ -48,7 +44,7 @@ interface NavigationItem {
   };
 }
 
-interface NavigationCategory {
+export interface NavigationCategory {
   category: 'General' | 'Analytics' | 'Settings';
   items: NavigationItem[];
 }
@@ -66,13 +62,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setCollapsed,
   mobileOpen,
   setMobileOpen,
-  onOpenSupport,
 }) => {
   const { role } = useAuth();
   const location = useLocation();
   const [filterQuery, setFilterQuery] = useState('');
 
-  // Grouped Navigation Sections: General, Analytics, Settings
+  // Clean Navigation Structure
   const roleCategorizedNavMap: Record<Role, NavigationCategory[]> = {
     [Role.ADMIN]: [
       {
@@ -236,28 +231,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Modern Responsive SaaS Off-Canvas & Collapsible Sidebar (Width 260px) */}
+      {/* Modern Clean Enterprise SaaS Left Sidebar (Width 260px) */}
       <aside
-        className={`bg-[var(--bg-secondary)] text-[var(--text-primary)] border-r border-[var(--border-color)] flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
+        className={`bg-[#0B1120] text-slate-100 border-r border-slate-800 flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
           collapsed ? 'w-[72px]' : 'w-[260px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Top Company Logo Area, Collapse Toggle & Mobile Close Button */}
-        <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between">
-          <StacklyLogo size={32} showText={!collapsed} />
-          <div className="flex items-center gap-1">
+        {/* Top Company Logo Area & Collapse Toggle */}
+        <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
+          <StacklyLogo size={28} showText={!collapsed} />
+          <div>
             {/* Mobile Close Button &times; */}
             <button
               onClick={() => setMobileOpen(false)}
-              className="md:hidden p-1.5 rounded-xl bg-[var(--bg-tertiary)] text-slate-400 hover:text-[var(--text-primary)] transition-all border border-[var(--border-color)]"
-              title="Close Off-Canvas Drawer"
+              className="md:hidden p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-all border border-slate-700/80"
+              title="Close Drawer"
             >
               <X size={16} />
             </button>
-            {/* Desktop / Tablet Collapse Toggle */}
+            {/* Desktop Collapse Toggle */}
             <button
               onClick={() => setCollapsed((prev) => !prev)}
-              className="hidden md:block p-1.5 rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all border border-[var(--border-color)]"
+              className="hidden md:block p-1.5 rounded-xl bg-slate-800/80 text-slate-400 hover:text-white transition-all border border-slate-700/80"
               title={collapsed ? 'Expand Sidebar (260px)' : 'Collapse Sidebar'}
             >
               {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -265,7 +260,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Quick Search Input */}
+        {/* Quick Search Navigation Input */}
         {!collapsed && (
           <div className="px-3.5 pt-3.5 pb-1">
             <div className="relative flex items-center">
@@ -275,12 +270,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 placeholder="Quick search navigation..."
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-slate-400 rounded-xl pl-8 pr-7 py-2 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
+                className="w-full bg-slate-900 border border-slate-800 text-xs text-slate-100 placeholder-slate-400 rounded-xl pl-8 pr-7 py-2 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
               />
               {filterQuery && (
                 <button
                   onClick={() => setFilterQuery('')}
-                  className="absolute right-2 text-slate-400 hover:text-[var(--text-primary)] p-0.5 rounded"
+                  className="absolute right-2 text-slate-400 hover:text-white p-0.5 rounded"
                 >
                   <X size={12} />
                 </button>
@@ -289,8 +284,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
-        {/* Scrollable Grouped Navigation (General, Analytics, Settings) */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 w-full scrollbar-thin scrollbar-thumb-[var(--border-color)]">
+        {/* Clean Uninterrupted Navigation List (No Harsh Text Headers) */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1 w-full scrollbar-thin scrollbar-thumb-slate-800">
           {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
             const filteredItems = cat.items.filter((item: NavigationItem) =>
               item.label.toLowerCase().includes(filterQuery.toLowerCase())
@@ -299,15 +294,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             if (filterQuery && filteredItems.length === 0) return null;
 
             return (
-              <div key={groupIdx} className="space-y-1">
-                {/* Grouped Section Header Label */}
-                {!collapsed && (
-                  <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
-                    {cat.category}
-                  </div>
+              <React.Fragment key={groupIdx}>
+                {/* Subtle Divider Line Between Logical Groups */}
+                {groupIdx > 0 && !collapsed && (
+                  <div className="my-2 border-t border-slate-800/60" />
                 )}
 
-                {/* Clean SVG Icon Navigation Links */}
+                {/* Clean Navigation Links */}
                 {filteredItems.map((item: NavigationItem) => {
                   const active = location.pathname === item.path;
 
@@ -319,8 +312,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       title={collapsed ? item.label : undefined}
                       className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all duration-200 group relative no-underline text-inherit ${
                         active
-                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-black shadow-lg shadow-blue-500/25 border border-blue-500/40'
-                          : 'hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-transparent hover:border-[var(--border-color)]'
+                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-extrabold shadow-lg shadow-blue-500/25 border border-blue-500/40'
+                          : 'hover:bg-slate-800/60 text-slate-300 hover:text-white border border-transparent hover:border-slate-800/60'
                       } ${collapsed ? 'justify-center px-0' : ''}`}
                     >
                       <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">
@@ -328,7 +321,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </span>
 
                       {!collapsed && (
-                        <span className="font-extrabold text-xs tracking-tight truncate flex-1 min-w-0">
+                        <span className="font-bold text-xs tracking-tight truncate flex-1 min-w-0">
                           {item.label}
                         </span>
                       )}
@@ -346,7 +339,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                       {/* Collapsed Hover Tooltip */}
                       {collapsed && (
-                        <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2">
+                        <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-900 text-slate-100 border border-slate-700 shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2">
                           {item.label}
                           {item.badge && (
                             <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${getBadgeStyle(item.badge.variant)}`}>
@@ -358,12 +351,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </Link>
                   );
                 })}
-              </div>
+              </React.Fragment>
             );
           })}
         </nav>
 
-        {/* Bottom User Profile Card with Avatar & Dropdown Menu */}
+        {/* Bottom User Profile Card */}
         <UserProfile collapsed={collapsed} />
       </aside>
     </>
