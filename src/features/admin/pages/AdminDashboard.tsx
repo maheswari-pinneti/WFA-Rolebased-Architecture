@@ -6,14 +6,13 @@ import { Permission } from '../../../security/permissions/permissions';
 import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
 
-// Recharts Modules
-import { WorkforceGrowthLine } from '../../analytics/charts/WorkforceGrowthLine';
-import { DepartmentDistribution } from '../../analytics/charts/DepartmentDistribution';
-import { AttendanceAnalysisArea } from '../../analytics/charts/AttendanceAnalysisArea';
-import { PerformanceAreaChart } from '../../analytics/charts/PerformanceAreaChart';
-import { AttendanceOverviewBar } from '../../analytics/charts/AttendanceOverviewBar';
-import { SalaryAnalyticsStackedBar } from '../../analytics/charts/SalaryAnalyticsStackedBar';
-import { EmployeeEngagementRadar } from '../../analytics/charts/EmployeeEngagementRadar';
+// 6 Distinct Recharts Modules (Each uses a completely different chart type)
+import { WorkforceGrowthLine } from '../../analytics/charts/WorkforceGrowthLine'; // 1. Dual Area Gradient Line Chart
+import { AttendanceOverviewBar } from '../../analytics/charts/AttendanceOverviewBar'; // 2. Vertical Stacked Bar Chart
+import { DepartmentDistribution } from '../../analytics/charts/DepartmentDistribution'; // 3. Donut / Pie Chart
+import { EmployeeEngagementRadar } from '../../analytics/charts/EmployeeEngagementRadar'; // 4. 6-Axis Radar Spiderweb Chart
+import { PerformanceAreaChart } from '../../analytics/charts/PerformanceAreaChart'; // 5. Composed Bar + Line Combo Chart
+import { SalaryAnalyticsStackedBar } from '../../analytics/charts/SalaryAnalyticsStackedBar'; // 6. Horizontal Stacked Bar Chart
 
 import {
   Users,
@@ -32,9 +31,11 @@ import {
   TrendingDown,
   Briefcase,
   Target,
-  Eye,
-  ShoppingCart,
-  ShoppingBag,
+  ShieldCheck,
+  DollarSign,
+  PieChart as PieIcon,
+  BarChart3,
+  Layers,
   ArrowUpRight,
   ArrowDownRight
 } from 'lucide-react';
@@ -106,177 +107,328 @@ export const AdminDashboard: React.FC = () => {
         {/* Global Filter Bar */}
         <AdvancedFilterBar onFilterChange={() => {}} />
 
-        {/* TAILADMIN STYLE TOP 4 KPI METRIC CARDS ROW */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          
-          {/* Card 1: Total Employees */}
-          <div 
-            onClick={() => openDrillDown('Total Employee Headcount', '15,420 Active Records', 'Global workforce roster', [
-              { label: 'Full-time Permanent', value: 13850 },
-              { label: 'Contractors & Consultants', value: 1570 },
-            ])}
-            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Eye size={22} />
-              </div>
-              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                0.43% <ArrowUpRight size={14} />
-              </span>
-            </div>
-            <div>
-              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">$3.456K</h4>
-              <p className="text-xs font-semibold text-slate-400 mt-1">Total Workforce Views</p>
-            </div>
+        {/* 10 EXECUTIVE KPI METRICS CARDS GRID (DISTINCT METRICS) */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-400">
+              EXECUTIVE WORKFORCE KPI METRICS (10 KEY INDICATORS)
+            </h3>
+            <span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
+              LIVE STREAM
+            </span>
           </div>
 
-          {/* Card 2: Total Profit / Attendance Rate */}
-          <div 
-            onClick={() => openDrillDown('Attendance Compliance Rate', '96.5%', 'Weekly shift adherence', [
-              { label: 'On-Time Clock Ins', value: '94.2%' },
-              { label: 'Approved Remote WFH', value: '2.3%' },
-            ])}
-            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <ShoppingCart size={22} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            
+            {/* KPI 1: Total Employees */}
+            <div 
+              onClick={() => openDrillDown('Total Employee Headcount', '15,420 Active Records', 'Global workforce roster', [
+                { label: 'Full-time Permanent', value: 13850 },
+                { label: 'Contractors & Consultants', value: 1570 },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Users size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +12.4% <ArrowUpRight size={13} />
+                </span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                4.35% <ArrowUpRight size={14} />
-              </span>
-            </div>
-            <div>
-              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">$45,2K</h4>
-              <p className="text-xs font-semibold text-slate-400 mt-1">Total Attendance Revenue</p>
-            </div>
-          </div>
-
-          {/* Card 3: Total Product / Productivity Index */}
-          <div 
-            onClick={() => openDrillDown('Performance Score Index', '87% Average', 'Quarterly KPI score', [
-              { label: 'Exceeding Expectations', value: '58%' },
-              { label: 'Meeting Targets', value: '38%' },
-            ])}
-            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <ShoppingBag size={22} />
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">15,420</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Total Headcount</p>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
-                2.59% <ArrowUpRight size={14} />
-              </span>
             </div>
-            <div>
-              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">2.450</h4>
-              <p className="text-xs font-semibold text-slate-400 mt-1">Total Productivity Tasks</p>
-            </div>
-          </div>
 
-          {/* Card 4: Total Users / Headcount */}
-          <div 
-            onClick={() => openDrillDown('Active Job Requisitions', '124 Roles', 'Hiring pipeline', [
-              { label: 'Engineering Roles', value: 64 },
-              { label: 'Sales & Growth', value: 32 },
-            ])}
-            className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users size={22} />
+            {/* KPI 2: Active Duty Rate */}
+            <div 
+              onClick={() => openDrillDown('Active Duty Status', '14,850 Clocked In', 'Real-time shift roster', [
+                { label: 'In-Office Campuses', value: 11200 },
+                { label: 'Remote WFH', value: 3650 },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ShieldCheck size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +96.3% <ArrowUpRight size={13} />
+                </span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-sky-400">
-                0.95% <ArrowDownRight size={14} />
-              </span>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">14,850</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Active Duty Rate</p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-2xl lg:text-3xl font-black text-white tracking-tight">3.456</h4>
-              <p className="text-xs font-semibold text-slate-400 mt-1">Total Active Users</p>
-            </div>
-          </div>
 
+            {/* KPI 3: Attendance Rate */}
+            <div 
+              onClick={() => openDrillDown('Attendance Compliance Rate', '96.5%', 'Weekly shift adherence', [
+                { label: 'On-Time Clock Ins', value: '94.2%' },
+                { label: 'Approved Remote WFH', value: '2.3%' },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Clock size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +1.5% <ArrowUpRight size={13} />
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">96.5%</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Attendance Compliance</p>
+              </div>
+            </div>
+
+            {/* KPI 4: Employee Turnover */}
+            <div 
+              onClick={() => openDrillDown('Employee Turnover Attrition', '4.2% Rate', 'Annual attrition index', [
+                { label: 'Voluntary Resignations', value: '3.1%' },
+                { label: 'Involuntary Departures', value: '1.1%' },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <TrendingDown size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  -0.8% <ArrowDownRight size={13} />
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">4.2%</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Annual Attrition</p>
+              </div>
+            </div>
+
+            {/* KPI 5: Avg Performance Score */}
+            <div 
+              onClick={() => openDrillDown('Performance Score Index', '87% Average', 'Quarterly KPI score', [
+                { label: 'Exceeding Expectations', value: '58%' },
+                { label: 'Meeting Targets', value: '38%' },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Award size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +3.2% <ArrowUpRight size={13} />
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">87%</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Avg Performance KPI</p>
+              </div>
+            </div>
+
+            {/* KPI 6: Open Hiring Requisitions */}
+            <div 
+              onClick={() => openDrillDown('Active Job Requisitions', '124 Roles', 'Hiring pipeline', [
+                { label: 'Engineering Roles', value: 64 },
+                { label: 'Sales & Growth', value: 32 },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Briefcase size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +8.4% <ArrowUpRight size={13} />
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">124</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Open Requisitions</p>
+              </div>
+            </div>
+
+            {/* KPI 7: Department Divisions */}
+            <div 
+              onClick={() => openDrillDown('Department Divisions', '28 Divisions', 'Organizational structure', [
+                { label: 'Engineering & Technology', value: '5,800 Staff' },
+                { label: 'Sales & Marketing', value: '4,200 Staff' },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Building2 size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-slate-400">
+                  0.0%
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">28</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Active Divisions</p>
+              </div>
+            </div>
+
+            {/* KPI 8: Skill & Compliance Matrix */}
+            <div 
+              onClick={() => openDrillDown('Training & Compliance', '92% Completed', 'Learning compliance', [
+                { label: 'Security & Compliance Badges', value: '96%' },
+                { label: 'Cloud Architecture Skills', value: '88%' },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Target size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +5.6% <ArrowUpRight size={13} />
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">92%</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Skill Compliance</p>
+              </div>
+            </div>
+
+            {/* KPI 9: Monthly Payroll Expense */}
+            <div 
+              onClick={() => openDrillDown('Monthly Enterprise Payroll', '$4.8M Total Budget', 'Monthly compensation', [
+                { label: 'Base Salaries', value: '$4.1M' },
+                { label: 'Bonuses & Perks', value: '$700K' },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <DollarSign size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +4.35% <ArrowUpRight size={13} />
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">$4.8M</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Monthly Payroll</p>
+              </div>
+            </div>
+
+            {/* KPI 10: Security & Audit Audit Score */}
+            <div 
+              onClick={() => openDrillDown('Security & Audit Score', '99.8% Pass Rate', 'Automated security compliance', [
+                { label: 'Zero Trust ABAC Policy', value: '100% Compliant' },
+                { label: 'DBAC Scope Isolation', value: '100% Passed' },
+              ])}
+              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl hover:border-slate-700 transition-all cursor-pointer group space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Layers size={20} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400">
+                  +0.2% <ArrowUpRight size={13} />
+                </span>
+              </div>
+              <div>
+                <h4 className="text-2xl font-black text-white tracking-tight">99.8%</h4>
+                <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Audit Compliance</p>
+              </div>
+            </div>
+
+          </div>
         </div>
 
-        {/* TAILADMIN MIDDLE MAIN CHART GRID: 8 COLUMNS (LEFT AREA CHART) + 4 COLUMNS (RIGHT BAR CHART) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* LEFT 8 COLUMNS: Total Revenue & Workforce Growth Area Chart */}
-          <div className="lg:col-span-8 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
-              <div>
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1.5 text-xs font-bold text-blue-400">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Total Revenue
-                  </span>
-                  <span className="flex items-center gap-1.5 text-xs font-bold text-cyan-400">
-                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" /> Total Sales
-                  </span>
-                </div>
-                <p className="text-[11px] font-mono text-slate-400 mt-1">12.04.2026 - 12.05.2026</p>
-              </div>
-
-              {/* Day / Week / Month Toggle Pills */}
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
-                {(['Day', 'Week', 'Month'] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setTimeRange(mode)}
-                    className={`px-3 py-1 text-xs font-extrabold rounded-lg transition-all ${
-                      timeRange === mode
-                        ? 'bg-slate-800 text-white shadow-md'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {mode}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <WorkforceGrowthLine />
+        {/* 6 DISTINCT SVG RECHARTS SECTION (EACH CHART TYPE IS COMPLETELY DIFFERENT) */}
+        <div className="space-y-6 pt-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-400">
+              6 DISTINCT ENTERPRISE ANALYTICS RECHARTS (ZERO DUPES)
+            </h3>
+            <span className="text-xs font-mono font-bold text-slate-400">
+              6 Visualization Types
+            </span>
           </div>
 
-          {/* RIGHT 4 COLUMNS: Profit This Week / Department Productivity Stacked Bar Chart */}
-          <div className="lg:col-span-4 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4 flex flex-col justify-between">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-              <div>
-                <h3 className="text-base font-extrabold text-white">Profit this week</h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="flex items-center gap-1 text-[11px] font-bold text-blue-400">
-                    <span className="w-2 h-2 rounded-full bg-blue-600" /> Sales
-                  </span>
-                  <span className="flex items-center gap-1 text-[11px] font-bold text-cyan-400">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400" /> Revenue
-                  </span>
+          {/* CHART ROW 1: 1. Dual Area Line Chart + 2. Vertical Stacked Column Bar Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Chart 1: WorkforceGrowthLine (Dual Area Gradient Line Chart) */}
+            <div className="lg:col-span-8 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h4 className="text-base font-extrabold text-white">1. Workforce Revenue & Growth Trend (Area Line Chart)</h4>
+                  <p className="text-xs text-slate-400">Smooth dual-gradient area curves for total revenue vs sales</p>
+                </div>
+                <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                  {(['Day', 'Week', 'Month'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setTimeRange(mode)}
+                      className={`px-3 py-1 text-xs font-extrabold rounded-lg transition-all ${
+                        timeRange === mode ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {mode}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <span className="text-xs font-mono font-bold text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
-                This Week ∨
-              </span>
+              <WorkforceGrowthLine />
             </div>
 
-            <div className="flex-1 flex items-center justify-center min-h-[260px]">
+            {/* Chart 2: AttendanceOverviewBar (Vertical Stacked Column Bar Chart) */}
+            <div className="lg:col-span-4 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-3">
+              <div className="border-b border-slate-800 pb-3">
+                <h4 className="text-base font-extrabold text-white">2. Weekly Shift Attendance (Stacked Bar)</h4>
+                <p className="text-xs text-slate-400">Vertical stacked bars per day (M T W T F S S)</p>
+              </div>
               <AttendanceOverviewBar />
             </div>
+
           </div>
 
-        </div>
+          {/* CHART ROW 2: 3. Donut Pie Chart + 4. 6-Axis Spiderweb Radar Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Chart 3: DepartmentDistribution (Donut Pie Chart) */}
+            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
+              <div className="border-b border-slate-800 pb-3 mb-2">
+                <h4 className="text-base font-extrabold text-white">3. Department Headcount Share (Donut Chart)</h4>
+                <p className="text-xs text-slate-400">Circular pie/donut distribution across 5 core divisions</p>
+              </div>
+              <DepartmentDistribution />
+            </div>
 
-        {/* TAILADMIN BOTTOM GRID: Department Distribution & Performance Radar */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Left 6 Columns: Department Distribution */}
-          <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
-            <DepartmentDistribution />
+            {/* Chart 4: EmployeeEngagementRadar (6-Axis Radar Spiderweb Chart) */}
+            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
+              <div className="border-b border-slate-800 pb-3 mb-2">
+                <h4 className="text-base font-extrabold text-white">4. Workforce Engagement Index (Radar Chart)</h4>
+                <p className="text-xs text-slate-400">6-axis spiderweb polygon across leadership & skill competencies</p>
+              </div>
+              <EmployeeEngagementRadar />
+            </div>
+
           </div>
 
-          {/* Right 6 Columns: Employee Engagement & Performance Radar */}
-          <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
-            <EmployeeEngagementRadar />
-          </div>
+          {/* CHART ROW 3: 5. Composed Bar + Line Combo Chart + 6. Horizontal Stacked Bar Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Chart 5: PerformanceAreaChart (Composed Bar + Line Combo Chart) */}
+            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
+              <PerformanceAreaChart />
+            </div>
 
+            {/* Chart 6: SalaryAnalyticsStackedBar (Horizontal Stacked Bar Chart) */}
+            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
+              <SalaryAnalyticsStackedBar />
+            </div>
+
+          </div>
         </div>
 
         {/* Recent Enterprise Activity Stream & Celebrations */}
