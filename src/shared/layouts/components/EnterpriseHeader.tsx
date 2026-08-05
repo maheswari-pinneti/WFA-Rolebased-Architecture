@@ -132,7 +132,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           aria-label="Toggle navigation"
           className="header-menu-button p-2 rounded-xl border cursor-pointer"
         >
-          <Menu size={18} />
+          <MenuIcon style={{ fontSize: 18 }} />
         </button>
 
         {/* STACKLY Brand Logo */}

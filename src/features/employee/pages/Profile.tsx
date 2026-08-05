@@ -7,22 +7,150 @@ import {
   Mail,
   Briefcase,
   Building2,
-  Shield,
   Calendar,
   MapPin,
   Clock,
   TrendingUp,
   FileText,
+  Settings,
   Download,
   CheckCircle2,
   LogOut as LogOutIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export const Profile: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'attendance' | 'performance' | 'documents'>('overview');
+
+  const [isGsiLoaded, setIsGsiLoaded] = useState(false);
+  const [clientId, setClientId] = useState(() => localStorage.getItem('google_calendar_client_id') || '');
+  const [accessToken, setAccessToken] = useState(() => localStorage.getItem('google_calendar_token') || '');
+  const [events, setEvents] = useState<any[]>([]);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  useEffect(() => {
+    if (document.getElementById('google-gsi-client')) {
+      setIsGsiLoaded(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'google-gsi-client';
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setIsGsiLoaded(true);
+    document.body.appendChild(script);
+  }, []);
+
+  const fetchCalendarEvents = async (token: string) => {
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=2026-08-01T00:00:00Z&timeMax=2026-08-31T23:59:59Z&singleEvents=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error('Failed to fetch events.');
+      }
+      const data = await response.json();
+      setEvents(data.items || []);
+    } catch (err: any) {
+      console.error(err);
+      setAccessToken('');
+      localStorage.removeItem('google_calendar_token');
+    }
+  };
+
+  useEffect(() => {
+    if (accessToken) {
+      fetchCalendarEvents(accessToken);
+    }
+  }, [accessToken]);
+
+  const handleConnectGoogle = () => {
+    if (!clientId) {
+      setShowSettings(true);
+      return;
+    }
+    if (!(window as any).google) {
+      alert('Google API client is loading, please try again in a moment.');
+      return;
+    }
+    setIsConnecting(true);
+    try {
+      const client = (window as any).google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'https://www.googleapis.com/auth/calendar.readonly',
+        callback: (response: any) => {
+          setIsConnecting(false);
+          if (response.error) {
+            alert('Google authentication error: ' + response.error);
+            return;
+          }
+          if (response.access_token) {
+            setAccessToken(response.access_token);
+            localStorage.setItem('google_calendar_token', response.access_token);
+            fetchCalendarEvents(response.access_token);
+          }
+        },
+      });
+      client.requestAccessToken();
+    } catch (error) {
+      console.error(error);
+      setIsConnecting(false);
+      alert('Initialization error. Please verify your Google Client ID.');
+    }
+  };
+
+  const handleDisconnectGoogle = () => {
+    setAccessToken('');
+    setEvents([]);
+    localStorage.removeItem('google_calendar_token');
+  };
+
+  const getDayStatus = (day: number, dayOfWeek: number) => {
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      return 'weekend';
+    }
+
+    // Check if there is a matching live event for this day
+    const dayStr = `2026-08-${day.toString().padStart(2, '0')}`;
+    const dayEvents = events.filter(event => {
+      const start = event.start?.date || event.start?.dateTime || '';
+      return start.startsWith(dayStr);
+    });
+
+    if (dayEvents.length > 0) {
+      const isLeave = dayEvents.some(e => {
+        const summary = (e.summary || '').toLowerCase();
+        return summary.includes('leave') || summary.includes('vacation') || summary.includes('ooo') || summary.includes('out of office');
+      });
+      if (isLeave) return 'leave';
+
+      const isWfh = dayEvents.some(e => {
+        const summary = (e.summary || '').toLowerCase();
+        return summary.includes('wfh') || summary.includes('remote') || summary.includes('home');
+      });
+      if (isWfh) return 'wfh';
+
+      return 'present';
+    }
+
+    // Fallback to initial static logic if no events are loaded
+    if (day === 5 || day === 12 || day === 19 || day === 26) {
+      return 'wfh';
+    } else if (day === 14) {
+      return 'leave';
+    }
+    return 'present';
+  };
 
   const handleLogout = () => {
     logout();
@@ -129,24 +257,14 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-[var(--border-color)]">
-              <h4 className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-2 mb-3">
-                <Shield size={16} className="text-emerald-500" /> Security Permissions
-              </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {user?.permissions.map((perm) => (
-                  <span key={perm} className="text-[10px] font-mono bg-blue-500/10 text-blue-500 border border-blue-500/20 px-2 py-0.5 rounded-lg">
-                    {perm}
-                  </span>
-                ))}
-              </div>
-            </div>
+            {/* Removed Security Permissions */}
           </div>
         )}
 
         {/* Tab 2: Attendance */}
         {activeTab === 'attendance' && (
           <div className="space-y-4 animate-fadeIn">
+            {/* Stats Overview */}
             <div className="grid grid-cols-3 gap-3 text-center">
               <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
                 <p className="text-[10px] text-emerald-400 font-bold">Present Days</p>
@@ -159,6 +277,169 @@ export const Profile: React.FC = () => {
               <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20">
                 <p className="text-[10px] text-amber-400 font-bold">Leave Taken</p>
                 <p className="text-lg font-black text-amber-500">1 Day</p>
+              </div>
+            </div>
+
+            {/* Google Calendar API Connection Section */}
+            <div className="p-4 rounded-2xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h5 className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                    Google Calendar Integration
+                  </h5>
+                  <p className="text-[10px] text-slate-400">Sync live shifts, leaves, and WFH schedules</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowSettings(!showSettings)}
+                    className="p-1.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-secondary)] text-slate-400 hover:text-blue-500 transition-colors"
+                    title="Google API Credentials"
+                  >
+                    <Settings size={14} />
+                  </button>
+                  {accessToken ? (
+                    <button
+                      onClick={handleDisconnectGoogle}
+                      className="text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1.5 rounded-xl hover:bg-red-500/20 transition-colors"
+                    >
+                      Disconnect
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleConnectGoogle}
+                      disabled={isConnecting}
+                      className="text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl transition-all shadow-md shadow-blue-500/20 disabled:opacity-50"
+                    >
+                      {isConnecting ? 'Connecting...' : 'Connect Calendar'}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {showSettings && (
+                <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-2 animate-fadeIn">
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Google OAuth Client ID</label>
+                    <input
+                      type="text"
+                      value={clientId}
+                      onChange={(e) => {
+                        setClientId(e.target.value);
+                        localStorage.setItem('google_calendar_client_id', e.target.value);
+                      }}
+                      placeholder="Enter your OAuth 2.0 Client ID..."
+                      className="w-full text-xs bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg px-2.5 py-1.5 text-[var(--text-primary)] focus:outline-none focus:border-blue-500 font-mono"
+                    />
+                  </div>
+                  <p className="text-[9px] text-slate-500 leading-normal">
+                    * Make sure to add <strong>{window.location.origin}</strong> to the Authorized JavaScript origins in the Google Cloud Console.
+                  </p>
+                </div>
+              )}
+
+              {accessToken && (
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500 bg-emerald-500/5 border border-emerald-500/10 px-2.5 py-1.5 rounded-xl">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  Successfully synced {events.length} calendar events for August 2026.
+                </div>
+              )}
+            </div>
+
+            {/* Attendance Calendar Card */}
+            <div className="p-4 rounded-2xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-[var(--text-primary)]">Attendance Calendar</h4>
+                  <p className="text-[10px] text-slate-400">Monthly breakdown & shifts</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-2.5 py-1 rounded-lg border border-[var(--border-color)]">
+                    August 2026
+                  </span>
+                </div>
+              </div>
+
+              {/* Grid Header: Days of the week */}
+              <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+              </div>
+
+              {/* Grid Body */}
+              <div className="grid grid-cols-7 gap-1.5">
+                {/* August 2026 starts on Saturday, so we need 6 empty slots (Sun, Mon, Tue, Wed, Thu, Fri) */}
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={`empty-${i}`} className="aspect-square" />
+                ))}
+
+                {/* Days of August 2026 */}
+                {Array.from({ length: 31 }).map((_, i) => {
+                  const day = i + 1;
+                  const dayOfWeek = (day + 5) % 7; // 0: Sun, 1: Mon, etc. (since Aug 1 is Saturday/6)
+                  
+                  const status = getDayStatus(day, dayOfWeek);
+
+                  let bgClass = 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+                  let tooltip = 'Present';
+
+                  if (status === 'weekend') {
+                    bgClass = 'bg-slate-500/5 text-slate-400 border border-slate-500/10 opacity-40';
+                    tooltip = 'Weekend';
+                  } else if (status === 'wfh') {
+                    bgClass = 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20';
+                    tooltip = 'Remote (WFH)';
+                  } else if (status === 'leave') {
+                    bgClass = 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
+                    tooltip = 'Leave';
+                  }
+
+                  return (
+                    <div
+                      key={day}
+                      title={tooltip}
+                      className={`aspect-square flex flex-col items-center justify-center rounded-xl text-xs font-bold transition-all hover:scale-105 ${bgClass}`}
+                    >
+                      <span>{day}</span>
+                      {status !== 'weekend' && (
+                        <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
+                          status === 'present' ? 'bg-emerald-500' : status === 'wfh' ? 'bg-indigo-500' : 'bg-amber-500'
+                        }`} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Calendar Legend */}
+              <div className="flex flex-wrap items-center justify-between pt-2 border-t border-[var(--border-color)] text-[10px] text-slate-400 font-semibold gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span>Present (22d)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                  </span>
+                  <span>Remote WFH (4d)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  </span>
+                  <span>Leave (1d)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-500/10 border border-slate-500/20" />
+                  <span>Weekend</span>
+                </div>
               </div>
             </div>
           </div>
