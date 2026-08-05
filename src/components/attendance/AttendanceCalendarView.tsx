@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, CheckCircle2, Clock, MapPin, X, Info } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, MapPin, X } from 'lucide-react';
 
 export interface AttendanceDayRecord {
   day: number;
@@ -51,6 +51,13 @@ export const AttendanceCalendarView: React.FC = () => {
     { day: 31, dateStr: 'Aug 31, 2026', status: 'PRESENT', checkIn: '09:00 AM', checkOut: '06:00 PM', hoursWorked: '09h 00m', breakDuration: '45m', ipAddress: '192.168.1.45', location: 'Office HQ (Floor 4)' },
   ];
 
+  const trackedDays = calendarRecords.filter((item) => item.status !== 'WEEKEND');
+  const officeDays = calendarRecords.filter((item) => item.status === 'PRESENT').length;
+  const remoteDays = calendarRecords.filter((item) => item.status === 'REMOTE').length;
+  const leaveDays = calendarRecords.filter((item) => item.status === 'LEAVE').length;
+  const workedDays = calendarRecords.filter((item) => ['PRESENT', 'REMOTE', 'HALF_DAY'].includes(item.status)).length;
+  const attendanceRate = Math.round((workedDays / trackedDays.length) * 100);
+
   const getStatusBadge = (status: AttendanceDayRecord['status']) => {
     switch (status) {
       case 'PRESENT':
@@ -69,33 +76,58 @@ export const AttendanceCalendarView: React.FC = () => {
   };
 
   return (
-    <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-5 text-slate-100 font-sans">
+    <div className="calendar-card p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-5 text-slate-100 font-sans">
       {/* Calendar Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="calendar-header flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
-          <h3 className="text-lg font-black text-white flex items-center gap-2">
-            <CalendarIcon size={20} className="text-blue-400" /> Monthly Attendance Calendar
+          <h3 className="calendar-title text-lg font-black text-white flex items-center gap-2">
+            <span className="calendar-title-icon"><CalendarIcon size={18} /></span>
+            Monthly Attendance Calendar
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Click any day tile to inspect exact Check-In, Check-Out, and office hours worked.
+          <p className="calendar-subtitle text-xs text-slate-400 mt-0.5">
+            A quick view of your August attendance, location, and work hours.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+        <div className="calendar-toolbar flex items-center gap-2">
+          <button type="button" aria-label="Previous month" className="calendar-nav-button p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
             <ChevronLeft size={16} />
           </button>
-          <span className="text-xs font-black font-mono bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+          <span className="calendar-month-label text-xs font-black font-mono bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
             August 2026
           </span>
-          <button className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+          <button type="button" aria-label="Next month" className="calendar-nav-button p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
 
+      {/* Monthly Summary */}
+      <div className="calendar-summary-grid">
+        <div className="calendar-summary-card calendar-summary-card--present">
+          <span className="calendar-summary-label">In office</span>
+          <strong>{officeDays} days</strong>
+          <small>Primary work location</small>
+        </div>
+        <div className="calendar-summary-card calendar-summary-card--remote">
+          <span className="calendar-summary-label">Remote</span>
+          <strong>{remoteDays} days</strong>
+          <small>Approved WFH sessions</small>
+        </div>
+        <div className="calendar-summary-card calendar-summary-card--leave">
+          <span className="calendar-summary-label">Time off</span>
+          <strong>{leaveDays} day</strong>
+          <small>Approved leave</small>
+        </div>
+        <div className="calendar-summary-card calendar-summary-card--rate">
+          <span className="calendar-summary-label">Attendance</span>
+          <strong>{attendanceRate}%</strong>
+          <small>{workedDays} of {trackedDays.length} working days</small>
+        </div>
+      </div>
+
       {/* Status Legend Pills */}
-      <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold">
+      <div className="calendar-legend flex flex-wrap items-center gap-2 text-[11px] font-bold">
         <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">● Present (In-Office)</span>
         <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">● Remote WFH</span>
         <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">● Half-Day</span>
@@ -105,7 +137,7 @@ export const AttendanceCalendarView: React.FC = () => {
       </div>
 
       {/* Calendar Weekday Names */}
-      <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-extrabold uppercase text-slate-400 pt-2">
+      <div className="calendar-weekdays grid grid-cols-7 gap-2 text-center text-[11px] font-extrabold uppercase text-slate-400 pt-2">
         <span>Sat</span>
         <span>Sun</span>
         <span>Mon</span>
@@ -116,25 +148,32 @@ export const AttendanceCalendarView: React.FC = () => {
       </div>
 
       {/* 31-Day Calendar Tiles Grid */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="calendar-grid grid grid-cols-7 gap-2">
         {calendarRecords.map((item) => (
           <div
             key={item.day}
             onClick={() => setSelectedDay(item)}
-            className={`p-2.5 rounded-2xl border transition-all cursor-pointer hover:scale-105 flex flex-col justify-between min-h-[75px] ${getStatusBadge(item.status)}`}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') setSelectedDay(item);
+            }}
+            className={`calendar-day calendar-day--${item.status.toLowerCase()} p-2.5 rounded-2xl border transition-all cursor-pointer hover:scale-105 flex flex-col justify-between min-h-[75px] ${getStatusBadge(item.status)}`}
           >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black font-mono">{item.day}</span>
-              <span className="text-[9px] font-bold uppercase">{item.status.replace('_', ' ')}</span>
+            <div className="calendar-day-top flex items-center justify-between">
+              <span className="calendar-day-number text-xs font-black font-mono">{item.day}</span>
+              <span className="calendar-day-dot" aria-hidden="true" />
             </div>
 
+            <span className="calendar-day-status text-[9px] font-bold uppercase">{item.status.replace('_', ' ')}</span>
+
             {item.status !== 'WEEKEND' && item.status !== 'LEAVE' ? (
-              <div className="space-y-0.5 text-[9.5px] font-mono">
+              <div className="calendar-day-meta space-y-0.5 text-[9.5px] font-mono">
                 <p className="truncate font-bold text-white">{item.hoursWorked}</p>
-                <p className="truncate opacity-75">{item.checkIn}</p>
+                <p className="truncate opacity-75">In {item.checkIn}</p>
               </div>
             ) : (
-              <p className="text-[9.5px] font-mono opacity-60">--</p>
+              <p className="calendar-day-meta text-[9.5px] font-mono opacity-60">{item.status === 'LEAVE' ? 'Approved' : 'Rest day'}</p>
             )}
           </div>
         ))}

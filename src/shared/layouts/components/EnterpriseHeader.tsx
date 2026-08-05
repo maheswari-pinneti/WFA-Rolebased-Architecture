@@ -124,7 +124,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
   const isDark = theme === 'dark';
 
   return (
-    <header className={`h-16 px-4 flex items-center justify-between sticky top-0 z-40 w-full shrink-0 transition-colors border-b overflow-visible ${
+    <header className={`app-header h-16 px-4 flex items-center justify-between sticky top-0 z-40 w-full shrink-0 transition-colors border-b overflow-visible ${
       isDark ? 'bg-[#0B1120] border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
     }`}>
       {/* Toast Notification for Scope Change */}
@@ -136,7 +136,16 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
       )}
 
       {/* LEFT SECTION: Logo & Breadcrumb Navigation */}
-      <div className="flex items-center gap-3 md:gap-4 shrink-0 min-w-0">
+      <div className="header-brand flex items-center gap-3 md:gap-4 shrink-0 min-w-0">
+
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label="Toggle navigation"
+          className="header-menu-button p-2 rounded-xl border cursor-pointer"
+        >
+          <Menu size={18} />
+        </button>
 
         {/* STACKLY Brand Logo */}
         <Link to="/" className="shrink-0 flex items-center hover:opacity-90 transition-opacity">
@@ -234,7 +243,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
       </div>
 
       {/* RIGHT SECTION: Quick Actions, Theme, Notifications & User Profile Menu */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="header-actions flex items-center gap-2 sm:gap-3 shrink-0">
         
         {/* Language Flag Selector */}
         <button
@@ -251,7 +260,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         </button>
 
         {/* 1. Notifications Center */}
-        <div className="relative">
+        <div className="header-action-wrap relative">
           <button
             onClick={() => toggleDropdown('notif')}
             aria-label="View Notifications"
@@ -272,7 +281,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
           {/* Notifications Dropdown Panel */}
           {activeDropdown === 'notif' && (
-            <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 p-3 shadow-2xl z-50 rounded-2xl text-xs text-slate-100 animate-fadeIn space-y-2 font-sans">
+            <div className="header-popover header-notifications absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 p-3 shadow-2xl z-50 rounded-2xl text-xs text-slate-100 animate-fadeIn space-y-2 font-sans">
               <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                 <span className="font-extrabold text-sm text-white">Notifications ({unreadCount})</span>
                 <button
@@ -354,7 +363,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
         {/* 5. User Profile Menu Container */}
         {user && (
-          <div className="relative border-l border-slate-800/80 pl-2.5 ml-1 shrink-0">
+          <div className="header-profile relative border-l border-slate-800/80 pl-2.5 ml-1 shrink-0">
             <button
               onClick={() => toggleDropdown('profile')}
               aria-label="User Profile Menu"
@@ -382,7 +391,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
             {/* STRICTLY CONSTRAINED USER PROFILE DROPDOWN MENU */}
             {activeDropdown === 'profile' && (
-              <div className="absolute right-0 top-full mt-2 w-80 max-w-[320px] bg-slate-900 border border-slate-800 p-3.5 shadow-2xl z-50 rounded-2xl text-xs text-slate-100 animate-fadeIn space-y-3 font-sans overflow-hidden">
+              <div className="header-popover absolute right-0 top-full mt-2 w-80 max-w-[320px] bg-slate-900 border border-slate-800 p-3.5 shadow-2xl z-50 rounded-2xl text-xs text-slate-100 animate-fadeIn space-y-3 font-sans overflow-hidden">
                 {/* Profile Header */}
                 <div className="px-2 py-1 border-b border-slate-800 space-y-1">
                   <p className="font-extrabold text-sm text-white truncate">{user.name}</p>

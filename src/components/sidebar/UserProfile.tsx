@@ -35,11 +35,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
   };
 
   return (
-    <div ref={dropdownRef} className="p-3 border-t border-slate-800/80 relative font-sans">
+    <div ref={dropdownRef} className="sidebar-profile relative font-sans">
       {/* Profile Card Trigger */}
       <div
         onClick={() => setDropdownOpen((prev) => !prev)}
-        className={`flex items-center gap-3 p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800/80 cursor-pointer transition-all ${
+        className={`sidebar-profile-trigger flex items-center gap-3 p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800/80 cursor-pointer transition-all ${
           collapsed ? 'justify-center p-1.5' : ''
         }`}
       >
@@ -53,13 +53,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
         </div>
 
         {!collapsed && (
-          <div className="flex-1 min-w-0 space-y-0.5">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-black text-white truncate">{user.name || 'David Sterling'}</p>
-              <span className="text-[9.5px] font-bold text-emerald-400">Active</span>
+          <div className="sidebar-profile-meta flex-1 min-w-0 space-y-0.5">
+            <div className="sidebar-profile-name-row flex items-center justify-between">
+              <p className="sidebar-profile-name text-xs font-black text-white truncate">{user.name || 'David Sterling'}</p>
+              <span className="sidebar-profile-status text-[9.5px] font-bold text-emerald-400">Active</span>
             </div>
-            <p className="text-[10px] font-bold text-blue-400 truncate">{user.title || ROLE_LABELS[role] || 'Department Manager'}</p>
-            <p className="text-[9.5px] font-medium text-slate-400 truncate">
+            <p className="sidebar-profile-role text-[10px] font-bold text-blue-400 truncate">{user.title || ROLE_LABELS[role] || 'Department Manager'}</p>
+            <p className="sidebar-profile-dept text-[9.5px] font-medium text-slate-400 truncate">
               {user.department || 'Engineering'}
             </p>
           </div>

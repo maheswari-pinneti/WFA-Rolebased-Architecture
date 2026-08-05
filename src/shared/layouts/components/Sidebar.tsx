@@ -10,24 +10,16 @@ import {
   Clock,
   TrendingUp,
   BarChart3,
-  ShieldCheck,
   Sliders,
   CheckCircle2,
   Zap,
-  UserCheck,
   User,
   FileText,
-  Lock,
   Layers,
   FileSpreadsheet,
   History,
-  MapPin,
   Briefcase,
   DollarSign,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  X,
   ClipboardList,
   UserCog,
   PieChart
@@ -230,17 +222,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Modern Clean Enterprise SaaS Left Sidebar */}
       <aside
-        className={`bg-[#0B1120] text-slate-100 border-r border-slate-800 flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
+        className={`app-sidebar bg-[#0B1120] text-slate-100 border-r border-slate-800 flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
           collapsed ? 'w-[64px]' : 'w-[220px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         {/* Jaydon Frankie Style User Profile Card Near Top */}
-        <div className="p-3">
+        <div className="sidebar-profile-wrap">
           <UserProfile collapsed={collapsed} />
         </div>
 
         {/* Sidebar Navigation Items List */}
-        <nav className="flex-1 overflow-y-auto px-3 py-1 space-y-1 w-full scrollbar-thin scrollbar-thumb-slate-800">
+        <nav className="sidebar-nav flex-1 overflow-y-auto px-3 py-1 space-y-1 w-full scrollbar-thin scrollbar-thumb-slate-800">
           {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
             return (
               <React.Fragment key={groupIdx}>
@@ -259,7 +251,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       to={item.path}
                       onClick={() => setMobileOpen(false)}
                       title={collapsed ? item.label : undefined}
-                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all duration-200 group relative no-underline text-inherit ${
+                      className={`sidebar-nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all duration-200 group relative no-underline text-inherit ${
                         active
                           ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-extrabold shadow-lg shadow-blue-500/25 border border-blue-500/40'
                           : 'hover:bg-slate-800/60 text-slate-300 hover:text-white border border-transparent hover:border-slate-800/60'
@@ -278,7 +270,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {/* Unread Badge Counter */}
                       {!collapsed && item.badge && (
                         <span
-                          className={`px-1.5 py-0.5 text-[10px] font-extrabold rounded-md border ml-auto shrink-0 ${getBadgeStyle(
+                          className={`sidebar-badge px-1.5 py-0.5 text-[10px] font-extrabold rounded-md border ml-auto shrink-0 ${getBadgeStyle(
                             item.badge.variant
                           )}`}
                         >
@@ -307,8 +299,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Bottom Upgrade to Pro CTA Card */}
         {!collapsed && (
-          <div className="p-3 border-t border-slate-800/80">
-            <div className="p-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 text-center space-y-2 relative overflow-hidden shadow-lg">
+          <div className="sidebar-upgrade-wrap p-3 border-t border-slate-800/80">
+            <div className="sidebar-upgrade p-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 text-center space-y-2 relative overflow-hidden shadow-lg">
               <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mx-auto border border-blue-500/30">
                 <Zap size={20} />
               </div>

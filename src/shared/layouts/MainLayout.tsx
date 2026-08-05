@@ -30,7 +30,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   return (
-    <div data-role={role} className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
+    <div data-role={role} className="app-shell min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
       {/* Fixed Enterprise Header */}
       <EnterpriseHeader onToggleSidebar={toggleSidebar} onOpenHelp={() => setSupportModalOpen(true)} />
 
@@ -38,7 +38,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
       <InformationBar />
 
       {/* Main Body */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="main-body flex-1 flex overflow-hidden">
         {/* Sleek Dynamic Modular Sidebar Navigation */}
         <Sidebar
           collapsed={collapsed}
@@ -49,7 +49,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
         />
 
         {/* Main Content Region */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+        <main className="app-main flex-1 overflow-y-auto p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
           {children}
         </main>
       </div>

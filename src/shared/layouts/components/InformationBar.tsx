@@ -32,7 +32,7 @@ export const InformationBar: React.FC = () => {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`px-4 py-1 flex items-center justify-between gap-4 text-[11px] font-medium transition-colors border-b ${
+    <div className={`status-bar px-4 py-1 flex items-center justify-between gap-4 text-[11px] font-medium transition-colors border-b ${
       isDark ? 'bg-[#0B1120]/90 border-slate-800/80 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
     }`}>
       {/* Current Date & Current Time */}
