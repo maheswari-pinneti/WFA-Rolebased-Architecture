@@ -6,26 +6,23 @@ import { ROLE_LABELS } from '../../../security/roles/roles';
 import { getRoleBadgeClass } from '../../utils/helpers';
 import { StacklyLogo } from '../../../components/common/StacklyLogo';
 import { LogoutModal } from '../../../auth/components/LogoutModal';
-import {
-  Menu,
-  Search,
-  Bell,
-  Sun,
-  Moon,
-  User as UserIcon,
-  Settings,
-  Shield,
-  LogOut,
-  ChevronDown,
-  Sparkles,
-  ChevronRight,
-  X,
-  MessageSquare,
-  HelpCircle,
-  Home,
-  CheckCircle2,
-  Layers
-} from 'lucide-react';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ShieldIcon from '@mui/icons-material/Shield';
+import LogoutIcon from '@mui/icons-material/Logout';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CloseIcon from '@mui/icons-material/Close';
+import ChatIcon from '@mui/icons-material/Chat';
+import HelpIcon from '@mui/icons-material/Help';
+import HomeIcon from '@mui/icons-material/Home';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import LayersIcon from '@mui/icons-material/Layers';
 
 interface EnterpriseHeaderProps {
   onToggleSidebar: () => void;
@@ -68,16 +65,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     { title: 'Engineering & Product Teams', category: 'departments', path: '/admin/departments' },
   ];
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setSearchFocused(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+
 
   const toggleDropdown = (name: 'profile' | 'role' | 'notif' | 'messages') => {
     setActiveDropdown((prev) => (prev === name ? null : name));
@@ -130,7 +118,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
       {/* Toast Notification for Scope Change */}
       {deptToast && (
         <div className="absolute top-18 right-6 bg-slate-900 border border-blue-500/40 text-blue-300 text-xs px-4 py-2 rounded-xl shadow-2xl z-50 flex items-center gap-2 font-bold animate-fadeIn">
-          <CheckCircle2 size={16} className="text-emerald-400" />
+          <CheckCircleIcon className="text-emerald-400" style={{ fontSize: 16 }} />
           <span>{deptToast}</span>
         </div>
       )}
@@ -155,11 +143,11 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
         {/* Dynamic Breadcrumbs */}
         <div className="hidden sm:flex items-center gap-1.5 text-xs min-w-0 pl-2 border-l border-slate-800/80">
           <Link to="/" className="text-slate-400 hover:text-blue-400 flex items-center gap-1">
-            <Home size={13} />
+            <HomeIcon style={{ fontSize: 13 }} />
           </Link>
           {breadcrumbs.map((b, idx) => (
             <React.Fragment key={b.path}>
-              <ChevronRight size={12} className="text-slate-500" />
+              <ChevronRightIcon className="text-slate-500" style={{ fontSize: 12 }} />
               <span className={`truncate max-w-[130px] ${
                 idx === breadcrumbs.length - 1 ? 'font-bold text-blue-400' : 'text-slate-400 hover:text-slate-200'
               }`}>
@@ -173,22 +161,19 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
       {/* CENTER SECTION: Global Command Search Surface */}
       <div className="flex-1 max-w-md mx-4 hidden md:block relative">
         <div className="relative flex items-center">
-          <Search size={16} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+          <SearchIcon className="absolute left-3.5 text-slate-400 pointer-events-none" style={{ fontSize: 16 }} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
-            placeholder="Search employees, departments, reports (Ctrl + K)..."
-            className={`w-full rounded-2xl pl-10 pr-16 py-2 text-xs transition-all outline-none border ${
+            placeholder="Search employees, departments, reports..."
+            className={`w-full rounded-2xl pl-10 pr-4 py-2 text-xs transition-all outline-none border ${
               isDark
                 ? 'bg-slate-900/90 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:bg-slate-900'
                 : 'bg-slate-100 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:bg-white'
             }`}
           />
-          <span className="absolute right-3 text-[10px] font-mono font-bold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700 pointer-events-none">
-            ⌘K
-          </span>
         </div>
 
         {/* Global Search Results Overlay */}
@@ -196,10 +181,10 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 p-3 shadow-2xl z-50 rounded-2xl animate-fadeIn space-y-2 text-slate-100">
             <div className="flex items-center justify-between pb-2 border-b border-slate-800">
               <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
-                <Sparkles size={12} className="text-blue-400" /> Command Palette Search
+                <SearchIcon className="text-blue-400" style={{ fontSize: 12 }} /> Command Palette Search
               </span>
               <button onClick={() => setSearchFocused(false)} className="text-slate-400 hover:text-white">
-                <X size={14} />
+                <CloseIcon style={{ fontSize: 14 }} />
               </button>
             </div>
 
@@ -233,7 +218,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                       <p className="text-xs font-bold text-slate-200 group-hover:text-blue-400">{res.title}</p>
                       <p className="text-[10px] text-slate-500 capitalize">{res.category}</p>
                     </div>
-                    <ChevronRight size={14} className="text-slate-500 group-hover:text-blue-400" />
+                    <ChevronRightIcon className="text-slate-500 group-hover:text-blue-400" style={{ fontSize: 14 }} />
                   </button>
                 ))
               )}
@@ -271,7 +256,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             }`}
             title="Notifications & System Alerts"
           >
-            <Bell size={18} />
+            <NotificationsIcon style={{ fontSize: 18 }} />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse shadow-md">
                 {unreadCount}
@@ -330,7 +315,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           }`}
           title="Team Messages"
         >
-          <MessageSquare size={18} />
+          <ChatIcon style={{ fontSize: 18 }} />
         </button>
 
         {/* 3. Theme Toggle */}
@@ -344,7 +329,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           }`}
           title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
         >
-          {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-blue-400" />}
+          {isDark ? <LightModeIcon className="text-amber-400" style={{ fontSize: 18 }} /> : <DarkModeIcon className="text-blue-400" style={{ fontSize: 18 }} />}
         </button>
 
         {/* 4. Help Icon */}
@@ -358,14 +343,14 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           }`}
           title="24/7 Enterprise Help Desk"
         >
-          <HelpCircle size={18} />
+          <HelpIcon style={{ fontSize: 18 }} />
         </button>
 
         {/* 5. User Profile Menu Container */}
         {user && (
           <div className="header-profile relative border-l border-slate-800/80 pl-2.5 ml-1 shrink-0">
             <button
-              onClick={() => toggleDropdown('profile')}
+              onClick={() => navigate('/employee/profile')}
               aria-label="User Profile Menu"
               className="flex items-center gap-2 focus:outline-none group cursor-pointer p-1 rounded-xl hover:bg-slate-800/50 transition-colors"
               title={`${user.name} (${ROLE_LABELS[role]})`}
@@ -378,15 +363,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                 />
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-950" />
               </div>
-              <div className="hidden sm:flex flex-col text-left max-w-[120px]">
-                <span className="text-xs font-bold text-slate-100 group-hover:text-blue-400 transition-colors leading-none truncate">
-                  {user.name}
-                </span>
-                <span className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5 truncate">
-                  {ROLE_LABELS[role]}
-                </span>
-              </div>
-              <ChevronDown size={14} className="text-slate-400 group-hover:text-white transition-colors shrink-0" />
+              <KeyboardArrowDownIcon className="text-slate-400 group-hover:text-white transition-colors shrink-0" style={{ fontSize: 14 }} />
             </button>
 
             {/* STRICTLY CONSTRAINED USER PROFILE DROPDOWN MENU */}
@@ -402,7 +379,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                       onClick={() => setShowPermissionsPreview(!showPermissionsPreview)}
                       className="text-[10px] font-bold text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
-                      <Layers size={12} /> {showPermissionsPreview ? 'Hide' : 'Permissions'}
+                      <LayersIcon style={{ fontSize: 12 }} /> {showPermissionsPreview ? 'Hide' : 'Permissions'}
                     </button>
                   </div>
                 </div>
@@ -427,19 +404,19 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     onClick={() => { navigate('/employee/profile'); setActiveDropdown(null); }}
                     className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 transition-colors cursor-pointer"
                   >
-                    <UserIcon size={16} className="text-blue-400 shrink-0" /> View Profile
+                    <PersonIcon className="text-blue-400 shrink-0" style={{ fontSize: 16 }} /> View Profile
                   </button>
                   <button
                     onClick={() => { navigate('/admin/settings'); setActiveDropdown(null); }}
                     className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 transition-colors cursor-pointer"
                   >
-                    <Settings size={16} className="text-indigo-400 shrink-0" /> Account Settings
+                    <SettingsIcon className="text-indigo-400 shrink-0" style={{ fontSize: 16 }} /> Account Settings
                   </button>
                   <button
                     onClick={() => { navigate('/admin/users'); setActiveDropdown(null); }}
                     className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 text-slate-200 transition-colors cursor-pointer"
                   >
-                    <Shield size={16} className="text-purple-400 shrink-0" /> Access Control Matrix
+                    <ShieldIcon className="text-purple-400 shrink-0" style={{ fontSize: 16 }} /> Access Control Matrix
                   </button>
                 </div>
 
@@ -449,7 +426,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
                     onClick={handleConfirmLogout}
                     className="w-full text-left px-3 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-2.5 font-extrabold transition-colors cursor-pointer"
                   >
-                    <LogOut size={16} className="shrink-0 text-rose-400" /> Log Out
+                    <LogoutIcon className="shrink-0 text-rose-400" style={{ fontSize: 16 }} /> Log Out
                   </button>
                 </div>
               </div>

@@ -14,12 +14,20 @@ import {
   TrendingUp,
   FileText,
   Download,
-  CheckCircle2
+  CheckCircle2,
+  LogOut as LogOutIcon
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'attendance' | 'performance' | 'documents'>('overview');
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto animate-fadeIn">
@@ -49,10 +57,16 @@ export const Profile: React.FC = () => {
             <p className="text-xs text-slate-400 font-medium">{user?.department || 'Engineering Department'}</p>
           </div>
 
-          <div className="text-right hidden sm:block">
+          <div className="text-center sm:text-right flex flex-col items-center sm:items-end gap-2 shrink-0">
             <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/30">
               ID: STK-1005
             </span>
+            <button
+              onClick={handleLogout}
+              className="px-3.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <LogOutIcon size={13} /> Log Out
+            </button>
           </div>
         </div>
 

@@ -47,11 +47,20 @@ src/
 
 ## 🛠️ Tech Stack
 
-- **Core**: React 18, TypeScript 5, Vite 5
+- **Core**: React 19, TypeScript 5, Vite 5, Tailwind CSS
 - **State Management**: Redux Toolkit 2, React-Redux 9
-- **Routing**: React Router v6
-- **Styling**: Vanilla CSS Variables, Lucide React Icons, Emotion / MUI
-- **Data Visualization**: Recharts
+- **Routing**: React Router v6/v7
+- **Styling**: Vanilla CSS Variables, Lucide React Icons, Material UI / Emotion
+- **Data Visualization**: Recharts, Chart.js
+
+---
+
+## 📄 Technical Documentation
+
+All system blueprints, security policies, and schemas are detailed in the [docs](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/) directory:
+- [System Architecture Blueprint](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/architecture/WFA.md): Detailed 5-tier security hierarchy model, RBAC/DBAC policy mappings, data pipeline layout, and normalization specifications.
+- [Sidebar Navigation Guide](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/architecture/Sidebar-Navigation-Architecture.md): Menu collapsing mechanism and filter specifications.
+- [System Architecture Flowcharts](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/architecture/System-Architecture.md): Component interactions and authorization flowcharts.
 
 ---
 

@@ -4,7 +4,6 @@ import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
-import { AdvancedFilterBar } from '../../../shared/components/AdvancedFilterBar';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
 import { EmployeeTable } from '../../../components/tables/EmployeeTable';
 
@@ -75,8 +74,7 @@ export const HRDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Advanced Filter Bar */}
-        <AdvancedFilterBar onFilterChange={() => {}} />
+
 
         {/* 8 Reusable HR KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
