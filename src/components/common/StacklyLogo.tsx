@@ -14,7 +14,7 @@ export const StacklyLogo: React.FC<StacklyLogoProps> = ({
   size = 32,
   showText = true,
   className = '',
-  useImg = false,
+  useImg = true,
   textColor = 'text-slate-800 dark:text-white',
 }) => {
   let theme = 'dark';
@@ -36,14 +36,6 @@ export const StacklyLogo: React.FC<StacklyLogoProps> = ({
           style={{ height: size, width: 'auto' }}
           className="shrink-0 object-contain"
         />
-        {showText && (
-          <span
-            className={`font-sans font-black tracking-widest ${textColor}`}
-            style={{ fontSize: `${size * 0.52}px`, lineHeight: 1 }}
-          >
-            STACKLY
-          </span>
-        )}
       </div>
     );
   }

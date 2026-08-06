@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { EnterpriseHeader } from './components/EnterpriseHeader';
-import { InformationBar } from './components/InformationBar';
 import { Sidebar } from './components/Sidebar';
 import { SupportModal } from '../components/SupportModal';
 
@@ -33,9 +32,6 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
     <div data-role={role} className="app-shell min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
       {/* Fixed Enterprise Header */}
       <EnterpriseHeader onToggleSidebar={toggleSidebar} onOpenHelp={() => setSupportModalOpen(true)} />
-
-      {/* Real-time Status Information Bar */}
-      <InformationBar />
 
       {/* Main Body */}
       <div className="main-body flex-1 flex overflow-hidden">

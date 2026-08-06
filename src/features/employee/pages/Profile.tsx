@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { Role } from '../../../security/roles/roles';
 import { getRoleBadgeClass } from '../../../shared/utils/helpers';
@@ -15,15 +15,61 @@ import {
   Settings,
   Download,
   CheckCircle2,
-  LogOut as LogOutIcon
+  LogOut as LogOutIcon,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const YEARS = Array.from({ length: 16 }, (_, i) => (2020 + i).toString());
 
 export const Profile: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'attendance' | 'performance' | 'documents'>('overview');
+
+  const [selectedMonth, setSelectedMonth] = useState('August');
+  const [selectedYear, setSelectedYear] = useState('2026');
+
+  const monthIndex = MONTHS.indexOf(selectedMonth);
+  const yearNum = parseInt(selectedYear, 10);
+
+  // Dynamic calculations for days and starting weekday
+  const daysInMonth = new Date(yearNum, monthIndex + 1, 0).getDate();
+  const firstDayOfWeek = new Date(yearNum, monthIndex, 1).getDay(); // 0: Sun, 1: Mon, etc.
+
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const emptySlots = Array.from({ length: firstDayOfWeek });
+
+  const handlePrevMonth = () => {
+    if (monthIndex === 0) {
+      setSelectedMonth('December');
+      setSelectedYear((prev) => (parseInt(prev, 10) - 1).toString());
+    } else {
+      setSelectedMonth(MONTHS[monthIndex - 1]);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (monthIndex === 11) {
+      setSelectedMonth('January');
+      setSelectedYear((prev) => (parseInt(prev, 10) + 1).toString());
+    } else {
+      setSelectedMonth(MONTHS[monthIndex + 1]);
+    }
+  };
+
+  const handleGoToToday = () => {
+    const today = new Date();
+    setSelectedMonth(MONTHS[today.getMonth()]);
+    setSelectedYear(today.getFullYear().toString());
+  };
 
   const [isGsiLoaded, setIsGsiLoaded] = useState(false);
   const [clientId, setClientId] = useState(() => localStorage.getItem('google_calendar_client_id') || '');
@@ -121,7 +167,7 @@ export const Profile: React.FC = () => {
     }
 
     // Check if there is a matching live event for this day
-    const dayStr = `2026-08-${day.toString().padStart(2, '0')}`;
+    const dayStr = `${selectedYear}-${(monthIndex + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
     const dayEvents = events.filter(event => {
       const start = event.start?.date || event.start?.dateTime || '';
       return start.startsWith(dayStr);
@@ -143,11 +189,13 @@ export const Profile: React.FC = () => {
       return 'present';
     }
 
-    // Fallback to initial static logic if no events are loaded
-    if (day === 5 || day === 12 || day === 19 || day === 26) {
-      return 'wfh';
-    } else if (day === 14) {
-      return 'leave';
+    // Fallback static calendar logic if no events are fetched
+    if (selectedMonth === 'August' && selectedYear === '2026') {
+      if (day === 5 || day === 12 || day === 19 || day === 26) {
+        return 'wfh';
+      } else if (day === 14) {
+        return 'leave';
+      }
     }
     return 'present';
   };
@@ -347,98 +395,127 @@ export const Profile: React.FC = () => {
             </div>
 
             {/* Attendance Calendar Card */}
-            <div className="p-4 rounded-2xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-[var(--text-primary)]">Attendance Calendar</h4>
-                  <p className="text-[10px] text-slate-400">Monthly breakdown & shifts</p>
-                </div>
+            <div className="p-6 rounded-3xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] shadow-2xl font-sans text-slate-200 space-y-6">
+              
+              {/* Calendar Controls */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-2.5 py-1 rounded-lg border border-[var(--border-color)]">
-                    August 2026
-                  </span>
-                </div>
-              </div>
+                  {/* Prev Button */}
+                  <button 
+                    onClick={handlePrevMonth}
+                    className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-800 text-slate-300 transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  {/* Next Button */}
+                  <button 
+                    onClick={handleNextMonth}
+                    className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-800 text-slate-300 transition-colors cursor-pointer"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
 
-              {/* Grid Header: Days of the week */}
-              <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <div>Sun</div>
-                <div>Mon</div>
-                <div>Tue</div>
-                <div>Wed</div>
-                <div>Thu</div>
-                <div>Fri</div>
-                <div>Sat</div>
-              </div>
-
-              {/* Grid Body */}
-              <div className="grid grid-cols-7 gap-1.5">
-                {/* August 2026 starts on Saturday, so we need 6 empty slots (Sun, Mon, Tue, Wed, Thu, Fri) */}
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={`empty-${i}`} className="aspect-square" />
-                ))}
-
-                {/* Days of August 2026 */}
-                {Array.from({ length: 31 }).map((_, i) => {
-                  const day = i + 1;
-                  const dayOfWeek = (day + 5) % 7; // 0: Sun, 1: Mon, etc. (since Aug 1 is Saturday/6)
-                  
-                  const status = getDayStatus(day, dayOfWeek);
-
-                  let bgClass = 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
-                  let tooltip = 'Present';
-
-                  if (status === 'weekend') {
-                    bgClass = 'bg-slate-500/5 text-slate-400 border border-slate-500/10 opacity-40';
-                    tooltip = 'Weekend';
-                  } else if (status === 'wfh') {
-                    bgClass = 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20';
-                    tooltip = 'Remote (WFH)';
-                  } else if (status === 'leave') {
-                    bgClass = 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
-                    tooltip = 'Leave';
-                  }
-
-                  return (
-                    <div
-                      key={day}
-                      title={tooltip}
-                      className={`aspect-square flex flex-col items-center justify-center rounded-xl text-xs font-bold transition-all hover:scale-105 ${bgClass}`}
+                  {/* Month Dropdown Selector */}
+                  <div className="relative">
+                    <select 
+                      value={selectedMonth} 
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      className="appearance-none bg-slate-800/60 hover:bg-slate-700/60 border border-slate-800 rounded-xl px-4 py-2 pr-10 text-xs font-bold text-slate-200 focus:outline-none cursor-pointer"
                     >
-                      <span>{day}</span>
-                      {status !== 'weekend' && (
-                        <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
-                          status === 'present' ? 'bg-emerald-500' : status === 'wfh' ? 'bg-indigo-500' : 'bg-amber-500'
-                        }`} />
-                      )}
-                    </div>
-                  );
-                })}
+                      {MONTHS.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+
+                  {/* Year Dropdown Selector */}
+                  <div className="relative">
+                    <select 
+                      value={selectedYear} 
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      className="appearance-none bg-slate-800/60 hover:bg-slate-700/60 border border-slate-800 rounded-xl px-4 py-2 pr-10 text-xs font-bold text-slate-200 focus:outline-none cursor-pointer"
+                    >
+                      {YEARS.map((y) => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Today Button */}
+                <button 
+                  onClick={handleGoToToday}
+                  className="px-4 py-2 bg-slate-800/65 hover:bg-slate-700/65 border border-slate-800 text-xs font-bold rounded-xl text-slate-200 transition-colors cursor-pointer"
+                >
+                  Today
+                </button>
               </div>
 
-              {/* Calendar Legend */}
-              <div className="flex flex-wrap items-center justify-between pt-2 border-t border-[var(--border-color)] text-[10px] text-slate-400 font-semibold gap-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span>Present (22d)</span>
+              {/* Calendar Grid Container */}
+              <div className="space-y-4">
+                
+                {/* Weekday Headers */}
+                <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 tracking-wider">
+                  <div>Su</div>
+                  <div>Mo</div>
+                  <div>Tu</div>
+                  <div>We</div>
+                  <div>Th</div>
+                  <div>Fr</div>
+                  <div>Sa</div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                  </span>
-                  <span>Remote WFH (4d)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                  </span>
-                  <span>Leave (1d)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-slate-500/10 border border-slate-500/20" />
-                  <span>Weekend</span>
+
+                {/* Calendar Days */}
+                <div className="grid grid-cols-7 gap-2 text-center">
+                  {/* Empty Slots */}
+                  {emptySlots.map((_, idx) => (
+                    <div key={`empty-${idx}`} className="aspect-square flex items-center justify-center text-sm font-semibold text-slate-700" />
+                  ))}
+
+                  {/* Day numbers */}
+                  {days.map((day) => {
+                    const dayOfWeek = (day + firstDayOfWeek) % 7; // Correct weekday index
+                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                    const isToday = day === 5 && selectedMonth === 'August' && selectedYear === '2026';
+                    
+                    const status = getDayStatus(day, dayOfWeek);
+
+                    let bgClass = 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+                    let tooltip = 'Present';
+
+                    if (status === 'weekend') {
+                      bgClass = 'bg-slate-500/5 text-slate-400 border border-slate-500/10 opacity-40';
+                      tooltip = 'Weekend';
+                    } else if (status === 'wfh') {
+                      bgClass = 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20';
+                      tooltip = 'Remote (WFH)';
+                    } else if (status === 'leave') {
+                      bgClass = 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
+                      tooltip = 'Leave';
+                    }
+
+                    let borderClass = 'border-transparent';
+                    if (isToday) {
+                      borderClass = 'border-slate-300/80 bg-slate-800/20';
+                    }
+
+                    return (
+                      <div
+                        key={day}
+                        title={tooltip}
+                        className={`aspect-square flex flex-col items-center justify-center rounded-xl text-xs font-bold transition-all hover:scale-105 border-2 ${borderClass} ${bgClass}`}
+                      >
+                        <span>{day}</span>
+                        {status !== 'weekend' && (
+                          <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
+                            status === 'present' ? 'bg-emerald-500' : status === 'wfh' ? 'bg-indigo-500' : 'bg-amber-500'
+                          }`} />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

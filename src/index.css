@@ -104,6 +104,14 @@ textarea:focus {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
 }
 
+/* Hide default browser password reveal and clear indicators */
+input::-ms-reveal,
+input::-ms-clear,
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
 /* Flex Utilities */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
