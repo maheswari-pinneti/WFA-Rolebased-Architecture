@@ -1,66 +1,48 @@
 # Enterprise Workforce Analytics Intelligence Platform
 
-An enterprise-grade, production-ready Workforce Analytics and Intelligence Platform featuring full **Role-Based Access Control (RBAC)**, **Attribute-Based Access Control (ABAC)**, and **Policy-Based Access Control (PBAC)** built with **React 18**, **TypeScript**, **Redux Toolkit**, **React Router v6**, and **Vite**.
+An enterprise-grade, production-ready Workforce Analytics and Intelligence Platform featuring full **Role-Based Access Control (RBAC)**, **Attribute-Based Access Control (ABAC)**, and **Policy-Based Access Control (PBAC)** built with a unified full-stack architecture (**React 18 + Node.js/Express + SQLite**).
 
 ---
 
 ## 🚀 Key Platform Features
 
 - 🔐 **5-Tier Role Security Model**: Full separation of concerns for `ADMIN`, `HR`, `MANAGER`, `TEAM_LEAD`, and `EMPLOYEE`.
-- 🛡️ **Declarative Security Guards & Hooks**: `<RoleGuard>`, `<PermissionGuard>`, `<ProtectedRoute>`, `usePermission()`, and `DataScopeEvaluator`.
-- 📊 **Dedicated Enterprise Dashboards & Pages**:
-  - **Admin**: User Management, Role Management, Permissions Matrix, Department Budgeting, Global Locations, Security Audit Trail, System Configuration.
-  - **HR**: Workforce Directory, Attendance Monitoring, Talent Recruitment Pipeline, Leave Policy Management, Monthly Payroll Ledgers.
-  - **Manager**: Department Overview, Team Analytics, Attendance & Leave Approvals, Performance Reviews, Team Productivity.
-  - **Team Lead**: Task Monitoring, Attendance Tracking, Sprint Productivity, 1-on-1 Feedback Tracker.
-  - **Employee**: Personal Portal, Attendance Punch, Leave Applications, OKRs & Goal Progress, Confidential Payslip Downloads.
-- 🔍 **Interactive Navigation**: Dynamic categorized sidebar navigation with search filter, badge counters, and `localStorage` state persistence.
-- 🎨 **Modern Glassmorphic Design System**: Dark/Light mode theme engine, vibrant HSL gradients, and responsive layouts.
+- 🛡️ **Declarative Security Guards & Hooks**: `<RoleGuard>`, `<PermissionGuard>`, `<ProtectedRoute>`, and `usePermission()`.
+- 📊 **Dynamic Data-Driven Dashboards**: Connected directly to the SQLite backend and wrapped in reusable Loading, Empty, and Error state chart containers.
+- ⏱️ **Smart Attendance Actions**: Real-time Check-In, Break, Resume, Check-Out, and corrections history backed by a local storage offline synchronization queue.
+- 📍 **Geofencing & Verification**: Distance calculations based on MAHE office perimeter coordinates.
 
 ---
 
-## 🏗️ Project Architecture Map
+## 🏗️ Project Folder Directory Structure
+
+The repository is divided into dedicated folders to ensure modular separation of concerns:
 
 ```
-src/
-├── api/
-│   ├── endpoints/          # Domain API endpoints (auth, dashboard, employee, user)
-│   └── interceptors/       # Axios & HTTP request token interceptors
-├── app/
-│   ├── providers/          # Global AppProvider & Redux store provider
-│   ├── routes/             # AppRoutes with 100% dedicated page resolution
-│   └── store/              # Redux Toolkit store & root reducers
-├── auth/                   # Authentication hooks, slices, and login/logout views
-├── components/             # Reusable domain tables and Stackly branding
-├── design-system/          # Theme tokens and CSS variables
-├── enums/                  # System domain enums (EmploymentStatus, LeaveStatus, etc.)
-├── features/               # Domain feature modules (admin, hr, manager, team-lead, employee, analytics)
-├── interfaces/             # API response wrappers & paginated result types
-├── security/               # Core security engines, guards, policies, and data scoping
-├── services/               # ApiService, StorageService, and logger utilities
-├── shared/                 # Reusable DataTable, Loader, FilterBar, constants, and hooks
-├── store/                  # Root Redux store export
-└── types/                  # Domain type models (UserProfile, Department, LocationItem, etc.)
+wfa-rolebased-architecture/
+├── frontend/               # React client SPA (formerly src/)
+│   ├── components/         # Reusable charts, UI wrappers, and layouts
+│   ├── features/           # Role-based dashboard panels (Admin, HR, etc.)
+│   ├── services/           # Api client interceptors and background sync logic
+│   └── store/              # Redux slices (auth, attendance, theme)
+├── backend/                # Node.js Express REST API server
+│   └── server.js           # Server routes, authorization middleware, and endpoints
+├── database/               # SQL Relational Persistence
+│   └── wfa.db              # SQLite binary database file
+├── tests/                  # Unified Quality Assurance Suite
+│   └── unit/               # Scoped unit tests for attendance and auth roles
+├── docs/                   # Architectural Guides & Specifications
+└── package.json            # Unified scripts & project dependencies
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
-- **Core**: React 19, TypeScript 5, Vite 5, Tailwind CSS
-- **State Management**: Redux Toolkit 2, React-Redux 9
-- **Routing**: React Router v6/v7
-- **Styling**: Vanilla CSS Variables, Lucide React Icons, Material UI / Emotion
-- **Data Visualization**: Recharts, Chart.js
-
----
-
-## 📄 Technical Documentation
-
-All system blueprints, security policies, and schemas are detailed in the [docs](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/) directory:
-- [System Architecture Blueprint](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/architecture/WFA.md): Detailed 5-tier security hierarchy model, RBAC/DBAC policy mappings, data pipeline layout, and normalization specifications.
-- [Sidebar Navigation Guide](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/architecture/Sidebar-Navigation-Architecture.md): Menu collapsing mechanism and filter specifications.
-- [System Architecture Flowcharts](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/docs/architecture/System-Architecture.md): Component interactions and authorization flowcharts.
+- **Frontend**: React 18, TypeScript 5, Vite 5, Tailwind CSS, Recharts
+- **Backend**: Node.js, Express.js (ES Modules), JWT (`jsonwebtoken`), Bcrypt
+- **Database**: SQLite3 relational schema
+- **Testing**: Vitest unit & integration test runner
 
 ---
 
@@ -70,21 +52,26 @@ All system blueprints, security policies, and schemas are detailed in the [docs]
 # 1. Install dependencies
 npm install
 
-# 2. Run local development server
+# 2. Run both backend and frontend dev servers concurrently
 npm run dev
 
-# 3. Type check & build production bundle
+# 3. Run all 16 Vitest unit tests
+npm run test
+
+# 4. Build frontend code for production
 npm run build
 ```
 
 ---
 
-## 🔑 Role Credentials
+## 🔑 Default Seeded Credentials
 
-| Role | Role Key | Landing Page |
+Use the following seeded accounts (all passwords are set to `password123`):
+
+| Role | Email | Target Landing Dashboard |
 | :--- | :--- | :--- |
-| **System Administrator** | `ADMIN` | `/admin/dashboard` |
-| **HR Operations Manager** | `HR` | `/hr/dashboard` |
-| **Department Head / Manager** | `MANAGER` | `/manager/dashboard` |
-| **Operational Team Lead** | `TEAM_LEAD` | `/team-lead/dashboard` |
-| **Employee Self-Service** | `EMPLOYEE` | `/employee/dashboard` |
+| **System Administrator** | `admin@thestackly.com` | `/admin/dashboard` |
+| **HR Operations Manager** | `hr@thestackly.com` | `/hr/dashboard` |
+| **Department Manager** | `manager@thestackly.com` | `/manager/dashboard` |
+| **Operational Team Lead** | `lead@thestackly.com` | `/team-lead/dashboard` |
+| **Employee Self-Service** | `employee@thestackly.com` | `/employee/dashboard` |

@@ -24,8 +24,8 @@
     "paths": {
       "react": ["./node_modules/@types/react"],
       "react-dom": ["./node_modules/@types/react-dom"],
-      "@/*": ["src/*"]
+      "@/*": ["frontend/*"]
     }
   },
-  "include": ["src"]
+  "include": ["frontend"]
 }
