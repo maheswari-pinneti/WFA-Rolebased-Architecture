@@ -156,97 +156,288 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     [Role.HR]: [
       {
-        category: 'General',
+        category: 'Dashboard',
         items: [
-          { label: 'HR Dashboard', path: '/hr/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Employee Directory', path: '/hr/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
-          { label: 'Recruitment', path: '/hr/recruitment', icon: <Briefcase size={18} strokeWidth={2} className="text-amber-400" />, badge: { text: 'Hiring', variant: 'purple' } },
+          { label: 'Dashboard', path: '/hr/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
         ],
       },
       {
         category: 'Analytics',
         items: [
           { label: 'Workforce Analytics', path: '/hr/workforce-analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
+          { label: 'Attendance Analytics', path: '/hr/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Hiring Analytics', path: '/hr/recruitment', icon: <Briefcase size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Performance Analytics', path: '/hr/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Productivity Analytics', path: '/hr/productivity', icon: <Zap size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Skills Analytics', path: '/hr/skills-gaps', icon: <Award size={18} strokeWidth={2} className="text-yellow-400" /> },
+          { label: 'Risk Analytics', path: '/hr/risk', icon: <AlertTriangle size={18} strokeWidth={2} className="text-rose-400" /> },
+        ],
+      },
+      {
+        category: 'Workforce',
+        items: [
+          { label: 'Employees', path: '/hr/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Departments', path: '/hr/departments', icon: <Building2 size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Teams', path: '/hr/teams', icon: <Network size={18} strokeWidth={2} className="text-teal-400" /> },
+        ],
+      },
+      {
+        category: 'Attendance',
+        items: [
+          { label: 'Overview', path: '/hr/attendance-overview', icon: <Calendar size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Attendance History', path: '/hr/attendance-history', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Shifts', path: '/hr/shifts', icon: <Timer size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Corrections', path: '/hr/corrections', icon: <CheckSquare size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Approvals', path: '/hr/approvals', icon: <ShieldAlert size={18} strokeWidth={2} className="text-red-400" /> },
+        ],
+      },
+      {
+        category: 'Skills',
+        items: [
+          { label: 'Skill Overview', path: '/hr/skills-overview', icon: <Compass size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Skill Gaps', path: '/hr/skills-gaps', icon: <Target size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Skill Coverage', path: '/hr/skills-coverage', icon: <Map size={18} strokeWidth={2} className="text-indigo-400" /> },
+        ],
+      },
+      {
+        category: 'Performance',
+        items: [
+          { label: 'Performance Overview', path: '/hr/performance-overview', icon: <Star size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Productivity', path: '/hr/productivity-metrics', icon: <Activity size={18} strokeWidth={2} className="text-emerald-400" /> },
+        ],
+      },
+      {
+        category: 'Recruitment',
+        items: [
+          { label: 'Hiring Analytics', path: '/hr/recruitment-analytics', icon: <Briefcase size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Workforce Planning', path: '/hr/workforce-planning', icon: <Layers size={18} strokeWidth={2} className="text-teal-400" /> },
+        ],
+      },
+      {
+        category: 'Reports',
+        items: [
+          { label: 'Reports', path: '/hr/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Audit Logs', path: '/hr/audit-logs', icon: <History size={18} strokeWidth={2} className="text-slate-400" /> },
         ],
       },
       {
         category: 'Settings',
         items: [
-          { label: 'Leave Requests', path: '/hr/leave', icon: <FileText size={18} strokeWidth={2} className="text-blue-400" />, badge: { text: '5 New', variant: 'rose' } },
-          { label: 'Payroll Ledger', path: '/hr/payroll-reports', icon: <DollarSign size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Settings', path: '/hr/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
+        ],
+      },
+      {
+        category: 'Help & Support',
+        items: [
+          { label: 'Help & Support', path: '#support', icon: <HelpCircle size={18} strokeWidth={2} className="text-slate-400" /> },
         ],
       },
     ],
 
     [Role.MANAGER]: [
       {
-        category: 'General',
+        category: 'Dashboard',
         items: [
-          { label: 'Manager Dashboard', path: '/manager/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Team Directory', path: '/manager/team', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Dashboard', path: '/manager/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
         ],
       },
       {
-        category: 'Analytics',
+        category: 'Team Analytics',
         items: [
-          { label: 'Team Analytics', path: '/manager/analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
-          { label: 'Productivity Metrics', path: '/manager/productivity', icon: <Zap size={18} strokeWidth={2} className="text-amber-400" /> },
-          { label: 'Performance Reviews', path: '/manager/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Team Reports', path: '/manager/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Workforce', path: '/manager/analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
+          { label: 'Attendance', path: '/manager/attendance-analytics', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Productivity', path: '/manager/productivity', icon: <Zap size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Performance', path: '/manager/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Skill Gaps', path: '/manager/skills-gaps', icon: <Award size={18} strokeWidth={2} className="text-yellow-400" /> },
+        ],
+      },
+      {
+        category: 'My Team',
+        items: [
+          { label: 'Team Members', path: '/manager/team-members', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Team Overview', path: '/manager/team-overview', icon: <Network size={18} strokeWidth={2} className="text-teal-400" /> },
+        ],
+      },
+      {
+        category: 'Attendance',
+        items: [
+          { label: 'Team Attendance', path: '/manager/team-attendance', icon: <Calendar size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Attendance History', path: '/manager/attendance-history', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Corrections', path: '/manager/corrections', icon: <CheckSquare size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Approvals', path: '/manager/approvals', icon: <ShieldAlert size={18} strokeWidth={2} className="text-red-400" /> },
+        ],
+      },
+      {
+        category: 'Skills',
+        items: [
+          { label: 'Team Skills', path: '/manager/team-skills', icon: <Compass size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Skill Gaps', path: '/manager/skills-gaps-view', icon: <Target size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Skill Coverage', path: '/manager/skills-coverage', icon: <Map size={18} strokeWidth={2} className="text-indigo-400" /> },
+        ],
+      },
+      {
+        category: 'Performance',
+        items: [
+          { label: 'Team Performance', path: '/manager/team-performance', icon: <Star size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Productivity', path: '/manager/productivity-metrics', icon: <Activity size={18} strokeWidth={2} className="text-emerald-400" /> },
+        ],
+      },
+      {
+        category: 'Shifts',
+        items: [
+          { label: 'Team Shifts', path: '/manager/shifts', icon: <Timer size={18} strokeWidth={2} className="text-teal-400" /> },
+        ],
+      },
+      {
+        category: 'Reports',
+        items: [
+          { label: 'Reports', path: '/manager/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-rose-400" /> },
         ],
       },
       {
         category: 'Settings',
         items: [
-          { label: 'Attendance Roster', path: '/manager/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Leave Approvals', path: '/manager/approvals', icon: <CheckCircle2 size={18} strokeWidth={2} className="text-teal-400" />, badge: { text: '3 Review', variant: 'amber' } },
+          { label: 'Settings', path: '/manager/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
+        ],
+      },
+      {
+        category: 'Help & Support',
+        items: [
+          { label: 'Help & Support', path: '#support', icon: <HelpCircle size={18} strokeWidth={2} className="text-slate-400" /> },
         ],
       },
     ],
 
     [Role.TEAM_LEAD]: [
       {
-        category: 'General',
+        category: 'Dashboard',
         items: [
-          { label: 'Team Lead Dashboard', path: '/team-lead/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-teal-400" /> },
-          { label: 'Task Monitoring', path: '/team-lead/tasks', icon: <ClipboardList size={18} strokeWidth={2} className="text-rose-400" />, badge: { text: '8 Active', variant: 'rose' } },
+          { label: 'Dashboard', path: '/team-lead/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
         ],
       },
       {
-        category: 'Analytics',
+        category: 'Team Analytics',
         items: [
-          { label: 'Productivity Analytics', path: '/team-lead/productivity', icon: <BarChart3 size={18} strokeWidth={2} className="text-amber-400" /> },
-          { label: 'Team Performance', path: '/team-lead/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Attendance', path: '/team-lead/attendance-analytics', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Productivity', path: '/team-lead/productivity', icon: <Zap size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Performance', path: '/team-lead/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Workforce', path: '/team-lead/workforce-analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
+        ],
+      },
+      {
+        category: 'My Team',
+        items: [
+          { label: 'Team Members', path: '/team-lead/team-members', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Team Overview', path: '/team-lead/team-overview', icon: <Network size={18} strokeWidth={2} className="text-teal-400" /> },
+        ],
+      },
+      {
+        category: 'Attendance',
+        items: [
+          { label: 'Team Attendance', path: '/team-lead/team-attendance', icon: <Calendar size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Attendance History', path: '/team-lead/attendance-history', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Corrections', path: '/team-lead/corrections', icon: <CheckSquare size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Approvals', path: '/team-lead/approvals', icon: <ShieldAlert size={18} strokeWidth={2} className="text-red-400" /> },
+        ],
+      },
+      {
+        category: 'Skills',
+        items: [
+          { label: 'Team Skills', path: '/team-lead/team-skills', icon: <Compass size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Skill Gaps', path: '/team-lead/skills-gaps', icon: <Target size={18} strokeWidth={2} className="text-rose-400" /> },
+        ],
+      },
+      {
+        category: 'Performance',
+        items: [
+          { label: 'Team Performance', path: '/team-lead/team-performance', icon: <Star size={18} strokeWidth={2} className="text-amber-400" /> },
+        ],
+      },
+      {
+        category: 'Shifts',
+        items: [
+          { label: 'Team Shifts', path: '/team-lead/shifts', icon: <Timer size={18} strokeWidth={2} className="text-teal-400" /> },
+        ],
+      },
+      {
+        category: 'Reports',
+        items: [
+          { label: 'Reports', path: '/team-lead/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-rose-400" /> },
         ],
       },
       {
         category: 'Settings',
         items: [
-          { label: 'Attendance Tracking', path: '/team-lead/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Settings', path: '/team-lead/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
+        ],
+      },
+      {
+        category: 'Help & Support',
+        items: [
+          { label: 'Help & Support', path: '#support', icon: <HelpCircle size={18} strokeWidth={2} className="text-slate-400" /> },
         ],
       },
     ],
 
     [Role.EMPLOYEE]: [
       {
-        category: 'General',
+        category: 'Dashboard',
         items: [
-          { label: 'My Dashboard', path: '/employee/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'My Profile', path: '/employee/profile', icon: <User size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Dashboard', path: '/employee/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
         ],
       },
       {
-        category: 'Analytics',
+        category: 'My Attendance',
         items: [
-          { label: 'My Performance', path: '/employee/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'My Goals', path: '/employee/goals', icon: <FileText size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Today\'s Attendance', path: '/employee/attendance-today', icon: <Calendar size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Check-In / Check-Out', path: '/employee/check-in-out', icon: <Clock size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Break', path: '/employee/break', icon: <Zap size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Attendance History', path: '/employee/attendance', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Working Hours', path: '/employee/working-hours', icon: <Timer size={18} strokeWidth={2} className="text-emerald-400" /> },
+        ],
+      },
+      {
+        category: 'My Shifts',
+        items: [
+          { label: 'Shift Schedule', path: '/employee/shifts', icon: <ClipboardList size={18} strokeWidth={2} className="text-teal-400" /> },
+        ],
+      },
+      {
+        category: 'My Skills',
+        items: [
+          { label: 'Skills', path: '/employee/skills', icon: <Compass size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Skill Coverage', path: '/employee/skills-coverage', icon: <Map size={18} strokeWidth={2} className="text-indigo-400" /> },
+          { label: 'Skill Gaps', path: '/employee/skills-gaps', icon: <Target size={18} strokeWidth={2} className="text-rose-400" /> },
+        ],
+      },
+      {
+        category: 'My Performance',
+        items: [
+          { label: 'Performance', path: '/employee/performance', icon: <Star size={18} strokeWidth={2} className="text-amber-400" /> },
+        ],
+      },
+      {
+        category: 'Attendance Requests',
+        items: [
+          { label: 'Correction Requests', path: '/employee/corrections', icon: <FileText size={18} strokeWidth={2} className="text-blue-400" /> },
+        ],
+      },
+      {
+        category: 'My Profile',
+        items: [
+          { label: 'My Profile', path: '/employee/profile', icon: <User size={18} strokeWidth={2} className="text-emerald-400" /> },
         ],
       },
       {
         category: 'Settings',
         items: [
-          { label: 'My Attendance', path: '/employee/attendance', icon: <Clock size={18} strokeWidth={2} className="text-amber-400" /> },
-          { label: 'My Payslips', path: '/employee/payslips', icon: <DollarSign size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Settings', path: '/employee/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
+        ],
+      },
+      {
+        category: 'Help & Support',
+        items: [
+          { label: 'Help & Support', path: '#support', icon: <HelpCircle size={18} strokeWidth={2} className="text-slate-400" /> },
         ],
       },
     ],
