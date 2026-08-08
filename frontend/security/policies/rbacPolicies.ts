@@ -30,6 +30,7 @@ export const ROLE_SECURITY_POLICIES: Record<Role, RoleSecurityPolicy> = {
       Permission.RECRUITMENT_MANAGE,
       Permission.REPORT_VIEW,
       Permission.REPORT_GENERATE,
+      Permission.TEAM_ANALYTICS_VIEW,
     ],
   },
   [Role.MANAGER]: {
