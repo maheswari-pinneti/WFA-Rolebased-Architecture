@@ -1,4 +1,5 @@
 import db, { logAudit } from '../config/db.js';
+import * as notificationService from '../services/notification.service.js';
 
 // MAHE Bangalore Geofence Configuration
 const OFFICE_COORDS = { lat: 12.9716, lng: 77.5946 };
@@ -26,11 +27,13 @@ export const checkIn = (req, res) => {
   if (workMode === 'Office') {
     if (latitude === undefined || longitude === undefined) {
       logAudit(employeeId, 'AUTHORIZATION_FAILURE', 'Office check-in rejected: missing coordinates');
+      notificationService.triggerAlarm(employeeId, employeeName, 'GEOFENCE_VIOLATION', 'Office check-in attempted without location coordinates.');
       return res.status(400).json({ success: false, message: 'Location coordinates required for Office check-in.' });
     }
     const distance = getDistance(latitude, longitude, OFFICE_COORDS.lat, OFFICE_COORDS.lng);
     if (distance > ALLOWED_RADIUS_METERS) {
       logAudit(employeeId, 'AUTHORIZATION_FAILURE', `Office check-in rejected: geofence breach (${Math.round(distance)}m away)`);
+      notificationService.triggerAlarm(employeeId, employeeName, 'GEOFENCE_VIOLATION', `Office check-in rejected: geofence breach (${Math.round(distance)}m away)`);
       return res.status(400).json({ success: false, message: `Geofencing validation failed. You are outside the office boundary (${Math.round(distance)}m away).` });
     }
   }
@@ -39,6 +42,7 @@ export const checkIn = (req, res) => {
     // Active check-in session check (duplicate prevention)
     db.get("SELECT * FROM attendance_records WHERE employeeId = ? AND status != 'Checked Out'", [employeeId], (err, activeSession) => {
       if (activeSession) {
+        notificationService.triggerAlarm(employeeId, employeeName, 'DUPLICATE_CHECKIN_ATTEMPT', 'Attempted check-in with an active session');
         return res.status(400).json({ success: false, message: 'Active session already exists. Must check out first.' });
       }
 
@@ -53,6 +57,7 @@ export const checkIn = (req, res) => {
           if (err2) return res.status(500).json({ success: false, message: err2.message });
           
           logAudit(employeeId, 'CHECK_IN', `Checked in using ${workMode} mode on ${shiftType} shift`);
+          notificationService.triggerGoogleCalendarNotification(employeeId, employeeName, 'Office Login Check-In', date);
           
           return res.json({
             success: true,
