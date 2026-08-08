@@ -22,7 +22,24 @@ import {
   DollarSign,
   ClipboardList,
   UserCog,
-  PieChart
+  PieChart,
+  Network,
+  Globe,
+  Calendar,
+  Timer,
+  CheckSquare,
+  ShieldAlert,
+  Compass,
+  Target,
+  Map,
+  Activity,
+  Key,
+  ShieldCheck,
+  MapPin,
+  HelpCircle,
+  Award,
+  AlertTriangle,
+  Star
 } from 'lucide-react';
 
 export interface NavigationItem {
@@ -36,7 +53,7 @@ export interface NavigationItem {
 }
 
 export interface NavigationCategory {
-  category: 'General' | 'Analytics' | 'Settings';
+  category: string;
   items: NavigationItem[];
 }
 
@@ -62,29 +79,77 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const roleCategorizedNavMap: Record<Role, NavigationCategory[]> = {
     [Role.ADMIN]: [
       {
-        category: 'General',
+        category: 'Dashboard',
         items: [
           { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={18} strokeWidth={2} className="text-blue-400" /> },
-          { label: 'Employee Directory', path: '/admin/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
-          { label: 'Departments', path: '/admin/departments', icon: <Building2 size={18} strokeWidth={2} className="text-purple-400" /> },
         ],
       },
       {
         category: 'Analytics',
         items: [
-          { label: 'Workforce Analytics', path: '/admin/analytics', icon: <PieChart size={18} strokeWidth={2} className="text-cyan-400" />, badge: { text: 'Live', variant: 'emerald' } },
-          { label: 'Attendance Analytics', path: '/hr/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" />, badge: { text: '3 Alert', variant: 'rose' } },
+          { label: 'Workforce Analytics', path: '/admin/analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
+          { label: 'Attendance Analytics', path: '/hr/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Hiring Analytics', path: '/hr/recruitment', icon: <Briefcase size={18} strokeWidth={2} className="text-amber-400" /> },
           { label: 'Performance Analytics', path: '/hr/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
-          { label: 'Reports & Export', path: '/admin/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Productivity Analytics', path: '/admin/productivity', icon: <Zap size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Skills Analytics', path: '/admin/skills-gaps', icon: <Award size={18} strokeWidth={2} className="text-yellow-400" /> },
+          { label: 'Risk Analytics', path: '/admin/risk', icon: <AlertTriangle size={18} strokeWidth={2} className="text-rose-400" /> },
+        ],
+      },
+      {
+        category: 'Workforce',
+        items: [
+          { label: 'Employees', path: '/admin/employees', icon: <Users size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Departments', path: '/admin/departments', icon: <Building2 size={18} strokeWidth={2} className="text-purple-400" /> },
+          { label: 'Teams', path: '/admin/teams', icon: <Network size={18} strokeWidth={2} className="text-teal-400" /> },
+          { label: 'Organization', path: '/admin/organization', icon: <Globe size={18} strokeWidth={2} className="text-sky-400" /> },
+        ],
+      },
+      {
+        category: 'Attendance',
+        items: [
+          { label: 'Overview', path: '/admin/attendance-overview', icon: <Calendar size={18} strokeWidth={2} className="text-blue-400" /> },
+          { label: 'Attendance History', path: '/admin/attendance-history', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Shifts', path: '/admin/shifts', icon: <Timer size={18} strokeWidth={2} className="text-emerald-400" /> },
+          { label: 'Corrections', path: '/admin/corrections', icon: <CheckSquare size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Approvals', path: '/admin/approvals', icon: <ShieldAlert size={18} strokeWidth={2} className="text-red-400" /> },
+        ],
+      },
+      {
+        category: 'Skills',
+        items: [
+          { label: 'Skill Overview', path: '/admin/skills-overview', icon: <Compass size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Skill Gaps', path: '/admin/skills-gaps', icon: <Target size={18} strokeWidth={2} className="text-rose-400" /> },
+          { label: 'Skill Coverage', path: '/admin/skills-coverage', icon: <Map size={18} strokeWidth={2} className="text-indigo-400" /> },
+        ],
+      },
+      {
+        category: 'Performance',
+        items: [
+          { label: 'Performance Overview', path: '/admin/performance-overview', icon: <Star size={18} strokeWidth={2} className="text-amber-400" /> },
+          { label: 'Productivity', path: '/admin/productivity-metrics', icon: <Activity size={18} strokeWidth={2} className="text-emerald-400" /> },
+        ],
+      },
+      {
+        category: 'Administration',
+        items: [
+          { label: 'Users & Roles', path: '/admin/users', icon: <UserCog size={18} strokeWidth={2} className="text-cyan-400" /> },
+          { label: 'Permissions', path: '/admin/permissions', icon: <Key size={18} strokeWidth={2} className="text-yellow-400" /> },
+          { label: 'Access Control', path: '/admin/access-control', icon: <ShieldCheck size={18} strokeWidth={2} className="text-green-400" /> },
+          { label: 'Geofencing', path: '/admin/geofencing', icon: <MapPin size={18} strokeWidth={2} className="text-orange-400" /> },
+          { label: 'Audit Logs', path: '/admin/audit-logs', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-rose-400" /> },
         ],
       },
       {
         category: 'Settings',
         items: [
-          { label: 'User Management', path: '/admin/users', icon: <UserCog size={18} strokeWidth={2} className="text-cyan-400" />, badge: { text: 'Active', variant: 'blue' } },
-          { label: 'Audit Logs', path: '/admin/audit-logs', icon: <History size={18} strokeWidth={2} className="text-rose-400" /> },
-          { label: 'System Settings', path: '/admin/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
-          { label: 'Configuration', path: '/admin/configuration', icon: <Layers size={18} strokeWidth={2} className="text-teal-400" /> },
+          { label: 'Settings', path: '/admin/settings', icon: <Sliders size={18} strokeWidth={2} className="text-slate-400" /> },
+        ],
+      },
+      {
+        category: 'Help & Support',
+        items: [
+          { label: 'Help & Support', path: '#support', icon: <HelpCircle size={18} strokeWidth={2} className="text-slate-400" /> },
         ],
       },
     ],
@@ -235,6 +300,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Subtle Divider Line Between Logical Groups */}
                 {groupIdx > 0 && !collapsed && (
                   <div className={`my-2 border-t ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`} />
+                )}
+
+                {/* Section Header Title */}
+                {!collapsed && cat.category && cat.category !== 'General' && cat.category !== 'Dashboard' && cat.category !== 'Settings' && cat.category !== 'Help & Support' && (
+                  <div className={`px-3.5 pt-3 pb-1.5 text-[10px] font-black tracking-wider uppercase ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                    {cat.category}
+                  </div>
                 )}
 
                 {/* Clean Navigation Links */}
