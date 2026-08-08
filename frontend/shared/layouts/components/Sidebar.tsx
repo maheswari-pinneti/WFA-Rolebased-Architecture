@@ -101,10 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {
         category: 'Analytics',
         items: [
-          { label: 'Attendance Analytics', path: '/hr/attendance', icon: <Clock size={18} strokeWidth={2} className="text-emerald-400" /> },
-          { label: 'Performance Analytics', path: '/hr/performance', icon: <TrendingUp size={18} strokeWidth={2} className="text-purple-400" /> },
           { label: 'Workforce Analytics', path: '/hr/workforce-analytics', icon: <BarChart3 size={18} strokeWidth={2} className="text-indigo-400" /> },
-          { label: 'HR Reports', path: '/hr/reports', icon: <FileSpreadsheet size={18} strokeWidth={2} className="text-amber-400" /> },
         ],
       },
       {
