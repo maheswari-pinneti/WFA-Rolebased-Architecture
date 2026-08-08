@@ -19,6 +19,8 @@ This report summarizes the final completion status of all requirements, listing 
 | **Offline Synchronization** | **Completed** | Implemented client-side queues in [attendance.service.ts](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/frontend/services/attendance.service.ts). |
 | **Database Audit Logs** | **Completed** | Automatic record creation via `logAudit` inside [db.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/config/db.js). |
 | **Sidebar Theme Adaptability** | **Completed** | Supports auto-responsive light and dark theme classes in [Sidebar.tsx](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/frontend/shared/layouts/components/Sidebar.tsx). |
+| **Google Calendar Notifications** | **Completed** | Event creation triggers via [notification.service.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/services/notification.service.js). |
+| **Alarm Alerts & Audit Triggers** | **Completed** | Automated security alarm dispatching for geofence breaches & duplicate session requests. |
 
 ---
 
@@ -28,6 +30,7 @@ This report summarizes the final completion status of all requirements, listing 
 - `backend/src/config/db.js`
 - `backend/src/middleware/auth.js`
 - `backend/src/services/mfa.service.js`
+- `backend/src/services/notification.service.js`
 - `backend/src/controllers/auth.controller.js`
 - `backend/src/controllers/attendance.controller.js`
 - `backend/src/controllers/analytics.controller.js`

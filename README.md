@@ -92,3 +92,5 @@ Use the following seeded accounts (all passwords are set to `password123`):
 | **Audit Logs** | Completed | [db.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/config/db.js) |
 | **Offline Synchronization** | Completed | [attendance.service.ts](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/frontend/services/attendance.service.ts) |
 | **Duplicate Prevention / Idempotency** | Completed | [attendance.controller.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/controllers/attendance.controller.js) |
+| **Google Calendar Integration** | Completed | [notification.service.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/services/notification.service.js) |
+| **Alarm alerts & security limits** | Completed | [notification.service.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/services/notification.service.js) |
