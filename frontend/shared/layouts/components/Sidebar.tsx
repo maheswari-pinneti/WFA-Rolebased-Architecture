@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
+import { useTheme } from '../../../design-system/theme/theme';
 import { Role } from '../../../security/roles/roles';
 import {
   LayoutDashboard,
@@ -189,22 +190,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
     ],
   };
 
+  const { theme } = useTheme();
   const currentCategories = roleCategorizedNavMap[role as Role] || roleCategorizedNavMap[Role.EMPLOYEE];
+  const isDark = theme === 'dark';
 
   const getBadgeStyle = (variant: 'blue' | 'purple' | 'amber' | 'emerald' | 'rose') => {
     switch (variant) {
       case 'blue':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+        return isDark ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-blue-50 text-blue-600 border-blue-200';
       case 'purple':
-        return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+        return isDark ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-purple-50 text-purple-600 border-purple-200';
       case 'amber':
-        return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+        return isDark ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-amber-50 text-amber-600 border-amber-200';
       case 'emerald':
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+        return isDark ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200';
       case 'rose':
-        return 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+        return isDark ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-rose-50 text-rose-600 border-rose-200';
       default:
-        return 'bg-slate-800 text-slate-300 border-slate-700';
+        return isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-600 border-slate-200';
     }
   };
 
@@ -221,18 +224,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Modern Clean Enterprise SaaS Left Sidebar */}
       <aside
-        className={`app-sidebar bg-[#0B1120] text-slate-100 border-r border-slate-800 flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out shadow-2xl font-sans ${
+        className={`app-sidebar ${
+          isDark ? 'bg-[#0B1120] text-slate-100 border-slate-800 shadow-2xl' : 'bg-white text-slate-800 border-slate-200 shadow-md'
+        } border-r flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
           collapsed ? 'w-[64px]' : 'w-[220px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         {/* Sidebar Navigation Items List */}
-        <nav className="sidebar-nav flex-1 overflow-y-auto px-3 py-1 space-y-1 w-full scrollbar-thin scrollbar-thumb-slate-800">
+        <nav className="sidebar-nav flex-1 overflow-y-auto px-3 py-1 space-y-1 w-full scrollbar-thin">
           {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
             return (
               <React.Fragment key={groupIdx}>
                 {/* Subtle Divider Line Between Logical Groups */}
                 {groupIdx > 0 && !collapsed && (
-                  <div className="my-2 border-t border-slate-800/60" />
+                  <div className={`my-2 border-t ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`} />
                 )}
 
                 {/* Clean Navigation Links */}
@@ -248,7 +253,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       className={`sidebar-nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all duration-200 group relative no-underline text-inherit ${
                         active
                           ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-extrabold shadow-lg shadow-blue-500/25 border border-blue-500/40'
-                          : 'hover:bg-slate-800/60 text-slate-300 hover:text-white border border-transparent hover:border-slate-800/60'
+                          : isDark
+                            ? 'hover:bg-slate-800/60 text-slate-300 hover:text-white border border-transparent hover:border-slate-800/60'
+                            : 'hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-transparent hover:border-slate-200'
                       } ${collapsed ? 'justify-center px-0' : ''}`}
                     >
                       <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">
@@ -274,7 +281,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                       {/* Collapsed Hover Tooltip */}
                       {collapsed && (
-                        <span className="absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-900 text-slate-100 border border-slate-700 shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2">
+                        <span className={`absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl border shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2 ${
+                          isDark ? 'bg-slate-900 text-slate-100 border-slate-700' : 'bg-white text-slate-800 border-slate-200'
+                        }`}>
                           {item.label}
                           {item.badge && (
                             <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${getBadgeStyle(item.badge.variant)}`}>

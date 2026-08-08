@@ -73,5 +73,22 @@ Use the following seeded accounts (all passwords are set to `password123`):
 | **System Administrator** | `admin@thestackly.com` | `/admin/dashboard` |
 | **HR Operations Manager** | `hr@thestackly.com` | `/hr/dashboard` |
 | **Department Manager** | `manager@thestackly.com` | `/manager/dashboard` |
-| **Operational Team Lead** | `lead@thestackly.com` | `/team-lead/dashboard` |
+| Operational Team Lead | `lead@thestackly.com` | `/team-lead/dashboard` |
 | **Employee Self-Service** | `employee@thestackly.com` | `/employee/dashboard` |
+
+---
+
+## 📊 Codebase Feature Classification Report
+
+| Feature | Status | Evidence |
+| --- | --- | --- |
+| **Chart loading/empty/error states** | Completed | [ChartCard.tsx](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/frontend/components/dashboard/ChartCard.tsx) |
+| **Workforce Analytics (Employee growth, hiring, etc.)** | Completed | [analytics.controller.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/controllers/analytics.controller.js) |
+| **All Five Role Dashboards** | Completed | `frontend/features/` |
+| **RBAC / Scopes (Org, Dept, Team, Self)** | Completed | [auth.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/middleware/auth.js) |
+| **Backend APIs & SQLite Persistence** | Completed | `backend/src/` |
+| **MFA OTP Delivery & Persistent Challenges** | Completed | [mfa.service.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/services/mfa.service.js) |
+| **Geofencing & Verification** | Completed | [attendance.controller.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/controllers/attendance.controller.js) |
+| **Audit Logs** | Completed | [db.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/config/db.js) |
+| **Offline Synchronization** | Completed | [attendance.service.ts](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/frontend/services/attendance.service.ts) |
+| **Duplicate Prevention / Idempotency** | Completed | [attendance.controller.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/controllers/attendance.controller.js) |
