@@ -53,6 +53,13 @@ export const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.error = null;
+    },
+    loginSuccessAction: (state, action: PayloadAction<{ user: User; token: string }>) => {
+      state.isLoading = false;
+      state.isAuthenticated = true;
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
@@ -63,9 +70,14 @@ export const authSlice = createSlice({
       })
       .addCase(loginUserThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        const payload = action.payload as any;
+        if (payload && payload.requiresMfa) {
+          state.isAuthenticated = false;
+        } else {
+          state.isAuthenticated = true;
+          state.user = payload ? payload.user : null;
+          state.token = payload ? payload.token : null;
+        }
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
         state.isLoading = false;
@@ -79,5 +91,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setRole, clearError, logoutAction } = authSlice.actions;
+export const { setRole, clearError, logoutAction, loginSuccessAction } = authSlice.actions;
 export default authSlice.reducer;

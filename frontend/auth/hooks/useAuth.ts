@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../app/store';
-import { loginUserThunk, logoutUserThunk, logoutAction, setRole, clearError } from '../store/authSlice';
+import { loginUserThunk, logoutUserThunk, logoutAction, setRole, clearError, loginSuccessAction } from '../store/authSlice';
 import { Role } from '../../security/roles/roles';
 import { authService } from '../services/auth.service';
 
@@ -9,6 +9,11 @@ export const useAuth = () => {
   const authState = useSelector((state: RootState) => state.auth);
 
   const login = (email: string) => dispatch(loginUserThunk(email));
+
+  const verifyMfa = async (tempToken: string, code: string) => {
+    const data = await authService.verifyMfa(tempToken, code);
+    dispatch(loginSuccessAction(data));
+  };
   
   const logout = () => {
     authService.logout();
@@ -22,6 +27,7 @@ export const useAuth = () => {
   return {
     ...authState,
     login,
+    verifyMfa,
     logout,
     switchRole,
     dismissError,

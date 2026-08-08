@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROLE_HOME_PATHS } from '../../security/roles/roles';
+import { authService } from '../services/auth.service';
 import { StacklyLogo } from '../../components/common/StacklyLogo';
 import {
   Mail,
@@ -63,7 +64,7 @@ const ROLE_DETAILS = {
 };
 
 export const LoginPage: React.FC = () => {
-  const { login, isAuthenticated, role } = useAuth();
+  const { login, verifyMfa, isAuthenticated, role } = useAuth();
   const navigate = useNavigate();
 
   // Active form tab: 'login' | 'otp' | 'signup'
@@ -84,6 +85,8 @@ export const LoginPage: React.FC = () => {
 
   // OTP inputs
   const [otpValues, setOtpValues] = useState<string[]>(['8', '4', '9', '2', '0', '1']);
+  const [tempToken, setTempToken] = useState<string | null>(null);
+
   const otpRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -138,36 +141,67 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleSendCode = () => {
+  const handleSendCode = async () => {
     setError('');
     setSuccessMsg('');
-    if (!email.toLowerCase().endsWith('@thestackly.com')) {
-      setError('Only official @thestackly.com company email addresses are permitted.');
+    const emailDomain = email.toLowerCase();
+    if (!emailDomain.endsWith('@thestackly.com') && !emailDomain.endsWith('@company.com')) {
+      setError('Only official @thestackly.com or @company.com company email addresses are permitted.');
       return;
     }
-    setTimer(45);
-    setOtpValues(['8', '4', '9', '2', '0', '1']);
-    setSuccessMsg('Demo OTP code [849201] has been resent.');
+    setIsLoading(true);
+    try {
+      const res = (await authService.login(email)) as any;
+      if (res.requiresMfa) {
+        setTempToken(res.tempToken);
+        if (res.otpDevHint) {
+          const otpStr = res.otpDevHint.toString();
+          setOtpValues(otpStr.split(''));
+        }
+        setTimer(45);
+        setSuccessMsg('MFA verification code has been resent.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to resend code.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
 
-    if (!email.toLowerCase().endsWith('@thestackly.com')) {
-      setError('Only official @thestackly.com company email addresses are permitted.');
+    const emailDomain = email.toLowerCase();
+    if (!emailDomain.endsWith('@thestackly.com') && !emailDomain.endsWith('@company.com')) {
+      setError('Only official @thestackly.com or @company.com company email addresses are permitted.');
       return;
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      login(email);
+    try {
+      const res = (await authService.login(email)) as any;
+      if (res.requiresMfa) {
+        setTempToken(res.tempToken);
+        if (res.otpDevHint) {
+          const otpStr = res.otpDevHint.toString();
+          setOtpValues(otpStr.split(''));
+        }
+        setActiveTab('otp');
+        setTimer(45);
+        setSuccessMsg('OTP Code has been generated.');
+      } else {
+        await login(email);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Login failed.');
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
-  const handleOtpLoginSubmit = (e: React.FormEvent) => {
+  const handleOtpLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
@@ -178,11 +212,19 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
+    if (!tempToken) {
+      setError('MFA session expired or invalid. Please request a new code.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      login(email);
+    try {
+      await verifyMfa(tempToken, otpCode);
+    } catch (err: any) {
+      setError(err.message || 'Verification failed. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   const handleSignUpSubmit = (e: React.FormEvent) => {
