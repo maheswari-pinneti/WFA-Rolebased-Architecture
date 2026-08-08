@@ -95,4 +95,67 @@ describe('E2E User Flow Tests', () => {
     expect(selfRecord).toBeDefined();
     expect(selfRecord.status).toBe('Checked Out');
   });
+
+  it('should enforce geofence, duplicate check-in, and double-checkout restrictions', async () => {
+    // 1. Login to get token
+    const loginRes = await client.post('/v1/auth/login', { email: 'employee@thestackly.com' });
+    const { tempToken, otpDevHint } = loginRes.data.data;
+    const verifyRes = await client.post('/v1/auth/mfa-verify', { tempToken, code: otpDevHint });
+    const empToken = verifyRes.data.data.token;
+
+    // 2. Try check-in with out-of-bounds geofence
+    const badGeofenceInfo = {
+      employeeId: 'usr-emp-01',
+      employeeName: 'Alex Mercer',
+      department: 'Engineering',
+      shiftType: 'Regular',
+      workMode: 'Office',
+      latitude: 0,
+      longitude: 0,
+      accuracy: 10,
+      idempotencyKey: `e2e-badgeo-${Date.now()}`
+    };
+    const badGeoRes = await client.post('/v1/attendance/check-in', badGeofenceInfo, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+    expect(badGeoRes.status).toBe(400);
+    expect(badGeoRes.data.message).toContain('Geofencing validation failed');
+
+    // 3. Perform a valid check-in
+    const validInfo = {
+      employeeId: 'usr-emp-01',
+      employeeName: 'Alex Mercer',
+      department: 'Engineering',
+      shiftType: 'Regular',
+      workMode: 'Remote',
+      idempotencyKey: `e2e-valid-${Date.now()}`
+    };
+    const goodCheckInRes = await client.post('/v1/attendance/check-in', validInfo, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+    expect(goodCheckInRes.status).toBe(200);
+
+    // 4. Try duplicate check-in (should reject with 400)
+    const duplicateCheckInRes = await client.post('/v1/attendance/check-in', {
+      ...validInfo,
+      idempotencyKey: `e2e-dup-${Date.now()}`
+    }, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+    expect(duplicateCheckInRes.status).toBe(400);
+    expect(duplicateCheckInRes.data.message).toContain('Active session already exists');
+
+    // 5. Perform valid check-out
+    const checkOutRes1 = await client.post('/v1/attendance/check-out', { employeeId: 'usr-emp-01' }, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+    expect(checkOutRes1.status).toBe(200);
+
+    // 6. Try duplicate check-out (should reject with 400 because there is no active session)
+    const checkOutRes2 = await client.post('/v1/attendance/check-out', { employeeId: 'usr-emp-01' }, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+    expect(checkOutRes2.status).toBe(400);
+    expect(checkOutRes2.data.message).toContain('No active session found');
+  });
 });
