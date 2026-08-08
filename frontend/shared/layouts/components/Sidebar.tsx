@@ -483,8 +483,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           collapsed ? 'w-[64px]' : 'w-[220px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
+        {/* Sidebar Branding Header */}
+        {!collapsed && (
+          <div className={`px-5 py-4 border-b ${isDark ? 'border-slate-800/80' : 'border-slate-150'}`}>
+            <div className="text-sm font-black tracking-widest text-blue-500">STACKLY</div>
+            <div className="text-[9px] font-black uppercase tracking-wider text-slate-400 mt-0.5">Workforce Intelligence</div>
+          </div>
+        )}
+
         {/* Sidebar Navigation Items List */}
-        <nav className="sidebar-nav flex-1 overflow-y-auto px-3 py-1 space-y-1 w-full scrollbar-thin">
+        <nav className="sidebar-nav flex-1 overflow-y-auto px-3 py-3 space-y-1 w-full scrollbar-thin">
           {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
             return (
               <React.Fragment key={groupIdx}>
