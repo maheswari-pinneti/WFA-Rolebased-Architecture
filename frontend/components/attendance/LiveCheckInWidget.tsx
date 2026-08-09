@@ -52,7 +52,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
   }, [dispatch, employeeId]);
 
   // Handle Action dispatchers (with geofencing & offline checks)
-  const handleCheckIn = () => {
+  const handleCheckIn = async () => {
     const idempotencyKey = Math.random().toString(36).substr(2, 9);
     const payload = {
       employeeId,
