@@ -19,6 +19,19 @@ import { LocationsManagement } from '../../features/admin/pages/LocationsManagem
 import { AuditLogsPage } from '../../features/admin/pages/AuditLogsPage';
 import { SystemSettings } from '../../features/admin/pages/SystemSettings';
 import { SystemConfiguration } from '../../features/admin/pages/SystemConfiguration';
+import { TeamsManagement } from '../../features/admin/pages/TeamsManagement';
+import { OrganizationHierarchy } from '../../features/admin/pages/OrganizationHierarchy';
+import { AdminAttendanceOverview } from '../../features/admin/pages/AdminAttendanceOverview';
+import { AdminAttendanceHistory } from '../../features/admin/pages/AdminAttendanceHistory';
+import { AdminShifts } from '../../features/admin/pages/AdminShifts';
+import { AdminCorrections } from '../../features/admin/pages/AdminCorrections';
+import { AdminApprovals } from '../../features/admin/pages/AdminApprovals';
+import { AdminSkillsOverview } from '../../features/admin/pages/AdminSkillsOverview';
+import { AdminSkillsCoverage } from '../../features/admin/pages/AdminSkillsCoverage';
+import { AdminPerformanceOverview } from '../../features/admin/pages/AdminPerformanceOverview';
+import { AdminProductivityMetrics } from '../../features/admin/pages/AdminProductivityMetrics';
+import { AdminAccessControl } from '../../features/admin/pages/AdminAccessControl';
+import { AdminGeofencing } from '../../features/admin/pages/AdminGeofencing';
 
 // HR Dashboards & Pages
 import { HRDashboard } from '../../features/hr/pages/HRDashboard';
@@ -28,6 +41,21 @@ import { RecruitmentManagement } from '../../features/hr/pages/RecruitmentManage
 import { LeaveManagement } from '../../features/hr/pages/LeaveManagement';
 import { PayrollReports } from '../../features/hr/pages/PayrollReports';
 import { HRReports } from '../../features/hr/pages/HRReports';
+import { HRRecruitmentAnalytics } from '../../features/hr/pages/HRRecruitmentAnalytics';
+import { HRWorkforcePlanning } from '../../features/hr/pages/HRWorkforcePlanning';
+import { HRDepartments } from '../../features/hr/pages/HRDepartments';
+import { HRTeams } from '../../features/hr/pages/HRTeams';
+import { HRAttendanceOverview } from '../../features/hr/pages/HRAttendanceOverview';
+import { HRAttendanceHistory } from '../../features/hr/pages/HRAttendanceHistory';
+import { HRShifts } from '../../features/hr/pages/HRShifts';
+import { HRCorrections } from '../../features/hr/pages/HRCorrections';
+import { HRApprovals } from '../../features/hr/pages/HRApprovals';
+import { HRSkillsOverview } from '../../features/hr/pages/HRSkillsOverview';
+import { HRSkillsCoverage } from '../../features/hr/pages/HRSkillsCoverage';
+import { HRPerformanceOverview } from '../../features/hr/pages/HRPerformanceOverview';
+import { HRProductivityMetrics } from '../../features/hr/pages/HRProductivityMetrics';
+import { HRAuditLogs } from '../../features/hr/pages/HRAuditLogs';
+import { HRSettings } from '../../features/hr/pages/HRSettings';
 
 // Manager Dashboards & Pages
 import { ManagerDashboard } from '../../features/team-manager/pages/ManagerDashboard';
@@ -35,6 +63,11 @@ import { TeamAnalytics } from '../../features/team-manager/pages/TeamAnalytics';
 import { TeamReports } from '../../features/team-manager/pages/TeamReports';
 import { ApprovalsPage } from '../../features/team-manager/pages/ApprovalsPage';
 import { DeptHeadDashboard } from '../../features/team-manager/pages/DeptHeadDashboard';
+
+// Analytics Sub-pages
+import { ProductivityAnalyticsPage } from '../../features/analytics/pages/ProductivityAnalyticsPage';
+import { SkillsAnalyticsPage } from '../../features/analytics/pages/SkillsAnalyticsPage';
+import { RiskAnalyticsPage } from '../../features/analytics/pages/RiskAnalyticsPage';
 
 // Team Lead Dashboards & Pages
 import { TeamLeadDashboard } from '../../features/team-lead/pages/TeamLeadDashboard';
@@ -106,22 +139,22 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/admin/configuration" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<SystemConfiguration />} />} />
                 
                 {/* Placeholder Admin Pages */}
-                <Route path="/admin/productivity" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Productivity Analytics" />} />} />
-                <Route path="/admin/skills-gaps" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Skills Gaps Analytics" />} />} />
-                <Route path="/admin/risk" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Risk Analytics" />} />} />
-                <Route path="/admin/teams" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Teams Management" />} />} />
-                <Route path="/admin/organization" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Organization Hierarchy" />} />} />
-                <Route path="/admin/attendance-overview" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Attendance Overview" />} />} />
-                <Route path="/admin/attendance-history" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Attendance History Logs" />} />} />
-                <Route path="/admin/shifts" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Shifts & Rosters" />} />} />
-                <Route path="/admin/corrections" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Attendance Corrections Requests" />} />} />
-                <Route path="/admin/approvals" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Admin Approvals Queue" />} />} />
-                <Route path="/admin/skills-overview" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Skills Matrix Overview" />} />} />
-                <Route path="/admin/skills-coverage" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Skills Coverage Mapping" />} />} />
-                <Route path="/admin/performance-overview" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Performance Milestones" />} />} />
-                <Route path="/admin/productivity-metrics" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Productivity Benchmarking" />} />} />
-                <Route path="/admin/access-control" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Advanced Access Policies" />} />} />
-                <Route path="/admin/geofencing" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<PlaceholderPage title="Geofencing Coordinates Policy" />} />} />
+                <Route path="/admin/productivity" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<ProductivityAnalyticsPage />} />} />
+                <Route path="/admin/skills-gaps" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
+                <Route path="/admin/risk" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<RiskAnalyticsPage />} />} />
+                <Route path="/admin/teams" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<TeamsManagement />} />} />
+                <Route path="/admin/organization" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<OrganizationHierarchy />} />} />
+                <Route path="/admin/attendance-overview" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminAttendanceOverview />} />} />
+                <Route path="/admin/attendance-history" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminAttendanceHistory />} />} />
+                <Route path="/admin/shifts" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminShifts />} />} />
+                <Route path="/admin/corrections" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminCorrections />} />} />
+                <Route path="/admin/approvals" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminApprovals />} />} />
+                <Route path="/admin/skills-overview" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminSkillsOverview />} />} />
+                <Route path="/admin/skills-coverage" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminSkillsCoverage />} />} />
+                <Route path="/admin/performance-overview" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminPerformanceOverview />} />} />
+                <Route path="/admin/productivity-metrics" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminProductivityMetrics />} />} />
+                <Route path="/admin/access-control" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminAccessControl />} />} />
+                <Route path="/admin/geofencing" element={<RoleGuard allowedRoles={[Role.ADMIN]} children={<AdminGeofencing />} />} />
 
                 {/* ==================== 2. HR ROUTES ==================== */}
                 <Route path="/hr/dashboard" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRDashboard />} />} />
@@ -135,24 +168,24 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/hr/reports" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRReports />} />} />
                 
                 {/* Placeholder HR Pages */}
-                <Route path="/hr/recruitment-analytics" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Recruitment Analytics" />} />} />
-                <Route path="/hr/workforce-planning" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Workforce Planning" />} />} />
-                <Route path="/hr/productivity" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="HR Productivity Metrics" />} />} />
-                <Route path="/hr/skills-gaps" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Skills Gaps Audit" />} />} />
-                <Route path="/hr/risk" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="HR Risk Assessment" />} />} />
-                <Route path="/hr/departments" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Departments View" />} />} />
-                <Route path="/hr/teams" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Teams Structure" />} />} />
-                <Route path="/hr/attendance-overview" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Attendance KPI Overview" />} />} />
-                <Route path="/hr/attendance-history" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Attendance History Archives" />} />} />
-                <Route path="/hr/shifts" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Shift Scheduling" />} />} />
-                <Route path="/hr/corrections" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Corrections Register" />} />} />
-                <Route path="/hr/approvals" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="HR Approvals Dashboard" />} />} />
-                <Route path="/hr/skills-overview" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Skills Matrix" />} />} />
-                <Route path="/hr/skills-coverage" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Skills Coverage" />} />} />
-                <Route path="/hr/performance-overview" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Performance Evaluations" />} />} />
-                <Route path="/hr/productivity-metrics" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="Employee Productivity Logs" />} />} />
-                <Route path="/hr/audit-logs" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="HR Audit Logs" />} />} />
-                <Route path="/hr/settings" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<PlaceholderPage title="HR Platform Settings" />} />} />
+                <Route path="/hr/recruitment-analytics" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRRecruitmentAnalytics />} />} />
+                <Route path="/hr/workforce-planning" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRWorkforcePlanning />} />} />
+                <Route path="/hr/productivity" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<ProductivityAnalyticsPage />} />} />
+                <Route path="/hr/skills-gaps" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
+                <Route path="/hr/risk" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<RiskAnalyticsPage />} />} />
+                <Route path="/hr/departments" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRDepartments />} />} />
+                <Route path="/hr/teams" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRTeams />} />} />
+                <Route path="/hr/attendance-overview" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRAttendanceOverview />} />} />
+                <Route path="/hr/attendance-history" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRAttendanceHistory />} />} />
+                <Route path="/hr/shifts" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRShifts />} />} />
+                <Route path="/hr/corrections" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRCorrections />} />} />
+                <Route path="/hr/approvals" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRApprovals />} />} />
+                <Route path="/hr/skills-overview" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRSkillsOverview />} />} />
+                <Route path="/hr/skills-coverage" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRSkillsCoverage />} />} />
+                <Route path="/hr/performance-overview" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRPerformanceOverview />} />} />
+                <Route path="/hr/productivity-metrics" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRProductivityMetrics />} />} />
+                <Route path="/hr/audit-logs" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRAuditLogs />} />} />
+                <Route path="/hr/settings" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]} children={<HRSettings />} />} />
 
                 {/* ==================== 3. DEPARTMENT MANAGER ROUTES ==================== */}
                 <Route path="/manager/dashboard" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<ManagerDashboard />} />} />
@@ -163,18 +196,18 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/manager/approvals" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<ApprovalsPage />} />} />
                 <Route path="/manager/performance" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<TeamReports />} />} />
                 <Route path="/manager/reports" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<TeamReports />} />} />
-                <Route path="/manager/productivity" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<Productivity />} />} />
+                <Route path="/manager/productivity" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<ProductivityAnalyticsPage />} />} />
                 
                 {/* Placeholder Manager Pages */}
                 <Route path="/manager/attendance-analytics" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Team Attendance Trends" />} />} />
-                <Route path="/manager/skills-gaps" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Team Skills Gap Assessment" />} />} />
+                <Route path="/manager/skills-gaps" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
                 <Route path="/manager/team-members" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Direct Reports List" />} />} />
                 <Route path="/manager/team-overview" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Department Overview Map" />} />} />
                 <Route path="/manager/team-attendance" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Team Attendance Overview" />} />} />
                 <Route path="/manager/attendance-history" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Team Attendance History" />} />} />
                 <Route path="/manager/corrections" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Corrections Approvals Queue" />} />} />
                 <Route path="/manager/team-skills" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Team Skills Matrix" />} />} />
-                <Route path="/manager/skills-gaps-view" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Skills Gaps Analytics" />} />} />
+                <Route path="/manager/skills-gaps-view" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
                 <Route path="/manager/skills-coverage" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Department Skill Coverage" />} />} />
                 <Route path="/manager/team-performance" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Team Appraisals Dashboard" />} />} />
                 <Route path="/manager/productivity-metrics" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]} children={<PlaceholderPage title="Department Productivity Insights" />} />} />
@@ -191,7 +224,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/team-lead/dashboard" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<TeamLeadDashboard />} />} />
                 <Route path="/team-lead/tasks" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<TaskTrackingPage />} />} />
                 <Route path="/team-lead/attendance" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<MyAttendance />} />} />
-                <Route path="/team-lead/productivity" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<Productivity />} />} />
+                <Route path="/team-lead/productivity" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<ProductivityAnalyticsPage />} />} />
                 <Route path="/team-lead/performance" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<TeamMembersPage />} />} />
                 <Route path="/team-lead/feedback" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<FeedbackManagement />} />} />
                 
@@ -205,7 +238,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/team-lead/corrections" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<PlaceholderPage title="Team Corrections Requests" />} />} />
                 <Route path="/team-lead/approvals" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<PlaceholderPage title="Lead Approvals Center" />} />} />
                 <Route path="/team-lead/team-skills" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<PlaceholderPage title="Team Skills Map" />} />} />
-                <Route path="/team-lead/skills-gaps" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<PlaceholderPage title="Skills Gaps" />} />} />
+                <Route path="/team-lead/skills-gaps" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
                 <Route path="/team-lead/team-performance" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<PlaceholderPage title="Performance Reviews" />} />} />
                 <Route path="/team-lead/shifts" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<PlaceholderPage title="Shift Rotas" />} />} />
                 <Route path="/team-lead/reports" element={<RoleGuard allowedRoles={[Role.TEAM_LEAD, Role.ADMIN]} children={<PlaceholderPage title="Operational Performance Reports" />} />} />
@@ -233,15 +266,15 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/employee/break" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<MyAttendance />} />} />
                 <Route path="/employee/working-hours" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<PlaceholderPage title="Working Hours Log" />} />} />
                 <Route path="/employee/shifts" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<PlaceholderPage title="Shift Rosters & Calendars" />} />} />
-                <Route path="/employee/skills" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<PlaceholderPage title="My Professional Skills" />} />} />
-                <Route path="/employee/skills-coverage" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<PlaceholderPage title="My Competencies Coverage" />} />} />
-                <Route path="/employee/skills-gaps" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<PlaceholderPage title="My Skills Gap Identification" />} />} />
+                <Route path="/employee/skills" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
+                <Route path="/employee/skills-coverage" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
+                <Route path="/employee/skills-gaps" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<SkillsAnalyticsPage />} />} />
                 <Route path="/employee/corrections" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<PlaceholderPage title="My Correction Submissions" />} />} />
                 <Route path="/employee/settings" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]} children={<PlaceholderPage title="Employee Settings" />} />} />
 
                 {/* Dedicated Error Pages Routes */}
-                <Route path="/404" element={<NotFoundPage />} />
-                <Route path="/403" element={<AccessDeniedPage />} />
+                <Route path="/404" element={<RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]} children={<NotFoundPage />} />} />
+                <Route path="/403" element={<RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]} children={<AccessDeniedPage />} />} />
                 <Route path="/500" element={<ServerErrorPage />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
 
@@ -256,7 +289,7 @@ export const AppRoutes: React.FC = () => {
 
                 {/* Default Route Fallback */}
                 <Route path="/" element={<DefaultHomeRedirect />} />
-                <Route path="*" element={<NotFoundPage />} />
+                <Route path="*" element={<RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]} children={<NotFoundPage />} />} />
               </Routes>
             </MainLayout>
           </ProtectedRoute>
