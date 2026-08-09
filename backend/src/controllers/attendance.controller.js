@@ -264,12 +264,12 @@ export const reviewCorrection = (req, res) => {
 export const getCorrections = (req, res) => {
   const { role, id: employeeId, department } = req.user;
 
-  if (role === 'ADMIN' || role === 'HR') {
+  if (role === 'ADMIN' || role === 'HR' || role === 'HR_MANAGER') {
     db.all("SELECT * FROM corrections", [], (err, rows) => {
       if (err) return res.status(500).json({ success: false, message: err.message });
       return res.json({ success: true, data: rows });
     });
-  } else if (role === 'MANAGER' || role === 'TEAM_LEAD') {
+  } else if (role === 'MANAGER' || role === 'TEAM_MANAGER' || role === 'TEAM_LEAD') {
     db.all("SELECT * FROM corrections WHERE department = ?", [department], (err, rows) => {
       if (err) return res.status(500).json({ success: false, message: err.message });
       return res.json({ success: true, data: rows });

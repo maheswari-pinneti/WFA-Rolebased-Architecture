@@ -34,7 +34,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
       <EnterpriseHeader onToggleSidebar={toggleSidebar} onOpenHelp={() => setSupportModalOpen(true)} />
 
       {/* Main Body */}
-      <div className="main-body flex-1 flex overflow-hidden">
+      <div className="main-body flex-1 flex relative">
         {/* Sleek Dynamic Modular Sidebar Navigation */}
         <Sidebar
           collapsed={collapsed}
@@ -45,7 +45,9 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
         />
 
         {/* Main Content Region */}
-        <main className="app-main flex-1 overflow-y-auto p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+        <main className={`app-main flex-1 overflow-y-auto p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6 transition-all duration-300 ${
+          collapsed ? 'md:ml-[64px]' : 'md:ml-[250px]'
+        }`}>
           {children}
         </main>
       </div>

@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import db, { logAudit } from '../config/db.js';
 import * as mfaService from '../services/mfa.service.js';
 
-const JWT_SECRET = 'wfa_platform_secret_jwt_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'wfa_platform_secret_jwt_key_2026';
 
 export const login = (req, res) => {
   const { email } = req.body;

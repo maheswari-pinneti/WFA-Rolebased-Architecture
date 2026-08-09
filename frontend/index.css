@@ -455,8 +455,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .main-body { min-width: 0; }
 
 .app-sidebar {
-  top: 6.5rem !important;
-  height: calc(100vh - 6.5rem) !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  height: 100vh !important;
   background: linear-gradient(180deg, #0b1424 0%, #07101d 100%) !important;
   border-color: rgba(148, 163, 184, 0.12) !important;
   box-shadow: 14px 0 40px rgba(2, 8, 23, 0.18) !important;
@@ -553,7 +556,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 767px) {
   .app-main { padding: 1rem !important; }
   .app-header { height: 4rem !important; }
-  .app-sidebar { top: 6rem !important; height: calc(100vh - 6rem) !important; }
+  .app-sidebar { top: 0 !important; height: 100vh !important; }
   .dashboard-hero { padding: 1.25rem !important; }
 }
 

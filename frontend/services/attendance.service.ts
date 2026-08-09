@@ -109,7 +109,7 @@ class AttendanceService {
   }
 
   // Smart validation and state machine for check-in
-  checkIn(params: {
+  async checkIn(params: {
     employeeId: string;
     employeeName: string;
     department: string;
@@ -119,7 +119,7 @@ class AttendanceService {
     longitude?: number;
     accuracy?: number;
     idempotencyKey?: string;
-  }): AttendanceRecord {
+  }): Promise<AttendanceRecord> {
     // 1. Idempotency Check
     const records = this.getRecords();
     if (params.idempotencyKey) {
@@ -144,37 +144,16 @@ class AttendanceService {
       }
     }
 
-    // 4. Create record
-    const serverTime = this.getServerTime();
-    const newRecord: AttendanceRecord = {
-      id: Math.random().toString(36).substr(2, 9),
-      employeeId: params.employeeId,
-      employeeName: params.employeeName,
-      department: params.department,
-      date: serverTime.toISOString().split('T')[0],
-      checkInTime: serverTime.toISOString(),
-      checkOutTime: null,
-      breaks: [],
-      shiftType: params.shiftType,
-      workMode: params.workMode,
-      status: 'Checked In',
-      latitude: params.latitude,
-      longitude: params.longitude,
-      accuracy: params.accuracy,
-      idempotencyKey: params.idempotencyKey,
-    };
+    const res = await apiClient.post('/v1/attendance/check-in', params);
+    
+    // Update local store for offline sync cache
+    const updatedRecords = [res.data.data, ...records.filter(r => r.employeeId !== params.employeeId)];
+    this.saveRecords(updatedRecords);
 
-    records.push(newRecord);
-    this.saveRecords(records);
-    this.logAction(params.employeeId, 'CHECK_IN', `Checked in using ${params.workMode} mode on ${params.shiftType} shift`);
-
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/check-in', params).catch(() => {});
-
-    return newRecord;
+    return res.data.data;
   }
 
-  takeBreak(employeeId: string) {
+  async takeBreak(employeeId: string): Promise<void> {
     const records = this.getRecords();
     const index = records.findIndex((r) => r.employeeId === employeeId && r.status !== 'Checked Out');
     if (index === -1) throw new Error('No active check-in session found.');
@@ -182,64 +161,52 @@ class AttendanceService {
     const record = records[index];
     if (record.status === 'On Break') throw new Error('Already on break.');
 
+    await apiClient.post('/v1/attendance/break', { employeeId });
+
     record.status = 'On Break';
     record.breaks.push({
       start: this.getServerTime().toISOString(),
       end: null,
     });
-
     records[index] = record;
     this.saveRecords(records);
-    this.logAction(employeeId, 'BREAK_START', 'Started break');
-
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/break', { employeeId }).catch(() => {});
   }
 
-  resumeWork(employeeId: string) {
+  async resumeWork(employeeId: string): Promise<void> {
     const records = this.getRecords();
     const index = records.findIndex((r) => r.employeeId === employeeId && r.status === 'On Break');
     if (index === -1) throw new Error('Employee is not on an active break.');
+
+    await apiClient.post('/v1/attendance/resume', { employeeId });
 
     const record = records[index];
     const activeBreakIndex = record.breaks.findIndex((b) => b.end === null);
     if (activeBreakIndex !== -1) {
       record.breaks[activeBreakIndex].end = this.getServerTime().toISOString();
     }
-
     record.status = 'Working';
     records[index] = record;
     this.saveRecords(records);
-    this.logAction(employeeId, 'BREAK_END', 'Resumed work');
-
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/resume', { employeeId }).catch(() => {});
   }
 
-  checkOut(employeeId: string) {
+  async checkOut(employeeId: string): Promise<void> {
     const records = this.getRecords();
     const index = records.findIndex((r) => r.employeeId === employeeId && r.status !== 'Checked Out');
     if (index === -1) throw new Error('Check-out-before-check-in rejection. No active session found.');
 
+    await apiClient.post('/v1/attendance/check-out', { employeeId });
+
     const record = records[index];
-    
-    // Close break if active
     if (record.status === 'On Break') {
       const activeBreakIndex = record.breaks.findIndex((b) => b.end === null);
       if (activeBreakIndex !== -1) {
         record.breaks[activeBreakIndex].end = this.getServerTime().toISOString();
       }
     }
-
     record.checkOutTime = this.getServerTime().toISOString();
     record.status = 'Checked Out';
-
     records[index] = record;
     this.saveRecords(records);
-    this.logAction(employeeId, 'CHECK_OUT', 'Checked out from active session');
-
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/check-out', { employeeId }).catch(() => {});
   }
 
   // Offline queue mechanisms
@@ -258,7 +225,7 @@ class AttendanceService {
     this.saveOfflineQueue(queue);
   }
 
-  syncOfflineActions(): { syncedCount: number; errors: string[] } {
+  async syncOfflineActions(): Promise<{ syncedCount: number; errors: string[] }> {
     const queue = this.getOfflineQueue();
     const errors: string[] = [];
     let syncedCount = 0;
@@ -266,13 +233,13 @@ class AttendanceService {
     for (const action of queue) {
       try {
         if (action.type === 'CHECK_IN') {
-          this.checkIn(action.payload);
+          await this.checkIn(action.payload);
         } else if (action.type === 'BREAK_START') {
-          this.takeBreak(action.payload.employeeId);
+          await this.takeBreak(action.payload.employeeId);
         } else if (action.type === 'BREAK_END') {
-          this.resumeWork(action.payload.employeeId);
+          await this.resumeWork(action.payload.employeeId);
         } else if (action.type === 'CHECK_OUT') {
-          this.checkOut(action.payload.employeeId);
+          await this.checkOut(action.payload.employeeId);
         }
         syncedCount++;
       } catch (err: any) {

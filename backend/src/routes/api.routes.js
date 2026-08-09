@@ -12,9 +12,10 @@ router.post('/auth/login', authController.login);
 router.post('/auth/mfa-verify', authController.verifyMfa);
 
 // Employees Directory (enforces scope filter internally or via middleware)
+// Employees Directory CRUD Operations
 router.get('/employees', authenticateToken, enforceScope, (req, res) => {
   const { role, department } = req.user;
-  if (role === 'ADMIN' || role === 'HR') {
+  if (role === 'ADMIN' || role === 'HR' || role === 'HR_MANAGER') {
     db.all("SELECT * FROM employees", [], (err, rows) => {
       if (err) return res.status(500).json({ success: false, message: err.message });
       return res.json({ success: true, data: rows });
@@ -25,6 +26,48 @@ router.get('/employees', authenticateToken, enforceScope, (req, res) => {
       return res.json({ success: true, data: rows });
     });
   }
+});
+
+router.get('/employees/:id', authenticateToken, enforceScope, (req, res) => {
+  const { id } = req.params;
+  db.get("SELECT * FROM employees WHERE id = ?", [id], (err, row) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
+    if (!row) return res.status(404).json({ success: false, message: 'Employee not found' });
+    return res.json({ success: true, data: row });
+  });
+});
+
+router.post('/employees', authenticateToken, authorizeRoles(['ADMIN', 'HR', 'HR_MANAGER']), (req, res) => {
+  const { id, employeeCode, name, email, role, department, designation, status, avatar, joinDate, performanceScore, attendanceRate } = req.body;
+  db.run(
+    "INSERT INTO employees VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [id, employeeCode, name, email, role, department, designation, status, avatar, joinDate, performanceScore, attendanceRate],
+    (err) => {
+      if (err) return res.status(500).json({ success: false, message: err.message });
+      return res.status(211).json({ success: true, data: req.body });
+    }
+  );
+});
+
+router.put('/employees/:id', authenticateToken, authorizeRoles(['ADMIN', 'HR', 'HR_MANAGER']), (req, res) => {
+  const { id } = req.params;
+  const { name, role, department, designation, status } = req.body;
+  db.run(
+    "UPDATE employees SET name = ?, role = ?, department = ?, designation = ?, status = ? WHERE id = ?",
+    [name, role, department, designation, status, id],
+    (err) => {
+      if (err) return res.status(500).json({ success: false, message: err.message });
+      return res.json({ success: true });
+    }
+  );
+});
+
+router.delete('/employees/:id', authenticateToken, authorizeRoles(['ADMIN', 'HR', 'HR_MANAGER']), (req, res) => {
+  const { id } = req.params;
+  db.run("DELETE FROM employees WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
+    return res.json({ success: true });
+  });
 });
 
 // Attendance Punch & Session Routes
@@ -59,6 +102,14 @@ router.put('/users/:userId/role', authenticateToken, authorizeRoles(['ADMIN']), 
       if (err2 || !user) return res.status(404).json({ success: false, message: 'Updated user not found' });
       return res.json({ success: true, data: { ...user, permissions: JSON.parse(user.permissions || '[]') } });
     });
+  });
+});
+
+// Audit Logs (Admin/HR Only)
+router.get('/audit-logs', authenticateToken, authorizeRoles(['ADMIN', 'HR', 'HR_MANAGER']), (req, res) => {
+  db.all("SELECT * FROM audit_logs ORDER BY timestamp DESC LIMIT 500", [], (err, rows) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
+    return res.json({ success: true, data: rows });
   });
 });
 

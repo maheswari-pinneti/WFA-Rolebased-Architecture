@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'wfa_platform_secret_jwt_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'wfa_platform_secret_jwt_key_2026';
 
 export const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -28,15 +28,16 @@ export const authorizeRoles = (allowedRoles) => {
 export const enforceScope = (req, res, next) => {
   const { role, department, id: userId } = req.user;
   
-  // Admin can do anything Organization-wide
-  if (role === 'ADMIN' || role === 'HR') {
+  // ADMIN and HR_MANAGER have organization-wide permissions
+  if (role === 'ADMIN' || role === 'HR_MANAGER' || role === 'HR') {
     return next();
   }
 
-  // Employee can only access their own resources
+  // Retrieve target scopes from request parameters
   const targetEmployeeId = (req.query && req.query.employeeId) || (req.body && req.body.employeeId) || (req.params && req.params.employeeId);
   const targetDept = (req.query && req.query.department) || (req.body && req.body.department) || (req.params && req.params.department);
 
+  // EMPLOYEE is restricted to SELF
   if (role === 'EMPLOYEE') {
     if (targetEmployeeId && targetEmployeeId !== userId) {
       return res.status(403).json({ success: false, message: 'Access Denied: You can only access your own records.' });
@@ -44,14 +45,15 @@ export const enforceScope = (req, res, next) => {
     return next();
   }
 
-  // Manager/Team Lead can access their department records
-  if (role === 'MANAGER') {
+  // TEAM_MANAGER / MANAGER is restricted to their Department
+  if (role === 'TEAM_MANAGER' || role === 'MANAGER') {
     if (targetDept && targetDept !== department) {
       return res.status(403).json({ success: false, message: 'Access Denied: Scoped to your department only.' });
     }
     return next();
   }
 
+  // TEAM_LEAD is restricted to their Department AND Team
   if (role === 'TEAM_LEAD') {
     if (targetDept && targetDept !== department) {
       return res.status(403).json({ success: false, message: 'Access Denied: Scoped to your department only.' });

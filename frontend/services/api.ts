@@ -1,8 +1,14 @@
 import axios from 'axios';
 import { STORAGE_KEYS } from '../shared/constants/constants';
 
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && window.location) return '/api';
+  return 'http://localhost:5098'; // Fallback for unit testing environments
+};
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: getBaseURL(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

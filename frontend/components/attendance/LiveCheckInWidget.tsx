@@ -77,7 +77,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.checkIn(payload);
+      await attendanceService.checkIn(payload);
       dispatch(addNotification({ message: 'Checked in successfully!', type: 'success' }));
       
       // Overtime or Late arrival warning push
@@ -96,7 +96,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleTakeBreak = () => {
+  const handleTakeBreak = async () => {
     if (isOfflineMode) {
       attendanceService.enqueueOfflineAction({
         type: 'BREAK_START',
@@ -108,7 +108,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.takeBreak(employeeId);
+      await attendanceService.takeBreak(employeeId);
       dispatch(addNotification({ message: 'Break started.', type: 'info' }));
       dispatch(syncLocalData({ employeeId }));
     } catch (err: any) {
@@ -116,7 +116,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleResume = () => {
+  const handleResume = async () => {
     if (isOfflineMode) {
       attendanceService.enqueueOfflineAction({
         type: 'BREAK_END',
@@ -128,7 +128,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.resumeWork(employeeId);
+      await attendanceService.resumeWork(employeeId);
       dispatch(addNotification({ message: 'Resumed work.', type: 'success' }));
       dispatch(syncLocalData({ employeeId }));
     } catch (err: any) {
@@ -136,7 +136,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleCheckOut = () => {
+  const handleCheckOut = async () => {
     if (isOfflineMode) {
       attendanceService.enqueueOfflineAction({
         type: 'CHECK_OUT',
@@ -148,7 +148,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.checkOut(employeeId);
+      await attendanceService.checkOut(employeeId);
       dispatch(addNotification({ message: 'Checked out successfully!', type: 'success' }));
       dispatch(syncLocalData({ employeeId }));
     } catch (err: any) {
@@ -156,8 +156,8 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleSyncOffline = () => {
-    const res = attendanceService.syncOfflineActions();
+  const handleSyncOffline = async () => {
+    const res = await attendanceService.syncOfflineActions();
     if (res.errors.length > 0) {
       dispatch(addNotification({ message: `Sync completed with errors: ${res.errors.join(', ')}`, type: 'warning' }));
     } else {

@@ -55,7 +55,7 @@ npm install
 # 2. Run both backend and frontend dev servers concurrently
 npm run dev
 
-# 3. Run all 16 Vitest unit tests
+# 3. Run all 25 Vitest unit tests
 npm run test
 
 # 4. Build frontend code for production

@@ -479,7 +479,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside
         className={`app-sidebar ${
           isDark ? 'bg-[#0B1120] text-slate-100 border-slate-800 shadow-2xl' : 'bg-white text-slate-800 border-slate-200 shadow-md'
-        } border-r flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
+        } border-r flex flex-col shrink-0 fixed top-0 h-screen left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
           collapsed ? 'w-[64px]' : 'w-[250px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >

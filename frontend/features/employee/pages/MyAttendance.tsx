@@ -3,7 +3,10 @@ import { LiveCheckInWidget } from '../../../components/attendance/LiveCheckInWid
 import { AttendanceCalendarView } from '../../../components/attendance/AttendanceCalendarView';
 import { AttendanceChart } from '../../analytics/charts/AttendanceChart';
 
+import { useAuth } from '../../../auth/hooks/useAuth';
+
 export const MyAttendance: React.FC = () => {
+  const { user } = useAuth();
   const history = [
     { date: 'Aug 4, 2026', in: '09:00 AM', out: '06:00 PM', hours: '09h 00m', mode: 'OFFICE', status: 'PRESENT' },
     { date: 'Aug 3, 2026', in: '08:55 AM', out: '06:15 PM', hours: '09h 20m', mode: 'OFFICE', status: 'PRESENT' },
@@ -20,7 +23,7 @@ export const MyAttendance: React.FC = () => {
       </div>
 
       {/* Live Check-In / Check-Out Widget */}
-      <LiveCheckInWidget employeeName="Alex Mercer" department="Engineering & Technology" />
+      <LiveCheckInWidget employeeName={user?.name || 'Employee'} department={user?.department || 'Engineering'} />
 
       {/* Monthly Attendance Calendar */}
       <AttendanceCalendarView />

@@ -42,18 +42,18 @@ export const OrganizationHierarchy: React.FC = () => {
         <div className="glass-panel p-8 flex flex-col items-center space-y-8 overflow-x-auto min-w-full">
           {/* Level 1: CEO / Executive Admin */}
           <div className="flex flex-col items-center">
-            <OrgNode title="VP of System Architecture" name="Sarah Connor" role="System Administrator (Level 5)" dept="Executive" />
+            <OrgNode title="System Administrator" name="Sarah Connor" role="ADMIN (Level 5)" dept="Executive" />
             <div className="w-0.5 h-8 bg-slate-800 my-2"></div>
           </div>
 
           {/* Level 2: HRVP / Dept Managers */}
           <div className="flex flex-wrap justify-center gap-8 relative w-full max-w-4xl">
             <div className="flex flex-col items-center">
-              <OrgNode title="VP of HR Operations" name="Elena Rostova" role="HR Operations Manager (Level 4)" dept="Human Resources" />
+              <OrgNode title="VP of HR Operations" name="Elena Rostova" role="HR (Level 4)" dept="Human Resources" />
             </div>
 
             <div className="flex flex-col items-center">
-              <OrgNode title="Department Manager" name="David Sterling" role="Department Manager (Level 3)" dept="Engineering & Tech" />
+              <OrgNode title="Department Manager" name="David Sterling" role="MANAGER (Level 3)" dept="Engineering" />
             </div>
           </div>
 
@@ -65,11 +65,11 @@ export const OrganizationHierarchy: React.FC = () => {
           {/* Level 3: Team Lead / Lead Developers */}
           <div className="flex flex-wrap justify-center gap-8 w-full max-w-4xl">
             <div className="flex flex-col items-center">
-              <OrgNode title="Team Lead (TL)" name="Marcus Vance" role="Team Lead (Level 2)" dept="Frontend Team" />
+              <OrgNode title="Team Lead" name="Marcus Vance" role="TEAM_LEAD (Level 2)" dept="Engineering" />
             </div>
             
             <div className="flex flex-col items-center">
-              <OrgNode title="Lead Developer / Advisor" name="Alex Mercer" role="Lead Engineer (Level 1)" dept="Engineering & Tech" />
+              <OrgNode title="Full Stack Developer" name="Alex Mercer" role="EMPLOYEE (Level 1)" dept="Engineering" />
             </div>
           </div>
         </div>
