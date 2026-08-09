@@ -1,6 +1,6 @@
 # Enterprise Workforce Analytics Intelligence Platform
 
-An enterprise-grade, production-ready Workforce Analytics and Intelligence Platform featuring full **Role-Based Access Control (RBAC)**, **Attribute-Based Access Control (ABAC)**, and **Policy-Based Access Control (PBAC)** built with a unified full-stack architecture (**React 18 + Node.js/Express + SQLite**).
+An Enterprise-oriented Workforce Analytics and Intelligence Platform with RBAC, ABAC/PBAC, MFA, attendance management, geofencing, audit logging, offline synchronization, and analytics built with a unified full-stack architecture (**React 18 + Node.js/Express + SQLite**).
 
 ---
 
