@@ -1,10 +1,10 @@
 export const colors = {
   primary: {
-    50: '#eef2ff',
-    100: '#e0e7ff',
-    500: '#3b82f6',
-    600: '#2563eb', // Primary actions & active navigation (#2563EB)
-    700: '#1d4ed8',
+    50: '#ecfdf5',
+    100: '#d1fae5',
+    500: '#10b981',
+    600: '#059669', // Primary actions & active navigation
+    700: '#047857',
   },
   secondary: {
     DEFAULT: '#0f172a', // Headers & dark surfaces (#0F172A)

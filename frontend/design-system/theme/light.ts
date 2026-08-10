@@ -5,5 +5,5 @@ export const lightTheme = {
   border: '#e2e8f0',
   textPrimary: '#0f172a',
   textSecondary: '#475569',
-  accent: '#4f46e5',
+  accent: '#059669',
 };

@@ -5,5 +5,5 @@ export const darkTheme = {
   border: '#1f2937',
   textPrimary: '#f9fafb',
   textSecondary: '#9ca3af',
-  accent: '#6366f1',
+  accent: '#34d399',
 };

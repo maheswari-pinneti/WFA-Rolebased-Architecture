@@ -15,10 +15,10 @@
   --text-secondary: #334155;
   --text-muted: #64748b;
   
-  --stackly-blue: #2563eb;
-  --stackly-blue-hover: #1d4ed8;
-  --stackly-navy: #1e3a8a;
-  --accent-cyan: #0284c7;
+  --stackly-blue: #059669;
+  --stackly-blue-hover: #047857;
+  --stackly-navy: #064e3b;
+  --accent-cyan: #059669;
   --accent-teal: #0d9488;
   
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
@@ -41,9 +41,9 @@
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
   
-  --stackly-blue: #3b82f6;
-  --stackly-blue-hover: #2563eb;
-  --stackly-navy: #1e3a8a;
+  --stackly-blue: #34d399;
+  --stackly-blue-hover: #10b981;
+  --stackly-navy: #064e3b;
 }
 
 * {
@@ -101,7 +101,7 @@ input[type="search"]:focus,
 select:focus,
 textarea:focus {
   border-color: var(--stackly-blue);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25);
 }
 
 /* Hide default browser password reveal and clear indicators */
@@ -254,7 +254,7 @@ input::-webkit-credentials-auto-fill-button {
 
 .glass-panel:hover {
   box-shadow: var(--shadow-md);
-  border-color: rgba(37, 99, 235, 0.4);
+  border-color: rgba(5, 150, 105, 0.4);
 }
 
 /* Explicit Button CSS Engine */
@@ -278,14 +278,14 @@ input::-webkit-credentials-auto-fill-button {
 .btn-lg { padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 12px; }
 
 .btn-primary {
-  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
   color: #ffffff;
-  border-color: rgba(37, 99, 235, 0.5);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  border-color: rgba(5, 150, 105, 0.5);
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.45);
   transform: translateY(-1px);
 }
 
@@ -1048,6 +1048,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .app-sidebar.sidebar-accent-manager { --sidebar-accent: #22d3ee; --sidebar-accent-strong: #0891b2; --sidebar-accent-soft: rgba(34, 211, 238, 0.15); --sidebar-ink: #cffafe; }
 .app-sidebar.sidebar-accent-team-lead { --sidebar-accent: #2dd4bf; --sidebar-accent-strong: #0f766e; --sidebar-accent-soft: rgba(45, 212, 191, 0.15); --sidebar-ink: #ccfbf1; }
 .app-sidebar.sidebar-accent-employee { --sidebar-accent: #34d399; --sidebar-accent-strong: #059669; --sidebar-accent-soft: rgba(52, 211, 153, 0.15); --sidebar-ink: #d1fae5; }
+.app-sidebar.sidebar-accent-emerald { --sidebar-accent: #34d399; --sidebar-accent-strong: #059669; --sidebar-accent-soft: rgba(52, 211, 153, 0.15); --sidebar-ink: #d1fae5; }
 
 [data-theme='light'] .app-sidebar {
   background: linear-gradient(180deg, #ffffff 0%, #f7faff 58%, #f3f7fc 100%) !important;
@@ -1229,6 +1230,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .sidebar-nav-link:hover .sidebar-icon-shell { border-color: color-mix(in srgb, var(--sidebar-accent) 24%, transparent); background: color-mix(in srgb, var(--sidebar-accent) 12%, transparent); }
 .sidebar-nav-link.is-active .sidebar-icon-shell { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.13); }
+.app-sidebar .sidebar-icon-shell > svg { color: var(--sidebar-accent) !important; }
 .sidebar-nav-link.is-active .sidebar-icon-shell svg { color: #ffffff !important; }
 .sidebar-link-label { color: inherit; }
 .sidebar-link-arrow { color: var(--text-muted); opacity: 0; transform: translateX(-3px); transition: opacity 160ms ease, transform 160ms ease; }
@@ -1304,4 +1306,41 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 767px) {
   .app-sidebar.sidebar-is-expanded { width: min(86vw, 20rem) !important; min-width: min(86vw, 20rem) !important; }
   .app-sidebar.sidebar-is-collapsed { width: 78px !important; min-width: 78px !important; }
+}
+
+/* Shared emerald visual language for every protected dashboard. */
+.emerald-theme {
+  --dashboard-accent: #10b981;
+  --dashboard-accent-strong: #059669;
+  --dashboard-accent-soft: rgba(16, 185, 129, 0.12);
+}
+.emerald-theme .dashboard-hero {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 52%, #022c22 100%) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+.emerald-theme [class*="text-blue-"],
+.emerald-theme [class*="text-indigo-"],
+.emerald-theme [class*="text-purple-"],
+.emerald-theme [class*="text-cyan-"],
+.emerald-theme [class*="text-teal-"] {
+  color: var(--dashboard-accent) !important;
+}
+.emerald-theme [class*="border-blue-"],
+.emerald-theme [class*="border-indigo-"],
+.emerald-theme [class*="border-purple-"],
+.emerald-theme [class*="border-cyan-"],
+.emerald-theme [class*="border-teal-"] {
+  border-color: rgba(52, 211, 153, 0.3) !important;
+}
+.emerald-theme [class*="bg-blue-"],
+.emerald-theme [class*="bg-indigo-"],
+.emerald-theme [class*="bg-purple-"],
+.emerald-theme [class*="bg-cyan-"],
+.emerald-theme [class*="bg-teal-"] {
+  background-color: var(--dashboard-accent-soft) !important;
+}
+.emerald-theme [class*="bg-blue-600"],
+.emerald-theme [class*="bg-indigo-600"],
+.emerald-theme [class*="bg-purple-600"] {
+  background-color: var(--dashboard-accent-strong) !important;
 }
