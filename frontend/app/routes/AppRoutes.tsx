@@ -140,6 +140,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/employee/dashboard" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.TEAM_LEAD, Role.MANAGER, Role.HR, Role.ADMIN]}><EmployeeDashboard /></RoleGuard>} />
                 <Route path="/employee/profile" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.TEAM_LEAD, Role.MANAGER, Role.HR, Role.ADMIN]}><Profile /></RoleGuard>} />
                 <Route path="/employee/attendance" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]}><MyAttendance /></RoleGuard>} />
+                <Route path="/employee/check-in-out" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]}><MyAttendance /></RoleGuard>} />
                 <Route path="/employee/leave" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]}><EmployeeRequestsPage /></RoleGuard>} />
                 <Route path="/employee/performance" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]}><MyPerformance /></RoleGuard>} />
                 <Route path="/employee/goals" element={<RoleGuard allowedRoles={[Role.EMPLOYEE, Role.ADMIN]}><MyGoalsPage /></RoleGuard>} />
