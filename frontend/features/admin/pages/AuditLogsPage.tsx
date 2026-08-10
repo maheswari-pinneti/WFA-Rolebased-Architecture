@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { History, ShieldAlert, Download, Search, Filter, Terminal } from 'lucide-react';
+import { History, Download } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 import { analyticsApi } from '../../../api/endpoints/analytics.api';
 

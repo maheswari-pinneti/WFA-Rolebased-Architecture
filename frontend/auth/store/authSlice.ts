@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState, User } from '../types/auth.types';
 import { authService } from '../services/auth.service';
 import { Role } from '../../security/roles/roles';
-import { PERMISSION_MATRIX } from '../../security/policies/permissionMatrix';
 
 const initialSession = authService.getStoredSession();
 
@@ -37,11 +36,6 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setRole: (state, action: PayloadAction<Role>) => {
-      // Role is issued by the backend and must never be changed client-side.
-      void state;
-      void action;
-    },
     clearError: (state) => {
       state.error = null;
     },
@@ -114,5 +108,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setRole, clearError, logoutAction, loginSuccessAction } = authSlice.actions;
+export const { clearError, logoutAction, loginSuccessAction } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { MessageSquare, Plus, Star, User, Calendar } from 'lucide-react';
+import { MessageSquare, Plus, Star, User } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 
 export const FeedbackManagement: React.FC = () => {

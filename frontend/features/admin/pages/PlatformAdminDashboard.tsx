@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, Sliders, ToggleLeft, ToggleRight, Cpu, Zap, Activity, CheckCircle2 } from 'lucide-react';
+import { Layers, Sliders, ToggleLeft, ToggleRight, Cpu, Zap, CheckCircle2 } from 'lucide-react';
 
 export const PlatformAdminDashboard: React.FC = () => {
   const [featureFlags, setFeatureFlags] = useState([

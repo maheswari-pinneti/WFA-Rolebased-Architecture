@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import { filterByDepartment } from '../../utils/filterByDepartment';
-import { Download, FileSpreadsheet } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 interface CSVExportProps {
   data: any[];

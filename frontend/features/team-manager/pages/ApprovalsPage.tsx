@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, XCircle, Clock, AlertCircle, Search, Filter } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { LeaveRequest, workforceApi } from '../../../api/endpoints/workforce.api';
 
 export const ApprovalsPage: React.FC = () => {

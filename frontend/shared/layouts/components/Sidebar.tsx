@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useTheme } from '../../../design-system/theme/theme';
@@ -12,7 +12,6 @@ import {
   TrendingUp,
   BarChart3,
   Sliders,
-  CheckCircle2,
   Zap,
   User,
   FileText,
@@ -20,10 +19,8 @@ import {
   FileSpreadsheet,
   History,
   Briefcase,
-  DollarSign,
   ClipboardList,
   UserCog,
-  PieChart,
   Network,
   Globe,
   Calendar,
@@ -47,6 +44,8 @@ import {
   Moon,
   Sun,
   ChevronRight,
+  Search,
+  X,
 } from 'lucide-react';
 
 export interface NavigationItem {
@@ -89,6 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { role } = useAuth();
   const location = useLocation();
+  const [navigationQuery, setNavigationQuery] = useState('');
 
   // Clean Navigation Structure
   const roleCategorizedNavMap: Record<Role, NavigationCategory[]> = {
@@ -465,6 +465,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const roleLabel = ROLE_LABELS[activeRole] || ROLE_LABELS[Role.EMPLOYEE];
   const isDark = theme === 'dark';
 
+  const visibleCategories = (() => {
+    const query = navigationQuery.trim().toLowerCase();
+    if (!query) return currentCategories;
+
+    return currentCategories
+      .map((category) => ({
+        ...category,
+        items: category.items.filter((item) =>
+          `${category.category} ${item.label}`.toLowerCase().includes(query)
+        ),
+      }))
+      .filter((category) => category.items.length > 0);
+  })();
+
   const getBadgeStyle = (variant: 'blue' | 'purple' | 'amber' | 'emerald' | 'rose') => {
     switch (variant) {
       case 'blue':
@@ -543,11 +557,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span>{roleLabel}</span>
             </div>
           )}
+
+          {!collapsed && (
+            <div className="relative mt-3">
+              <Search
+                size={15}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="search"
+                value={navigationQuery}
+                onChange={(event) => setNavigationQuery(event.target.value)}
+                placeholder="Search navigation"
+                aria-label="Search navigation"
+                className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] py-2 pl-9 pr-9 text-xs font-semibold text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--sidebar-accent)]"
+              />
+              {navigationQuery && (
+                <button
+                  type="button"
+                  onClick={() => setNavigationQuery('')}
+                  aria-label="Clear navigation search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:text-[var(--text-primary)]"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar Navigation Items List */}
         <nav className="sidebar-nav sidebar-nav-scroll flex-1 overflow-y-auto w-full scrollbar-thin">
-          {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
+          {visibleCategories.map((cat: NavigationCategory, groupIdx: number) => {
             return (
               <React.Fragment key={groupIdx}>
                 {/* Subtle Divider Line Between Logical Groups */}
@@ -629,6 +671,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </React.Fragment>
             );
           })}
+          {visibleCategories.length === 0 && (
+            <p className="px-3 py-6 text-center text-xs font-semibold text-[var(--text-muted)]">
+              No navigation items found.
+            </p>
+          )}
         </nav>
 
         <div className={`sidebar-footer ${collapsed ? 'is-collapsed' : ''}`}>

@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { useTheme } from '../../design-system/theme/theme';
-import { Layers } from 'lucide-react';
+import React from 'react';
 
 interface StacklyLogoProps {
   size?: number;
@@ -17,16 +15,6 @@ export const StacklyLogo: React.FC<StacklyLogoProps> = ({
   useImg = true,
   textColor = 'text-slate-800 dark:text-white',
 }) => {
-  let theme = 'dark';
-  try {
-    const themeContext = useTheme();
-    theme = themeContext.theme;
-  } catch {
-    theme = 'dark';
-  }
-
-  const isDark = theme === 'dark';
-
   if (useImg) {
     return (
       <div className={`inline-flex items-center shrink-0 gap-2.5 transition-all duration-300 ${className}`}>

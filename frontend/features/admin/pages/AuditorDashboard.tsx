@@ -1,5 +1,5 @@
 import React from 'react';
-import { History, ShieldCheck, Lock, FileText, CheckCircle2 } from 'lucide-react';
+import { History, ShieldCheck, Lock, FileText } from 'lucide-react';
 import { auditLogger } from '../../../security/audit/auditLogger';
 
 export const AuditorDashboard: React.FC = () => {

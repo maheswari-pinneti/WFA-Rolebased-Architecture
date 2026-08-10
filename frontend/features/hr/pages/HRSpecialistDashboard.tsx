@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Calendar, Briefcase, Clock, FileSpreadsheet, CheckCircle2 } from 'lucide-react';
+import { Users, Calendar, Briefcase, Clock, FileSpreadsheet } from 'lucide-react';
 
 export const HRSpecialistDashboard: React.FC = () => {
   const candidates = [

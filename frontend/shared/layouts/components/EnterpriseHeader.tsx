@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useTheme } from '../../../design-system/theme/theme';
@@ -21,7 +21,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import ChatIcon from '@mui/icons-material/Chat';
 import HelpIcon from '@mui/icons-material/Help';
 import HomeIcon from '@mui/icons-material/Home';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LayersIcon from '@mui/icons-material/Layers';
 
 interface EnterpriseHeaderProps {
@@ -53,7 +52,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
 
   // Scope & Modal States
   const [showPermissionsPreview, setShowPermissionsPreview] = useState(false);
-  const [deptToast, setDeptToast] = useState<string | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const searchResultsMap = [
@@ -115,14 +113,6 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
     <header className={`app-header h-16 px-4 flex items-center justify-between sticky top-0 z-40 w-full shrink-0 transition-colors border-b overflow-visible ${
       isDark ? 'bg-[#0B1120] border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
     }`}>
-      {/* Toast Notification for Scope Change */}
-      {deptToast && (
-        <div className="absolute top-18 right-6 bg-slate-900 border border-blue-500/40 text-blue-300 text-xs px-4 py-2 rounded-xl shadow-2xl z-50 flex items-center gap-2 font-bold animate-fadeIn">
-          <CheckCircleIcon className="text-emerald-400" style={{ fontSize: 16 }} />
-          <span>{deptToast}</span>
-        </div>
-      )}
-
       {/* LEFT SECTION: Logo & Breadcrumb Navigation */}
       <div className="header-brand flex items-center gap-3 md:gap-4 shrink-0 min-w-0">
 

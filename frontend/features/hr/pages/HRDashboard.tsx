@@ -8,7 +8,7 @@ import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillD
 import { EmployeeTable } from '../../../components/tables/EmployeeTable';
 import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
-import { UserCheck, Users, Briefcase, FileText, Plus, Clock, HeartHandshake, Star, AlertTriangle, DollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { UserCheck, Users, Briefcase, FileText, Plus, Clock, HeartHandshake, Star, AlertTriangle, DollarSign, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const HRDashboard: React.FC = () => {

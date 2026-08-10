@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { Building2, Plus, Users, DollarSign, Edit3, Trash2, ArrowUpRight } from 'lucide-react';
+import { Building2, Plus, Edit3, Trash2 } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 
 export const DepartmentsManagement: React.FC = () => {

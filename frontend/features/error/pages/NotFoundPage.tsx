@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FileQuestion, ArrowLeft, Home, Search } from 'lucide-react';
+import { FileQuestion, ArrowLeft, Home } from 'lucide-react';
 import { StacklyLogo } from '../../../components/common/StacklyLogo';
 
 export const NotFoundPage: React.FC = () => {

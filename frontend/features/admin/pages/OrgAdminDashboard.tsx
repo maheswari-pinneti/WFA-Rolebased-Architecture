@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, MapPin, Users, GitBranch, ArrowUpRight } from 'lucide-react';
+import { Building2, MapPin, Users, GitBranch } from 'lucide-react';
 
 export const OrgAdminDashboard: React.FC = () => {
   const departments = [

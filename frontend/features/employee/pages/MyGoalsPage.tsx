@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { Target, Plus, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { Target, Plus, Clock } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 
 export const MyGoalsPage: React.FC = () => {

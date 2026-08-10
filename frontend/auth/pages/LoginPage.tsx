@@ -9,13 +9,11 @@ import {
   AlertCircle,
   ArrowRight,
   ShieldCheck,
-  Sparkles,
   Lock,
   User,
   Hash,
   Briefcase,
   ChevronDown,
-  ChevronUp,
   Eye,
   EyeOff
 } from 'lucide-react';

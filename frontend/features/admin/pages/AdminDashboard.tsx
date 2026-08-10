@@ -34,7 +34,6 @@ import { Link } from 'react-router-dom';
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
-  const [timeRange, setTimeRange] = useState<'Day' | 'Week' | 'Month'>('Month');
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
     setDrillDownData({
@@ -95,7 +94,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Global Filter Bar */}
-        <AdvancedFilterBar onFilterChange={() => {}} />
+        <AdvancedFilterBar />
 
         {/* EXECUTIVE WORKFORCE KPI METRICS (EXACTLY 8 CARDS - 4 COLS X 2 ROWS) */}
         <div>

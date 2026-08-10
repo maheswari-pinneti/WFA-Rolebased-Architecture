@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Calendar, Clock, Send, ShieldAlert, CheckCircle2, XCircle } from 'lucide-react';
+import { Calendar, Send, CheckCircle2, XCircle } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { attendanceService, CorrectionRequest } from '../../services/attendance.service';
+import { attendanceService } from '../../services/attendance.service';
 import { syncLocalData, addNotification } from '../../store/attendanceSlice';
 import { RootState } from '../../app/store';
 

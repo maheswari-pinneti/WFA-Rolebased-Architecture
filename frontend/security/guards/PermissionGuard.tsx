@@ -1,19 +1,16 @@
 import React from 'react';
 import { Permission } from '../permissions/permissions';
 import { usePermission } from '../../shared/hooks/usePermission';
-import { ResourceTarget } from '../scopes/dataScope';
 import { ShieldAlert } from 'lucide-react';
 
 interface PermissionGuardProps {
   requiredPermission: Permission;
-  targetResource?: ResourceTarget;
   fallback?: React.ReactNode;
   children: React.ReactNode;
 }
 
 export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   requiredPermission,
-  targetResource,
   fallback,
   children,
 }) => {

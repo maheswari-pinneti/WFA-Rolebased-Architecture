@@ -4,7 +4,6 @@ import { Search, X } from 'lucide-react';
 export interface AdvancedFilterBarProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
-  onFilterChange?: (filter: any) => void;
   placeholder?: string;
   onClear?: () => void;
   children?: React.ReactNode;
@@ -13,7 +12,6 @@ export interface AdvancedFilterBarProps {
 export const AdvancedFilterBar: React.FC<AdvancedFilterBarProps> = ({
   searchQuery = '',
   onSearchChange,
-  onFilterChange,
   placeholder = 'Filter records...',
   onClear,
   children,

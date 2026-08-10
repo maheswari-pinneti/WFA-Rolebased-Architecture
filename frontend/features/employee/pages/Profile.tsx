@@ -5,7 +5,6 @@ import { getRoleBadgeClass } from '../../../shared/utils/helpers';
 import {
   User as UserIcon,
   Mail,
-  Briefcase,
   Building2,
   Calendar,
   MapPin,
@@ -14,7 +13,6 @@ import {
   FileText,
   Settings,
   Download,
-  CheckCircle2,
   LogOut as LogOutIcon,
   ChevronLeft,
   ChevronRight,
@@ -71,7 +69,6 @@ export const Profile: React.FC = () => {
     setSelectedYear(today.getFullYear().toString());
   };
 
-  const [isGsiLoaded, setIsGsiLoaded] = useState(false);
   const [clientId, setClientId] = useState(() => localStorage.getItem('google_calendar_client_id') || '');
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('google_calendar_token') || '');
   const [events, setEvents] = useState<any[]>([]);
@@ -80,7 +77,6 @@ export const Profile: React.FC = () => {
 
   useEffect(() => {
     if (document.getElementById('google-gsi-client')) {
-      setIsGsiLoaded(true);
       return;
     }
     const script = document.createElement('script');
@@ -88,8 +84,8 @@ export const Profile: React.FC = () => {
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    script.onload = () => setIsGsiLoaded(true);
     document.body.appendChild(script);
+    return () => script.remove();
   }, []);
 
   const fetchCalendarEvents = async (token: string) => {
@@ -477,7 +473,6 @@ export const Profile: React.FC = () => {
                   {/* Day numbers */}
                   {days.map((day) => {
                     const dayOfWeek = (day + firstDayOfWeek) % 7; // Correct weekday index
-                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                     const isToday = day === 5 && selectedMonth === 'August' && selectedYear === '2026';
                     
                     const status = getDayStatus(day, dayOfWeek);

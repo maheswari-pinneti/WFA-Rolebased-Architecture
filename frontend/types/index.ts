@@ -1,5 +1,4 @@
 import { Role } from '../security/roles/roles';
-import { Permission } from '../security/permissions/permissions';
 
 export interface UserProfile {
   id: string;

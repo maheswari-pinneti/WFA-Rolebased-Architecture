@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { UserCheck, Mail, MapPin, Zap, CheckCircle2, Shield } from 'lucide-react';
 import { employeeApi } from '../../../api/endpoints/employee.api';
 import { workforceApi, Task } from '../../../api/endpoints/workforce.api';
 import { Employee } from '../../../shared/types/common.types';

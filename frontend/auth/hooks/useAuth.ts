@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../app/store';
-import { loginUserThunk, logoutUserThunk, logoutAction, setRole, clearError, loginSuccessAction } from '../store/authSlice';
+import { loginUserThunk, logoutUserThunk, logoutAction, clearError, loginSuccessAction } from '../store/authSlice';
 import { Role } from '../../security/roles/roles';
 import { authService } from '../services/auth.service';
 
@@ -21,7 +21,6 @@ export const useAuth = () => {
     dispatch(logoutUserThunk());
   };
 
-  const switchRole = (_role: Role) => undefined;
   const dismissError = () => dispatch(clearError());
 
   return {
@@ -29,7 +28,6 @@ export const useAuth = () => {
     login,
     verifyMfa,
     logout,
-    switchRole,
     dismissError,
     role: authState.user?.role || Role.EMPLOYEE,
     permissions: authState.user?.permissions || [],

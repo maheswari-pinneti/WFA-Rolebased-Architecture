@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { MapPin, Plus, Globe, Clock, Users, Building } from 'lucide-react';
+import { MapPin, Plus, Globe, Clock, Users } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 
 export const LocationsManagement: React.FC = () => {

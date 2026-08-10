@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { FileText, CheckCircle2, XCircle, Clock, Calendar, Shield } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 import { LeaveRequest, workforceApi } from '../../../api/endpoints/workforce.api';
 

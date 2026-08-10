@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Check, X, ShieldAlert, AlertCircle, Filter } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { Role } from '../../security/roles/roles';
-import { attendanceService, CorrectionRequest } from '../../services/attendance.service';
+import { attendanceService } from '../../services/attendance.service';
 import { syncLocalData, addNotification } from '../../store/attendanceSlice';
 import { RootState } from '../../app/store';
 

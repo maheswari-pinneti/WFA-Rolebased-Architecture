@@ -3,7 +3,7 @@ import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
 import { PERMISSION_MATRIX } from '../../../security/policies/permissionMatrix';
-import { Shield, Check, Lock } from 'lucide-react';
+import { Check, Lock } from 'lucide-react';
 
 export const RoleManagement: React.FC = () => {
   const roles = Object.values(Role);

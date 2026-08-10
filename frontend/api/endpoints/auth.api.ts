@@ -1,5 +1,4 @@
 import { apiClient } from '../../services/api';
-import { User } from '../../auth/types/auth.types';
 
 export const authApi = {
   login: async (email: string): Promise<any> => {

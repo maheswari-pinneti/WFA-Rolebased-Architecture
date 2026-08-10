@@ -1,5 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { ServerCrash, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { ServerCrash, RefreshCw } from 'lucide-react';
 import { StacklyLogo } from '../../components/common/StacklyLogo';
 
 interface Props {

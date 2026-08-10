@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Clock, Play, Square, Coffee, MapPin, CheckCircle2, ShieldAlert, Wifi, WifiOff } from 'lucide-react';
+import { Play, Square, Coffee, Wifi, WifiOff } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { attendanceService, OFFICE_COORDS, getDistance } from '../../services/attendance.service';
+import { attendanceService, OFFICE_COORDS } from '../../services/attendance.service';
 import { syncLocalData, addNotification, fetchAttendanceDataThunk } from '../../store/attendanceSlice';
 import { RootState, AppDispatch } from '../../app/store';
 import { analyticsApi } from '../../api/endpoints/analytics.api';
@@ -35,7 +35,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
   ]);
 
   // Redux state
-  const { activeRecord, records, isOffline, offlineQueueLength } = useSelector(
+  const { activeRecord, offlineQueueLength } = useSelector(
     (state: RootState) => state.attendance
   );
 

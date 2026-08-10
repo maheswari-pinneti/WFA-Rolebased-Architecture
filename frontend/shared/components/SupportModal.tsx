@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   ExternalLink,
   MessageSquare,
-  HelpCircle,
   Clock
 } from 'lucide-react';
 

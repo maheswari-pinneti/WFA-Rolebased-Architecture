@@ -11,7 +11,7 @@ import { AttendanceCalendarView } from '../../../components/attendance/Attendanc
 
 import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
-import { Clock, Calendar, FileText, Compass, DollarSign, Target } from 'lucide-react';
+import { Clock, Calendar, FileText, Compass, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const EmployeeDashboard: React.FC = () => {

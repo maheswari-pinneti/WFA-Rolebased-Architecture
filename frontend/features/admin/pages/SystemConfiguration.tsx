@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { Layers, Sliders, Database, ShieldCheck, Save, Server, Key } from 'lucide-react';
+import { Layers, ShieldCheck, Save, Server } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 
 export const SystemConfiguration: React.FC = () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
-import { DollarSign, FileSpreadsheet, Download, TrendingUp, ShieldCheck } from 'lucide-react';
+import { DollarSign, Download } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 
 export const PayrollReports: React.FC = () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, ArrowUpRight, TrendingUp } from 'lucide-react';
+import { Activity, ArrowUpRight } from 'lucide-react';
 
 interface AnalyticsWidgetProps {
   title: string;

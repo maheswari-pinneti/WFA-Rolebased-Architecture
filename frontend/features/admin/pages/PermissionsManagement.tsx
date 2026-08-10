@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
-import { Lock, Shield, Key, Search } from 'lucide-react';
+import { Lock, Key, Search } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 
 export const PermissionsManagement: React.FC = () => {

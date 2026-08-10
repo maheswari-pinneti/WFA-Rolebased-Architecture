@@ -10,7 +10,7 @@ export const ExportReport: React.FC<ExportReportProps> = ({ title = 'Export Anal
   const [downloading, setDownloading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleExport = (format: 'CSV' | 'JSON') => {
+  const handleExport = () => {
     setDownloading(true);
     setSuccess(false);
     setTimeout(() => {
@@ -46,7 +46,7 @@ export const ExportReport: React.FC<ExportReportProps> = ({ title = 'Export Anal
                 size="sm"
                 isLoading={downloading}
                 icon={<Download size={14} />}
-                onClick={() => handleExport('CSV')}
+                onClick={handleExport}
               >
                 Export CSV
               </Button>
@@ -55,7 +55,7 @@ export const ExportReport: React.FC<ExportReportProps> = ({ title = 'Export Anal
                 size="sm"
                 isLoading={downloading}
                 icon={<Download size={14} />}
-                onClick={() => handleExport('JSON')}
+                onClick={handleExport}
               >
                 Export JSON
               </Button>
