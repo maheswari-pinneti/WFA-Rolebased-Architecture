@@ -9,6 +9,8 @@ interface AttendanceState {
   auditLogs: AuditLog[];
   isOffline: boolean;
   offlineQueueLength: number;
+  isLoading: boolean;
+  error: string | null;
   notifications: Array<{ id: string; message: string; type: 'info' | 'warning' | 'success'; timestamp: string }>;
 }
 
@@ -19,6 +21,8 @@ const initialState: AttendanceState = {
   auditLogs: [],
   isOffline: !navigator.onLine,
   offlineQueueLength: 0,
+  isLoading: false,
+  error: null,
   notifications: [],
 };
 
@@ -34,6 +38,10 @@ export const fetchAttendanceDataThunk = createAsyncThunk(
       const correctionsRes = await apiClient.get('/v1/attendance/corrections');
       if (correctionsRes.data && correctionsRes.data.success) {
         attendanceService.saveCorrections(correctionsRes.data.data);
+      }
+      const auditRes = await apiClient.get('/v1/attendance/audit-logs');
+      if (auditRes.data && auditRes.data.success) {
+        localStorage.setItem('wfa_attendance_audit', JSON.stringify(auditRes.data.data));
       }
     } catch (err) {
       console.warn('Offline or unable to fetch from server, fallback to local storage cache.', err);

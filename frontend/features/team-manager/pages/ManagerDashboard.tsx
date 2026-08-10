@@ -1,30 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
-
-// Custom Manager Charts
-import { DepartmentOverviewBar } from '../../analytics/charts/DepartmentOverviewBar';
-import { PerformanceRadar } from '../../analytics/charts/PerformanceRadar';
-import { AttendanceAnalyticsArea } from '../../analytics/charts/AttendanceAnalyticsArea';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
+import { workforceApi } from '../../../api/endpoints/workforce.api';
 
 import { Briefcase, Users, CheckCircle2, XCircle, Clock, Zap, Star, FileText, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const ManagerDashboard: React.FC = () => {
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
-  const [approvals, setApprovals] = useState([
-    { id: 'REQ-101', employee: 'Alex Mercer', type: 'Annual Leave Request', duration: '3 Days (Aug 5 - Aug 8)', reason: 'Family vacation', status: 'PENDING' },
-    { id: 'REQ-102', employee: 'Samantha Wu', type: 'Equipment Expense', duration: '$450.00', reason: 'Ergonomic Chair & Monitor Arm', status: 'PENDING' },
-    { id: 'REQ-103', employee: 'Rachel Kim', type: 'Conference Travel', duration: '$1,200.00', reason: 'React Summit 2026', status: 'PENDING' },
-  ]);
+  const [approvals, setApprovals] = useState<Array<{ id: string; employee: string; type: string; duration: string; reason: string; status: 'PENDING' | 'APPROVED' | 'REJECTED' }>>([]);
 
-  const handleAction = (id: string, status: 'APPROVED' | 'REJECTED') => {
-    setApprovals((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status } : item))
-    );
+  const loadApprovals = async () => {
+    const requests = await workforceApi.getLeaveRequests();
+    setApprovals(requests.map((request) => ({
+      id: request.id,
+      employee: request.employeeName,
+      type: request.type,
+      duration: `${request.startDate} - ${request.endDate}`,
+      reason: request.reason,
+      status: request.status
+    })));
+  };
+
+  useEffect(() => { void loadApprovals().catch(() => setApprovals([])); }, []);
+
+  const handleAction = async (id: string, status: 'APPROVED' | 'REJECTED') => {
+    try {
+      await workforceApi.reviewLeaveRequest(id, status);
+      await loadApprovals();
+    } catch {
+      // The API remains the source of truth; the next load keeps the desk consistent.
+    }
   };
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
@@ -66,7 +76,7 @@ export const ManagerDashboard: React.FC = () => {
           </div>
         </div>
 
-
+        <AnalyticsOverview title="Department Intelligence" subtitle="Real-time analytics limited to your authenticated department scope" compact />
 
         {/* 8 Reusable Manager KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -189,7 +199,7 @@ export const ManagerDashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {approvals.map((req) => (
+            {approvals.length === 0 ? <p className="text-sm text-[var(--text-muted)] md:col-span-3">No leave requests are waiting in your department.</p> : approvals.map((req) => (
               <div key={req.id} className="p-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-sm text-[var(--text-primary)]">{req.employee}</span>
@@ -202,13 +212,13 @@ export const ManagerDashboard: React.FC = () => {
                   {req.status === 'PENDING' ? (
                     <>
                       <button
-                        onClick={() => handleAction(req.id, 'APPROVED')}
+                        onClick={() => void handleAction(req.id, 'APPROVED')}
                         className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
                       >
                         <CheckCircle2 size={14} /> Approve
                       </button>
                       <button
-                        onClick={() => handleAction(req.id, 'REJECTED')}
+                        onClick={() => void handleAction(req.id, 'REJECTED')}
                         className="px-3 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 font-bold text-xs flex items-center gap-1.5 transition-all"
                       >
                         <XCircle size={14} /> Reject
@@ -223,31 +233,6 @@ export const ManagerDashboard: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Section 2: Department Sub-Team Productivity & Radar */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Zap size={18} className="text-indigo-400" /> Sub-Team Productive Output & Allocation
-            </h3>
-            <DepartmentOverviewBar />
-          </div>
-
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Star size={18} className="text-purple-400" /> Department Skill Matrix & Radar Score
-            </h3>
-            <PerformanceRadar />
-          </div>
-        </div>
-
-        {/* Section 3: Attendance Analytics Area Chart */}
-        <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-          <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-            <Clock size={18} className="text-cyan-400" /> Department Shift Attendance & Overtime Analytics
-          </h3>
-          <AttendanceAnalyticsArea />
         </div>
 
         {/* Drill-Down Modal */}

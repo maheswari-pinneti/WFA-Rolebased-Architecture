@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import db, { ORGANIZATION_ID } from '../config/db.js';
 
 const JWT_SECRET = 'wfa_platform_secret_jwt_key_2026';
 
@@ -10,7 +11,7 @@ export const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ success: false, message: 'Invalid or expired token' });
-    req.user = user;
+    req.user = { ...user, organizationId: user.organizationId || ORGANIZATION_ID };
     next();
   });
 };
@@ -24,18 +25,36 @@ export const authorizeRoles = (allowedRoles) => {
   };
 };
 
+export const authorizePermissions = (allowedPermissions) => {
+  return (req, res, next) => {
+    const permissions = Array.isArray(req.user?.permissions) ? req.user.permissions : [];
+    if (req.user?.role === 'ADMIN' || allowedPermissions.some((permission) => permissions.includes(permission))) {
+      return next();
+    }
+    return res.status(403).json({ success: false, message: 'Access Denied: Required permission is missing.' });
+  };
+};
+
 // Check if request complies with organization, department, and employee scopes
 export const enforceScope = (req, res, next) => {
-  const { role, department, id: userId } = req.user;
+  const { role, department, team, id: userId, organizationId = ORGANIZATION_ID } = req.user;
   
-  // Admin can do anything Organization-wide
+  const targetOrganization = (req.query && (req.query.organizationId || req.query.orgId))
+    || (req.body && (req.body.organizationId || req.body.orgId));
+
+  if (targetOrganization && targetOrganization !== organizationId) {
+    return res.status(403).json({ success: false, message: 'Access Denied: Cross-organization access is forbidden.' });
+  }
+
+  // Admin and HR can access any record inside their organization.
   if (role === 'ADMIN' || role === 'HR') {
     return next();
   }
 
   // Employee can only access their own resources
-  const targetEmployeeId = (req.query && req.query.employeeId) || (req.body && req.body.employeeId) || (req.params && req.params.employeeId);
+  const targetEmployeeId = (req.query && req.query.employeeId) || (req.body && req.body.employeeId) || (req.params && (req.params.employeeId || req.params.id));
   const targetDept = (req.query && req.query.department) || (req.body && req.body.department) || (req.params && req.params.department);
+  const targetTeam = (req.query && req.query.team) || (req.body && req.body.team) || (req.params && req.params.team);
 
   if (role === 'EMPLOYEE') {
     if (targetEmployeeId && targetEmployeeId !== userId) {
@@ -44,23 +63,36 @@ export const enforceScope = (req, res, next) => {
     return next();
   }
 
-  // Manager/Team Lead can access their department records
-  if (role === 'MANAGER') {
+  // Manager and Team Lead targets are checked against the server-side employee record,
+  // rather than trusting a client-supplied department/team value.
+  if (role === 'MANAGER' || role === 'TEAM_LEAD') {
     if (targetDept && targetDept !== department) {
       return res.status(403).json({ success: false, message: 'Access Denied: Scoped to your department only.' });
     }
-    return next();
-  }
-
-  if (role === 'TEAM_LEAD') {
-    if (targetDept && targetDept !== department) {
-      return res.status(403).json({ success: false, message: 'Access Denied: Scoped to your department only.' });
-    }
-    const targetTeam = (req.query && req.query.team) || (req.body && req.body.team) || (req.params && req.params.team);
-    if (targetTeam && req.user.team && targetTeam !== req.user.team) {
+    if (targetTeam && role === 'TEAM_LEAD' && targetTeam !== team) {
       return res.status(403).json({ success: false, message: 'Access Denied: Scoped to your team only.' });
     }
-    return next();
+
+    if (!targetEmployeeId) return next();
+
+    return db.get(
+      `SELECT department, team, organizationId FROM employees WHERE id = ?
+       UNION ALL SELECT department, team, organizationId FROM users WHERE id = ? LIMIT 1`,
+      [targetEmployeeId, targetEmployeeId],
+      (err, target) => {
+        if (err) return res.status(500).json({ success: false, message: 'Unable to validate access scope.' });
+        if (!target || target.organizationId !== organizationId) {
+          return res.status(403).json({ success: false, message: 'Access Denied: Target is outside your organization.' });
+        }
+        if (target.department !== department) {
+          return res.status(403).json({ success: false, message: 'Access Denied: Scoped to your department only.' });
+        }
+        if (role === 'TEAM_LEAD' && target.team !== team) {
+          return res.status(403).json({ success: false, message: 'Access Denied: Scoped to your team only.' });
+        }
+        return next();
+      }
+    );
   }
 
   return res.status(403).json({ success: false, message: 'Access Denied: Invalid scopes.' });

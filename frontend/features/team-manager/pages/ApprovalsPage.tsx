@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckCircle2, XCircle, Clock, AlertCircle, Search, Filter } from 'lucide-react';
+import { LeaveRequest, workforceApi } from '../../../api/endpoints/workforce.api';
 
 export const ApprovalsPage: React.FC = () => {
-  const [approvals, setApprovals] = useState([
-    { id: 'REQ-101', employee: 'Alex Mercer', type: 'Annual Leave Request', duration: '3 Days (Aug 5 - Aug 8)', reason: 'Family vacation', date: '2 hours ago', status: 'PENDING' },
-    { id: 'REQ-102', employee: 'Samantha Wu', type: 'Equipment Expense', duration: '$450.00', reason: 'Ergonomic Chair & Monitor Arm', date: '5 hours ago', status: 'PENDING' },
-    { id: 'REQ-103', employee: 'Marcus Vance', type: 'Overtime Claim', duration: '12 Hours (Project Launch)', reason: 'Q3 Release Deployment', date: '1 day ago', status: 'APPROVED' },
-    { id: 'REQ-104', employee: 'Rachel Kim', type: 'Remote Work Request', duration: '2 Weeks (Aug 15 - Aug 30)', reason: 'Relocation transition', date: '2 days ago', status: 'REJECTED' },
-  ]);
+  type ApprovalItem = LeaveRequest & { employee: string; duration: string; date: string };
+  const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
 
-  const handleAction = (id: string, status: 'APPROVED' | 'REJECTED') => {
-    setApprovals((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status } : item))
-    );
+  const loadApprovals = async () => {
+    const requests = await workforceApi.getLeaveRequests();
+    setApprovals(requests.map((request) => ({
+      ...request,
+      employee: request.employeeName,
+      duration: `${request.startDate} - ${request.endDate}`,
+      date: new Date(request.createdAt).toLocaleString()
+    })));
+  };
+
+  useEffect(() => { void loadApprovals().catch(() => setApprovals([])); }, []);
+
+  const handleAction = async (id: string, status: 'APPROVED' | 'REJECTED') => {
+    await workforceApi.reviewLeaveRequest(id, status);
+    await loadApprovals();
   };
 
   return (
@@ -30,7 +38,7 @@ export const ApprovalsPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-mono font-bold">
-            2 Action Items Pending
+            {approvals.filter((request) => request.status === 'PENDING').length} Action Items Pending
           </span>
         </div>
       </div>
@@ -65,13 +73,13 @@ export const ApprovalsPage: React.FC = () => {
                 {req.status === 'PENDING' ? (
                   <>
                     <button
-                      onClick={() => handleAction(req.id, 'APPROVED')}
+                      onClick={() => void handleAction(req.id, 'APPROVED')}
                       className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
                     >
                       <CheckCircle2 size={14} /> Approve
                     </button>
                     <button
-                      onClick={() => handleAction(req.id, 'REJECTED')}
+                      onClick={() => void handleAction(req.id, 'REJECTED')}
                       className="px-3 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 font-bold text-xs flex items-center gap-1.5 transition-all"
                     >
                       <XCircle size={14} /> Reject

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PerformanceChart } from '../../analytics/charts/PerformanceChart';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 import { Star, Award, Target } from 'lucide-react';
 
 export const MyPerformance: React.FC = () => {
@@ -39,7 +39,7 @@ export const MyPerformance: React.FC = () => {
         </div>
       </div>
 
-      <PerformanceChart />
+      <AnalyticsOverview title="My Live Performance Analytics" subtitle="Personal performance trend, productivity and workforce skills" compact />
     </div>
   );
 };

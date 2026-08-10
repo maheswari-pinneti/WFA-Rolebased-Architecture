@@ -28,7 +28,7 @@ export const CorrectionRequests: React.FC = () => {
   // Filter requests to show only current employee's requests
   const myRequests = corrections.filter((c) => c.employeeId === employeeId);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!date || !checkIn || !checkOut || !reason) {
       dispatch(addNotification({ message: 'Please fill in all details.', type: 'warning' }));
@@ -36,7 +36,7 @@ export const CorrectionRequests: React.FC = () => {
     }
 
     try {
-      attendanceService.submitCorrectionRequest({
+      await attendanceService.submitCorrectionRemote({
         employeeId,
         employeeName,
         department,

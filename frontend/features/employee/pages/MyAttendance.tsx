@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../../app/store';
+import { fetchAttendanceDataThunk } from '../../../store/attendanceSlice';
+import { useAuth } from '../../../auth/hooks/useAuth';
 import { LiveCheckInWidget } from '../../../components/attendance/LiveCheckInWidget';
 import { AttendanceCalendarView } from '../../../components/attendance/AttendanceCalendarView';
-import { AttendanceChart } from '../../analytics/charts/AttendanceChart';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 export const MyAttendance: React.FC = () => {
-  const history = [
-    { date: 'Aug 4, 2026', in: '09:00 AM', out: '06:00 PM', hours: '09h 00m', mode: 'OFFICE', status: 'PRESENT' },
-    { date: 'Aug 3, 2026', in: '08:55 AM', out: '06:15 PM', hours: '09h 20m', mode: 'OFFICE', status: 'PRESENT' },
-    { date: 'Aug 2, 2026', in: '--', out: '--', hours: '00h 00m', mode: 'WEEKEND', status: 'WEEKEND' },
-    { date: 'Aug 1, 2026', in: '--', out: '--', hours: '00h 00m', mode: 'WEEKEND', status: 'WEEKEND' },
-    { date: 'Jul 31, 2026', in: '09:05 AM', out: '05:45 PM', hours: '08h 40m', mode: 'REMOTE', status: 'PRESENT' },
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useAuth();
+  const { records } = useSelector((state: RootState) => state.attendance);
+
+  useEffect(() => {
+    if (user?.id) dispatch(fetchAttendanceDataThunk(user.id));
+  }, [dispatch, user?.id]);
+
+  const history = records.map((record) => ({
+    date: new Date(record.date).toLocaleDateString(),
+    in: new Date(record.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    out: record.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Active',
+    hours: `${record.checkOutTime ? Math.max(0, (new Date(record.checkOutTime).getTime() - new Date(record.checkInTime).getTime()) / 3600000).toFixed(2) : '—'} hrs`,
+    mode: record.workMode,
+    status: record.status
+  }));
 
   return (
     <div className="space-y-6 animate-fadeIn font-sans pb-10">
@@ -20,13 +33,12 @@ export const MyAttendance: React.FC = () => {
       </div>
 
       {/* Live Check-In / Check-Out Widget */}
-      <LiveCheckInWidget employeeName="Alex Mercer" department="Engineering & Technology" />
+      <LiveCheckInWidget />
 
       {/* Monthly Attendance Calendar */}
       <AttendanceCalendarView />
 
-      {/* Analytics Chart */}
-      <AttendanceChart />
+      <AnalyticsOverview title="My Attendance Analytics" subtitle="Personal attendance trends and authorized workforce context" compact />
 
       {/* Table */}
       <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4">
@@ -53,7 +65,7 @@ export const MyAttendance: React.FC = () => {
                   <td className="py-3 px-4"><span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">{h.mode}</span></td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                      h.status === 'PRESENT' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
+                      h.status === 'Checked In' || h.status === 'Working' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
                     }`}>
                       {h.status}
                     </span>

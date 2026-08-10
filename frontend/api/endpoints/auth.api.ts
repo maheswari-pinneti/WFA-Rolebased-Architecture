@@ -3,7 +3,7 @@ import { User } from '../../auth/types/auth.types';
 
 export const authApi = {
   login: async (email: string): Promise<any> => {
-    const response = await apiClient.post('/v1/auth/login', { email });
+    const response = await apiClient.post('/v1/auth/login', { email: email.trim().toLowerCase() });
     if (response.data && response.data.success) {
       return response.data.data;
     }

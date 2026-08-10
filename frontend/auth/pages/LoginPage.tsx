@@ -144,14 +144,14 @@ export const LoginPage: React.FC = () => {
   const handleSendCode = async () => {
     setError('');
     setSuccessMsg('');
-    const emailDomain = email.toLowerCase();
+    const emailDomain = email.trim().toLowerCase();
     if (!emailDomain.endsWith('@thestackly.com') && !emailDomain.endsWith('@company.com')) {
       setError('Only official @thestackly.com or @company.com company email addresses are permitted.');
       return;
     }
     setIsLoading(true);
     try {
-      const res = (await authService.login(email)) as any;
+      const res = (await authService.login(email.trim())) as any;
       if (res.requiresMfa) {
         setTempToken(res.tempToken);
         if (res.otpDevHint) {
@@ -173,7 +173,7 @@ export const LoginPage: React.FC = () => {
     setError('');
     setSuccessMsg('');
 
-    const emailDomain = email.toLowerCase();
+    const emailDomain = email.trim().toLowerCase();
     if (!emailDomain.endsWith('@thestackly.com') && !emailDomain.endsWith('@company.com')) {
       setError('Only official @thestackly.com or @company.com company email addresses are permitted.');
       return;
@@ -181,7 +181,7 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = (await authService.login(email)) as any;
+      const res = (await authService.login(email.trim())) as any;
       if (res.requiresMfa) {
         setTempToken(res.tempToken);
         if (res.otpDevHint) {

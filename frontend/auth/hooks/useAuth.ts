@@ -21,7 +21,7 @@ export const useAuth = () => {
     dispatch(logoutUserThunk());
   };
 
-  const switchRole = (role: Role) => dispatch(setRole(role));
+  const switchRole = (_role: Role) => undefined;
   const dismissError = () => dispatch(clearError());
 
   return {

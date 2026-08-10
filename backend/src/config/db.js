@@ -5,291 +5,410 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const dbDir = path.join(__dirname, '..', '..', '..', 'database');
+
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
+const ORGANIZATION_ID = 'org-stackly';
 const dbName = process.env.DB_NAME || 'wfa.db';
 const dbPath = path.join(dbDir, dbName);
 const db = new sqlite3.Database(dbPath);
 
-export const initDb = () => {
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      // 1. Create Users Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS users (
-          id TEXT PRIMARY KEY,
-          name TEXT,
-          email TEXT UNIQUE,
-          password_hash TEXT,
-          role TEXT,
-          department TEXT,
-          team TEXT,
-          location TEXT,
-          title TEXT,
-          clearanceLevel INTEGER,
-          status TEXT,
-          permissions TEXT,
-          mfa_enabled INTEGER DEFAULT 1
-        )
-      `);
+const run = (sql, params = []) => new Promise((resolve, reject) => {
+  db.run(sql, params, function onRun(err) {
+    if (err) reject(err);
+    else resolve(this);
+  });
+});
 
-      // 2. Create Employees Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS employees (
-          id TEXT PRIMARY KEY,
-          employeeCode TEXT UNIQUE,
-          name TEXT,
-          email TEXT UNIQUE,
-          role TEXT,
-          department TEXT,
-          designation TEXT,
-          status TEXT,
-          avatar TEXT,
-          joinDate TEXT,
-          performanceScore REAL,
-          attendanceRate REAL
-        )
-      `);
+const get = (sql, params = []) => new Promise((resolve, reject) => {
+  db.get(sql, params, (err, row) => (err ? reject(err) : resolve(row)));
+});
 
-      // 3. Create Attendance Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS attendance_records (
-          id TEXT PRIMARY KEY,
-          employeeId TEXT,
-          employeeName TEXT,
-          department TEXT,
-          date TEXT,
-          checkInTime TEXT,
-          checkOutTime TEXT,
-          breaks TEXT, -- JSON array of breaks
-          shiftType TEXT,
-          workMode TEXT,
-          status TEXT,
-          latitude REAL,
-          longitude REAL,
-          accuracy REAL,
-          idempotencyKey TEXT UNIQUE
-        )
-      `);
+const all = (sql, params = []) => new Promise((resolve, reject) => {
+  db.all(sql, params, (err, rows) => (err ? reject(err) : resolve(rows)));
+});
 
-      // 4. Create Corrections Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS corrections (
-          id TEXT PRIMARY KEY,
-          employeeId TEXT,
-          employeeName TEXT,
-          department TEXT,
-          date TEXT,
-          requestedCheckIn TEXT,
-          requestedCheckOut TEXT,
-          reason TEXT,
-          status TEXT,
-          managerComment TEXT,
-          reviewedBy TEXT,
-          createdAt TEXT
-        )
-      `);
+const prepareAndRun = (sql, rows) => new Promise((resolve, reject) => {
+  const statement = db.prepare(sql, (prepareError) => {
+    if (prepareError) reject(prepareError);
+  });
 
-      // 5. Create Audit Logs Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS audit_logs (
-          id TEXT PRIMARY KEY,
-          timestamp TEXT,
-          employeeId TEXT,
-          action TEXT,
-          details TEXT
-        )
-      `);
+  rows.forEach((row) => statement.run(row));
+  statement.finalize((finalizeError) => (finalizeError ? reject(finalizeError) : resolve()));
+});
 
-      // 5.5 Create MFA Challenges Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS mfa_challenges (
-          email TEXT PRIMARY KEY,
-          otp_hash TEXT,
-          expires_at TEXT,
-          attempts_count INTEGER,
-          created_at TEXT,
-          status TEXT
-        )
-      `);
+const ensureColumn = async (table, column, definition) => {
+  const columns = await all(`PRAGMA table_info(${table})`);
+  if (!columns.some((item) => item.name === column)) {
+    await run(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+};
 
-      // 6. Create Shifts Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS shifts (
-          id TEXT PRIMARY KEY,
-          name TEXT,
-          startTime TEXT, -- HH:MM
-          endTime TEXT,
-          gracePeriodMinutes INTEGER
-        )
-      `);
+const createSchema = async () => {
+  await run(`CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT,
+    role TEXT NOT NULL,
+    department TEXT,
+    team TEXT,
+    location TEXT,
+    title TEXT,
+    clearanceLevel INTEGER DEFAULT 1,
+    status TEXT DEFAULT 'ACTIVE',
+    permissions TEXT DEFAULT '[]',
+    mfa_enabled INTEGER DEFAULT 1,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
 
-      // 7. Create Skills Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS skills (
-          id TEXT PRIMARY KEY,
-          employeeId TEXT,
-          skillName TEXT,
-          level INTEGER, -- 1 to 5
-          isTopSkill INTEGER,
-          isMissingSkill INTEGER
-        )
-      `);
+  await run(`CREATE TABLE IF NOT EXISTS employees (
+    id TEXT PRIMARY KEY,
+    employeeCode TEXT UNIQUE,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE,
+    role TEXT,
+    department TEXT,
+    designation TEXT,
+    status TEXT,
+    avatar TEXT,
+    joinDate TEXT,
+    performanceScore REAL,
+    attendanceRate REAL,
+    team TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
 
-      // 8. Create Performance Records Table
-      db.run(`
-        CREATE TABLE IF NOT EXISTS performance_records (
-          id TEXT PRIMARY KEY,
-          employeeId TEXT,
-          quarter TEXT,
-          kpiScore REAL,
-          targetScore REAL
-        )
-      `);
+  await run(`CREATE TABLE IF NOT EXISTS attendance_records (
+    id TEXT PRIMARY KEY,
+    employeeId TEXT NOT NULL,
+    employeeName TEXT,
+    department TEXT,
+    date TEXT,
+    checkInTime TEXT,
+    checkOutTime TEXT,
+    breaks TEXT DEFAULT '[]',
+    shiftType TEXT,
+    workMode TEXT,
+    status TEXT,
+    latitude REAL,
+    longitude REAL,
+    accuracy REAL,
+    idempotencyKey TEXT UNIQUE,
+    team TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
 
-      // Seed core users if empty
-      db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
-        if (err) return reject(err);
-        if (row.count === 0) {
-          const passHash = "$2a$10$T81n17/iPq6XhN.Wz96tqOuXvP9w7bC4T5uVbX2Rj7qD1yI/3K22.";
-          const users = [
-            {
-              id: "usr-admin-01",
-              name: "Sarah Connor",
-              email: "admin@thestackly.com",
-              password_hash: passHash,
-              role: "ADMIN",
-              department: "Executive",
-              team: "System Architecture",
-              location: "Global HQ",
-              title: "System Administrator",
-              clearanceLevel: 5,
-              status: "ACTIVE",
-              permissions: JSON.stringify(["USER_CREATE", "USER_UPDATE", "USER_DELETE", "USER_MANAGE", "ROLE_CREATE", "ROLE_UPDATE", "ROLE_DELETE", "ROLE_MANAGE", "PERMISSION_ASSIGN", "EMPLOYEE_VIEW_ALL", "EMPLOYEE_CREATE", "EMPLOYEE_UPDATE", "EMPLOYEE_DELETE", "REPORT_VIEW_ALL", "REPORT_EXPORT", "SYSTEM_SETTINGS_MANAGE", "SYSTEM_CONFIG", "AUDIT_LOG_VIEW", "VIEW_ALL_DATA"])
-            },
-            {
-              id: "usr-hr-01",
-              name: "Elena Rostova",
-              email: "hr@thestackly.com",
-              password_hash: passHash,
-              role: "HR",
-              department: "Human Resources",
-              team: "People Operations",
-              location: "New York",
-              title: "VP of HR Operations",
-              clearanceLevel: 4,
-              status: "ACTIVE",
-              permissions: JSON.stringify(["EMPLOYEE_VIEW", "EMPLOYEE_CREATE", "EMPLOYEE_UPDATE", "EMPLOYEE_PROFILE_MANAGE", "ATTENDANCE_VIEW_ALL", "ATTENDANCE_MANAGE", "LEAVE_APPROVE", "PERFORMANCE_MANAGE", "RECRUITMENT_MANAGE", "REPORT_GENERATE", "EMPLOYEE_MANAGE", "REPORT_VIEW", "TEAM_ANALYTICS_VIEW"])
-            },
-            {
-              id: "usr-mgr-01",
-              name: "David Sterling",
-              email: "manager@thestackly.com",
-              password_hash: passHash,
-              role: "MANAGER",
-              department: "Engineering",
-              team: "Frontend & Backend",
-              location: "San Francisco",
-              title: "Department Manager",
-              clearanceLevel: 3,
-              status: "ACTIVE",
-              permissions: JSON.stringify(["TEAM_VIEW", "TEAM_ANALYTICS_VIEW", "EMPLOYEE_VIEW_TEAM", "ATTENDANCE_VIEW_TEAM", "LEAVE_APPROVE", "PERFORMANCE_REVIEW", "TASK_ASSIGN", "REPORT_VIEW_TEAM"])
-            },
-            {
-              id: "usr-lead-01",
-              name: "Marcus Vance",
-              email: "lead@thestackly.com",
-              password_hash: passHash,
-              role: "TEAM_LEAD",
-              department: "Engineering",
-              team: "Frontend Team",
-              location: "San Francisco",
-              title: "Team Lead (TL)",
-              clearanceLevel: 2,
-              status: "ACTIVE",
-              permissions: JSON.stringify(["TEAM_MEMBER_VIEW", "TEAM_VIEW", "TASK_ASSIGN", "TASK_TRACK", "ATTENDANCE_VIEW_TEAM", "PRODUCTIVITY_VIEW", "FEEDBACK_CREATE", "PERFORMANCE_FEEDBACK"])
-            },
-            {
-              id: "usr-emp-01",
-              name: "Alex Mercer",
-              email: "employee@thestackly.com",
-              password_hash: passHash,
-              role: "EMPLOYEE",
-              department: "Engineering",
-              team: "Frontend Team",
-              location: "San Francisco",
-              title: "Full Stack Developer",
-              clearanceLevel: 1,
-              status: "ACTIVE",
-              permissions: JSON.stringify(["PROFILE_VIEW", "PROFILE_UPDATE", "ATTENDANCE_VIEW_SELF", "LEAVE_REQUEST", "PERFORMANCE_VIEW_SELF", "GOAL_UPDATE", "DOCUMENT_UPLOAD"])
-            }
-          ];
+  await run(`CREATE TABLE IF NOT EXISTS corrections (
+    id TEXT PRIMARY KEY,
+    employeeId TEXT NOT NULL,
+    employeeName TEXT,
+    department TEXT,
+    date TEXT,
+    requestedCheckIn TEXT,
+    requestedCheckOut TEXT,
+    reason TEXT,
+    status TEXT,
+    managerComment TEXT,
+    reviewedBy TEXT,
+    createdAt TEXT,
+    team TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
 
-          const stmt = db.prepare("INSERT OR IGNORE INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
-          users.forEach(u => {
-            stmt.run(u.id, u.name, u.email, u.password_hash, u.role, u.department, u.team, u.location, u.title, u.clearanceLevel, u.status, u.permissions);
-          });
-          stmt.finalize();
-        }
-      });
+  await run(`CREATE TABLE IF NOT EXISTS audit_logs (
+    id TEXT PRIMARY KEY,
+    timestamp TEXT,
+    employeeId TEXT,
+    action TEXT,
+    details TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
 
-      // Seed shifts if empty
-      db.get("SELECT COUNT(*) as count FROM shifts", (err, row) => {
-        if (err) return reject(err);
-        if (row.count === 0) {
-          const stmt = db.prepare("INSERT OR IGNORE INTO shifts VALUES (?, ?, ?, ?, ?)");
-          stmt.run("shift-regular", "Regular", "09:00", "18:00", 15);
-          stmt.run("shift-flexible", "Flexible", "00:00", "23:59", 0);
-          stmt.run("shift-overnight", "Overnight", "21:00", "06:00", 15);
-          stmt.finalize();
-        }
-      });
+  await run(`CREATE TABLE IF NOT EXISTS mfa_challenges (
+    email TEXT PRIMARY KEY,
+    otp_hash TEXT,
+    expires_at TEXT,
+    attempts_count INTEGER DEFAULT 0,
+    created_at TEXT,
+    status TEXT
+  )`);
 
-      // Seed employees if empty
-      db.get("SELECT COUNT(*) as count FROM employees", (err, row) => {
-        if (err) return reject(err);
-        if (row.count === 0) {
-          const stmt = db.prepare("INSERT OR IGNORE INTO employees VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-          const depts = ['Engineering', 'Product Management', 'Sales & Marketing', 'Human Resources', 'Customer Success', 'Finance & Operations'];
-          const designatives = ['Senior Software Engineer', 'Staff Systems Architect', 'Principal DevOps Lead', 'HR Operations Manager', 'Financial Analyst', 'Customer Success Director'];
-          const roles = ['EMPLOYEE', 'TEAM_LEAD', 'MANAGER', 'HR', 'ADMIN'];
-          const statuses = ['PRESENT', 'REMOTE', 'ON_LEAVE', 'OFFLINE'];
-          
-          for (let i = 1; i <= 200; i++) {
-            const id = `emp-${i}`;
-            const code = `STK-${10000 + i}`;
-            const name = `Employee ${i}`;
-            const email = `employee${i}@thestackly.com`;
-            const role = roles[i % roles.length];
-            const dept = depts[i % depts.length];
-            const desig = designatives[i % designatives.length];
-            const status = statuses[i % statuses.length];
-            const avatar = `https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150`;
-            const joinDate = '2023-01-15';
-            const performanceScore = 80 + (i % 20);
-            const attendanceRate = 90 + (i % 10);
-            
-            stmt.run(id, code, name, email, role, dept, desig, status, avatar, joinDate, performanceScore, attendanceRate);
-          }
-          stmt.finalize();
-          console.log("Employees table seeded.");
-        }
-        resolve(true);
+  await run(`CREATE TABLE IF NOT EXISTS shifts (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    startTime TEXT,
+    endTime TEXT,
+    gracePeriodMinutes INTEGER DEFAULT 0,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
+
+  await run(`CREATE TABLE IF NOT EXISTS skills (
+    id TEXT PRIMARY KEY,
+    employeeId TEXT NOT NULL,
+    skillName TEXT NOT NULL,
+    level INTEGER,
+    isTopSkill INTEGER DEFAULT 0,
+    isMissingSkill INTEGER DEFAULT 0,
+    department TEXT,
+    team TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
+
+  await run(`CREATE TABLE IF NOT EXISTS performance_records (
+    id TEXT PRIMARY KEY,
+    employeeId TEXT NOT NULL,
+    quarter TEXT,
+    kpiScore REAL,
+    targetScore REAL,
+    productivityScore REAL,
+    department TEXT,
+    team TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}'
+  )`);
+
+  await run(`CREATE TABLE IF NOT EXISTS leave_requests (
+    id TEXT PRIMARY KEY,
+    employeeId TEXT NOT NULL,
+    employeeName TEXT,
+    department TEXT,
+    team TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}',
+    type TEXT,
+    startDate TEXT,
+    endDate TEXT,
+    reason TEXT,
+    status TEXT DEFAULT 'PENDING',
+    reviewedBy TEXT,
+    reviewComment TEXT,
+    createdAt TEXT
+  )`);
+
+  await run(`CREATE TABLE IF NOT EXISTS tasks (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    assigneeId TEXT,
+    assigneeName TEXT,
+    department TEXT,
+    team TEXT,
+    organizationId TEXT DEFAULT '${ORGANIZATION_ID}',
+    priority TEXT,
+    status TEXT,
+    points INTEGER DEFAULT 0,
+    updatedAt TEXT
+  )`);
+
+  // Add columns to databases created by earlier versions without destroying data.
+  await ensureColumn('users', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+  await ensureColumn('employees', 'team', 'TEXT');
+  await ensureColumn('employees', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+  await ensureColumn('attendance_records', 'team', 'TEXT');
+  await ensureColumn('attendance_records', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+  await ensureColumn('corrections', 'team', 'TEXT');
+  await ensureColumn('corrections', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+  await ensureColumn('audit_logs', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+  await ensureColumn('shifts', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+  await ensureColumn('skills', 'department', 'TEXT');
+  await ensureColumn('skills', 'team', 'TEXT');
+  await ensureColumn('skills', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+  await ensureColumn('performance_records', 'productivityScore', 'REAL');
+  await ensureColumn('performance_records', 'department', 'TEXT');
+  await ensureColumn('performance_records', 'team', 'TEXT');
+  await ensureColumn('performance_records', 'organizationId', `TEXT DEFAULT '${ORGANIZATION_ID}'`);
+
+  await run(`UPDATE users SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+  await run(`UPDATE employees SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+  await run(`UPDATE employees SET team = CASE department
+    WHEN 'Engineering' THEN 'Frontend Team'
+    WHEN 'Product Management' THEN 'Product Strategy'
+    WHEN 'Sales & Marketing' THEN 'Growth Team'
+    WHEN 'Human Resources' THEN 'People Operations'
+    WHEN 'Customer Success' THEN 'Customer Success'
+    ELSE 'Finance Operations' END WHERE team IS NULL`);
+  await run(`UPDATE attendance_records SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+  await run(`UPDATE corrections SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+  await run(`UPDATE audit_logs SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+  await run(`UPDATE shifts SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+  await run(`UPDATE skills SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+  await run(`UPDATE performance_records SET organizationId = ? WHERE organizationId IS NULL`, [ORGANIZATION_ID]);
+};
+
+const seedCoreUsers = async () => {
+  const row = await get('SELECT COUNT(*) AS count FROM users');
+  if (row.count > 0) return;
+
+  const passHash = '$2a$10$T81n17/iPq6XhN.Wz96tqOuXvP9w7bC4T5uVbX2Rj7qD1yI/3K22.';
+  const users = [
+    ['usr-admin-01', 'Sarah Connor', 'admin@thestackly.com', 'ADMIN', 'Executive', 'System Architecture', 'Global HQ', 'System Administrator', 5, ['USER_CREATE', 'USER_UPDATE', 'USER_DELETE', 'USER_MANAGE', 'ROLE_CREATE', 'ROLE_UPDATE', 'ROLE_DELETE', 'ROLE_MANAGE', 'PERMISSION_ASSIGN', 'EMPLOYEE_VIEW_ALL', 'EMPLOYEE_CREATE', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE', 'REPORT_VIEW_ALL', 'REPORT_EXPORT', 'SYSTEM_SETTINGS_MANAGE', 'SYSTEM_CONFIG', 'AUDIT_LOG_VIEW', 'VIEW_ALL_DATA']],
+    ['usr-hr-01', 'Elena Rostova', 'hr@thestackly.com', 'HR', 'Human Resources', 'People Operations', 'New York', 'VP of HR Operations', 4, ['EMPLOYEE_VIEW', 'EMPLOYEE_CREATE', 'EMPLOYEE_UPDATE', 'EMPLOYEE_PROFILE_MANAGE', 'ATTENDANCE_VIEW_ALL', 'ATTENDANCE_MANAGE', 'LEAVE_APPROVE', 'PERFORMANCE_MANAGE', 'RECRUITMENT_MANAGE', 'REPORT_GENERATE', 'EMPLOYEE_MANAGE', 'REPORT_VIEW', 'TEAM_ANALYTICS_VIEW']],
+    ['usr-mgr-01', 'David Sterling', 'manager@thestackly.com', 'MANAGER', 'Engineering', 'Frontend & Backend', 'San Francisco', 'Department Manager', 3, ['TEAM_VIEW', 'TEAM_ANALYTICS_VIEW', 'EMPLOYEE_VIEW_TEAM', 'ATTENDANCE_VIEW_TEAM', 'LEAVE_APPROVE', 'PERFORMANCE_REVIEW', 'TASK_ASSIGN', 'REPORT_VIEW_TEAM']],
+    ['usr-lead-01', 'Marcus Vance', 'lead@thestackly.com', 'TEAM_LEAD', 'Engineering', 'Frontend Team', 'San Francisco', 'Team Lead', 2, ['TEAM_MEMBER_VIEW', 'TEAM_VIEW', 'TASK_ASSIGN', 'TASK_TRACK', 'ATTENDANCE_VIEW_TEAM', 'PRODUCTIVITY_VIEW', 'FEEDBACK_CREATE', 'PERFORMANCE_FEEDBACK']],
+    ['usr-emp-01', 'Alex Mercer', 'employee@thestackly.com', 'EMPLOYEE', 'Engineering', 'Frontend Team', 'San Francisco', 'Full Stack Developer', 1, ['PROFILE_VIEW', 'PROFILE_UPDATE', 'ATTENDANCE_VIEW_SELF', 'LEAVE_REQUEST', 'PERFORMANCE_VIEW_SELF', 'GOAL_UPDATE', 'DOCUMENT_UPLOAD']]
+  ];
+
+  await prepareAndRun(
+    `INSERT OR IGNORE INTO users (id,name,email,password_hash,role,department,team,location,title,clearanceLevel,status,permissions,mfa_enabled,organizationId)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?, ?,1,?)`,
+    users.map((u) => [u[0], u[1], u[2], passHash, u[3], u[4], u[5], u[6], u[7], u[8], 'ACTIVE', JSON.stringify(u[9]), ORGANIZATION_ID])
+  );
+};
+
+const seedEmployees = async () => {
+  const row = await get('SELECT COUNT(*) AS count FROM employees');
+  if (row.count > 0) return;
+
+  const departments = ['Engineering', 'Product Management', 'Sales & Marketing', 'Human Resources', 'Customer Success', 'Finance & Operations'];
+  const teams = ['Frontend Team', 'Product Strategy', 'Growth Team', 'People Operations', 'Customer Success', 'Finance Operations'];
+  const designations = ['Senior Software Engineer', 'Product Manager', 'Account Executive', 'HR Operations Manager', 'Customer Success Director', 'Financial Analyst'];
+  const roles = ['EMPLOYEE', 'TEAM_LEAD', 'MANAGER', 'HR', 'ADMIN'];
+  const statuses = ['ACTIVE', 'REMOTE', 'ON_LEAVE', 'ACTIVE'];
+  const rows = [];
+
+  for (let i = 1; i <= 200; i += 1) {
+    const departmentIndex = i % departments.length;
+    rows.push([
+      `emp-${i}`, `STK-${10000 + i}`, `Employee ${i}`, `employee${i}@thestackly.com`, roles[i % roles.length],
+      departments[departmentIndex], designations[departmentIndex], statuses[i % statuses.length],
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      `202${2 + (i % 4)}-${String((i % 12) + 1).padStart(2, '0')}-15`, 80 + (i % 20), 90 + (i % 10),
+      teams[departmentIndex], ORGANIZATION_ID
+    ]);
+  }
+
+  await prepareAndRun(
+    `INSERT OR IGNORE INTO employees (id,employeeCode,name,email,role,department,designation,status,avatar,joinDate,performanceScore,attendanceRate,team,organizationId)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    rows
+  );
+};
+
+const syncUserEmployeeProfiles = async () => {
+  await run(
+    `INSERT OR IGNORE INTO employees (id,employeeCode,name,email,role,department,designation,status,avatar,joinDate,performanceScore,attendanceRate,team,organizationId)
+     SELECT id, 'USR-' || id, name, email, role, department, title, status, NULL, date('now'), 85, 95, team, organizationId
+     FROM users WHERE role = 'EMPLOYEE' AND organizationId = ?`,
+    [ORGANIZATION_ID]
+  );
+};
+
+const seedReferenceData = async () => {
+  const shiftCount = await get('SELECT COUNT(*) AS count FROM shifts');
+  if (shiftCount.count === 0) {
+    await prepareAndRun(
+      `INSERT OR IGNORE INTO shifts (id,name,startTime,endTime,gracePeriodMinutes,organizationId) VALUES (?,?,?,?,?,?)`,
+      [
+        ['shift-regular', 'Regular', '09:00', '18:00', 15, ORGANIZATION_ID],
+        ['shift-flexible', 'Flexible', '00:00', '23:59', 0, ORGANIZATION_ID],
+        ['shift-overnight', 'Overnight', '21:00', '06:00', 15, ORGANIZATION_ID]
+      ]
+    );
+  }
+
+  const employeeRows = await all('SELECT id, department, team FROM employees WHERE organizationId = ?', [ORGANIZATION_ID]);
+  const skillCount = await get('SELECT COUNT(*) AS count FROM skills');
+  if (skillCount.count === 0) {
+    const skills = ['React', 'TypeScript', 'Node.js', 'SQL', 'Cloud Architecture', 'Kubernetes', 'Data Analysis', 'Leadership'];
+    const rows = [];
+    employeeRows.forEach((employee, index) => {
+      skills.slice(0, 5).forEach((skill, skillIndex) => {
+        const level = 2 + ((index + skillIndex) % 4);
+        rows.push([
+          `skill-${index}-${skillIndex}`, employee.id, skill, level,
+          level >= 4 ? 1 : 0, level <= 2 ? 1 : 0, employee.department, employee.team, ORGANIZATION_ID
+        ]);
       });
     });
-  });
+    await prepareAndRun(
+      `INSERT OR IGNORE INTO skills (id,employeeId,skillName,level,isTopSkill,isMissingSkill,department,team,organizationId) VALUES (?,?,?,?,?,?,?,?,?)`,
+      rows
+    );
+  }
+
+  const performanceCount = await get('SELECT COUNT(*) AS count FROM performance_records');
+  if (performanceCount.count === 0) {
+    const rows = [];
+    employeeRows.forEach((employee, index) => {
+      ['Q1', 'Q2', 'Q3', 'Q4'].forEach((quarter, quarterIndex) => {
+        const score = 72 + ((index + quarterIndex * 3) % 25);
+        rows.push([
+          `performance-${index}-${quarter}`, employee.id, quarter, score, 85,
+          Math.min(100, score + 4), employee.department, employee.team, ORGANIZATION_ID
+        ]);
+      });
+    });
+    await prepareAndRun(
+      `INSERT OR IGNORE INTO performance_records (id,employeeId,quarter,kpiScore,targetScore,productivityScore,department,team,organizationId) VALUES (?,?,?,?,?,?,?,?,?)`,
+      rows
+    );
+  }
+
+  // Existing databases may already have reference rows from before core user
+  // profiles were mirrored into employees. Backfill only those new profiles.
+  const userProfiles = await all(`SELECT id, department, team FROM employees WHERE id LIKE 'usr-%' AND organizationId = ?`, [ORGANIZATION_ID]);
+  for (const employee of userProfiles) {
+    const profileSkillCount = await get('SELECT COUNT(*) AS count FROM skills WHERE employeeId = ? AND organizationId = ?', [employee.id, ORGANIZATION_ID]);
+    if (profileSkillCount.count === 0) {
+      await prepareAndRun(
+        `INSERT OR IGNORE INTO skills (id,employeeId,skillName,level,isTopSkill,isMissingSkill,department,team,organizationId) VALUES (?,?,?,?,?,?,?,?,?)`,
+        ['React', 'TypeScript', 'Node.js', 'SQL', 'Leadership'].map((skill, index) => [`${employee.id}-skill-${index}`, employee.id, skill, 3 + (index % 3), index < 2 ? 1 : 0, index > 2 ? 1 : 0, employee.department, employee.team, ORGANIZATION_ID])
+      );
+    }
+    const profilePerformanceCount = await get('SELECT COUNT(*) AS count FROM performance_records WHERE employeeId = ? AND organizationId = ?', [employee.id, ORGANIZATION_ID]);
+    if (profilePerformanceCount.count === 0) {
+      await prepareAndRun(
+        `INSERT OR IGNORE INTO performance_records (id,employeeId,quarter,kpiScore,targetScore,productivityScore,department,team,organizationId) VALUES (?,?,?,?,?,?,?,?,?)`,
+        ['Q1', 'Q2', 'Q3', 'Q4'].map((quarter, index) => [`${employee.id}-performance-${quarter}`, employee.id, quarter, 85 + index, 85, 88 + index, employee.department, employee.team, ORGANIZATION_ID])
+      );
+    }
+  }
+
+  const taskCount = await get('SELECT COUNT(*) AS count FROM tasks WHERE organizationId = ?', [ORGANIZATION_ID]);
+  if (taskCount.count === 0 && employeeRows.length > 0) {
+    const taskTemplates = [
+      ['Implement attendance export API', 'HIGH', 'IN_PROGRESS', 8],
+      ['Review quarterly performance goals', 'MEDIUM', 'TODO', 5],
+      ['Close accessibility findings', 'LOW', 'COMPLETED', 3],
+      ['Validate department skill gaps', 'HIGH', 'TODO', 5]
+    ];
+    await prepareAndRun(
+      `INSERT OR IGNORE INTO tasks (id,title,assigneeId,assigneeName,department,team,organizationId,priority,status,points,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+      taskTemplates.map((task, index) => {
+        const assignee = employeeRows[index % employeeRows.length];
+        return [`task-seed-${index + 1}`, task[0], assignee.id, `Employee ${index + 1}`, assignee.department, assignee.team, ORGANIZATION_ID, task[1], task[2], task[3], new Date().toISOString()];
+      })
+    );
+  }
 };
 
-export const logAudit = (userId, action, details) => {
-  const id = Math.random().toString(36).substr(2, 9);
+let initPromise;
+export const initDb = () => {
+  if (!initPromise) {
+    initPromise = (async () => {
+      await createSchema();
+      await seedCoreUsers();
+      await seedEmployees();
+      await syncUserEmployeeProfiles();
+      await seedReferenceData();
+      return true;
+    })();
+  }
+  return initPromise;
+};
+
+export const logAudit = (userId, action, details, organizationId = ORGANIZATION_ID) => {
+  const id = Math.random().toString(36).slice(2, 11);
   const timestamp = new Date().toISOString();
-  db.run("INSERT INTO audit_logs VALUES (?, ?, ?, ?, ?)", [id, timestamp, userId, action, details], (err) => {
-    if (err) console.error("Failed to write audit log:", err);
-  });
+  db.run(
+    `INSERT INTO audit_logs (id,timestamp,employeeId,action,details,organizationId) VALUES (?,?,?,?,?,?)`,
+    [id, timestamp, userId, action, details, organizationId],
+    (err) => {
+      if (err) console.error('Failed to write audit log:', err);
+    }
+  );
 };
 
+export { ORGANIZATION_ID };
 export default db;

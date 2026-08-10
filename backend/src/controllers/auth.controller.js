@@ -3,9 +3,35 @@ import db, { logAudit } from '../config/db.js';
 import * as mfaService from '../services/mfa.service.js';
 
 const JWT_SECRET = 'wfa_platform_secret_jwt_key_2026';
+const ORGANIZATION_ID = 'org-stackly';
+
+const toUser = (user) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  department: user.department,
+  team: user.team,
+  location: user.location,
+  title: user.title,
+  clearanceLevel: user.clearanceLevel,
+  status: user.status,
+  organizationId: user.organizationId || ORGANIZATION_ID,
+  permissions: JSON.parse(user.permissions || '[]')
+});
+
+const signUser = (user) => jwt.sign(
+  {
+    ...toUser(user),
+    requiresMfa: false
+  },
+  JWT_SECRET,
+  { expiresIn: '24h' }
+);
 
 export const login = (req, res) => {
-  const { email } = req.body;
+  const rawEmail = req.body?.email;
+  const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
   if (!email) {
     return res.status(400).json({ success: false, message: 'Email is required' });
   }
@@ -15,7 +41,12 @@ export const login = (req, res) => {
     return res.status(403).json({ success: false, message: 'Domain access denied. Only corporate email domains permitted.' });
   }
 
-  db.get("SELECT * FROM users WHERE email = ?", [email], async (err, user) => {
+  // Keep the older demo-domain aliases usable while persisting one canonical identity.
+  const lookupEmail = email.endsWith('@company.com')
+    ? email.replace('@company.com', '@thestackly.com')
+    : email;
+
+  db.get("SELECT * FROM users WHERE email = ?", [lookupEmail], async (err, user) => {
     if (err) return res.status(500).json({ success: false, message: 'Database error' });
     if (!user) {
       logAudit('anonymous', 'FAILED_AUTHENTICATION', `User not found: ${email}`);
@@ -50,11 +81,7 @@ export const login = (req, res) => {
     }
 
     // Direct Login if MFA not enabled
-    const token = jwt.sign(
-      { id: user.id, name: user.name, email: user.email, role: user.role, department: user.department, permissions: JSON.parse(user.permissions) },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+    const token = signUser(user);
 
     logAudit(user.id, 'LOGIN', `Logged in without MFA successfully`);
 
@@ -62,19 +89,7 @@ export const login = (req, res) => {
       success: true,
       data: {
         token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          department: user.department,
-          team: user.team,
-          location: user.location,
-          title: user.title,
-          clearanceLevel: user.clearanceLevel,
-          status: user.status,
-          permissions: JSON.parse(user.permissions)
-        }
+        user: toUser(user)
       }
     });
   });
@@ -100,11 +115,7 @@ export const verifyMfa = async (req, res) => {
     db.get("SELECT * FROM users WHERE email = ?", [decoded.email], (err, user) => {
       if (err || !user) return res.status(404).json({ success: false, message: 'User not found' });
 
-      const token = jwt.sign(
-        { id: user.id, name: user.name, email: user.email, role: user.role, department: user.department, permissions: JSON.parse(user.permissions) },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
+      const token = signUser(user);
 
       logAudit(user.id, 'MFA_VERIFICATION', `Successfully authenticated user ${decoded.email} via MFA OTP`);
 
@@ -112,19 +123,7 @@ export const verifyMfa = async (req, res) => {
         success: true,
         data: {
           token,
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            department: user.department,
-            team: user.team,
-            location: user.location,
-            title: user.title,
-            clearanceLevel: user.clearanceLevel,
-            status: user.status,
-            permissions: JSON.parse(user.permissions)
-          }
+          user: toUser(user)
         }
       });
     });

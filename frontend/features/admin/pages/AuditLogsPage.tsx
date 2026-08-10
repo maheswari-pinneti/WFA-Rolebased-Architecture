@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { History, ShieldAlert, Download, Search, Filter, Terminal } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
+import { analyticsApi } from '../../../api/endpoints/analytics.api';
 
 export const AuditLogsPage: React.FC = () => {
-  const [logs] = useState([
-    { id: 'log-101', timestamp: '2026-08-02 22:45:12', actor: 'Admin (David Sterling)', role: 'ADMIN', action: 'UPDATE_ROLE_PERMISSIONS', target: 'Role: MANAGER', ip: '192.168.1.45', status: 'SUCCESS' },
-    { id: 'log-102', timestamp: '2026-08-02 21:12:04', actor: 'Elena Rostova', role: 'HR', action: 'EXPORT_PAYROLL_REPORT', target: 'Report: Q2 Payroll', ip: '10.0.4.12', status: 'SUCCESS' },
-    { id: 'log-103', timestamp: '2026-08-02 19:30:50', actor: 'Unknown Actor', role: 'UNKNOWN', action: 'FAILED_LOGIN_ATTEMPT', target: 'User: admin@corp.com', ip: '185.220.101.5', status: 'FAILURE' },
-    { id: 'log-104', timestamp: '2026-08-02 18:15:22', actor: 'Marcus Vance', role: 'MANAGER', action: 'APPROVE_LEAVE_REQUEST', target: 'Emp: Alex Mercer', ip: '172.16.0.8', status: 'SUCCESS' },
-    { id: 'log-105', timestamp: '2026-08-02 16:04:11', actor: 'System Auto-Job', role: 'SYSTEM', action: 'DATABASE_BACKUP_COMPLETED', target: 'Cluster: Primary-DB', ip: '127.0.0.1', status: 'SUCCESS' },
-  ]);
+  const [logs, setLogs] = useState<Array<{ id: string; timestamp: string; actor: string; role: string; action: string; target: string; ip: string; status: string }>>([]);
+  useEffect(() => {
+    analyticsApi.getAuditLogs().then((items) => setLogs(items.map((item) => ({
+      id: item.id,
+      timestamp: item.timestamp,
+      actor: item.employeeId,
+      role: 'AUDIT',
+      action: item.action,
+      target: item.details,
+      ip: 'server',
+      status: 'RECORDED'
+    })))).catch(() => setLogs([]));
+  }, []);
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN]}>

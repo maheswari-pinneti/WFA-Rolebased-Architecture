@@ -7,10 +7,14 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
-  if (!isAuthenticated) {
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)] text-[var(--text-muted)] text-sm">Restoring secure session…</div>;
+  }
+
+  if (!isAuthenticated || !user || !user.role) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

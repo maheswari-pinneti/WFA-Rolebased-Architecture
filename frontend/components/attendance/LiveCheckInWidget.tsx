@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { attendanceService, OFFICE_COORDS, getDistance } from '../../services/attendance.service';
 import { syncLocalData, addNotification, fetchAttendanceDataThunk } from '../../store/attendanceSlice';
 import { RootState, AppDispatch } from '../../app/store';
+import { analyticsApi } from '../../api/endpoints/analytics.api';
 
 interface LiveCheckInWidgetProps {
   employeeName?: string;
@@ -27,6 +28,11 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
   
   // Local state to simulate offline mode
   const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [availableShifts, setAvailableShifts] = useState<Array<{ name: 'Regular' | 'Flexible' | 'Overnight'; startTime: string; endTime: string }>>([
+    { name: 'Regular', startTime: '09:00', endTime: '18:00' },
+    { name: 'Flexible', startTime: '00:00', endTime: '23:59' },
+    { name: 'Overnight', startTime: '21:00', endTime: '06:00' }
+  ]);
 
   // Redux state
   const { activeRecord, records, isOffline, offlineQueueLength } = useSelector(
@@ -51,8 +57,12 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     (dispatch as AppDispatch)(fetchAttendanceDataThunk(employeeId));
   }, [dispatch, employeeId]);
 
+  useEffect(() => {
+    analyticsApi.getShifts().then((shifts) => setAvailableShifts(shifts)).catch(() => undefined);
+  }, []);
+
   // Handle Action dispatchers (with geofencing & offline checks)
-  const handleCheckIn = () => {
+  const handleCheckIn = async () => {
     const idempotencyKey = Math.random().toString(36).substr(2, 9);
     const payload = {
       employeeId,
@@ -77,7 +87,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.checkIn(payload);
+      await attendanceService.checkInRemote(payload);
       dispatch(addNotification({ message: 'Checked in successfully!', type: 'success' }));
       
       // Overtime or Late arrival warning push
@@ -96,7 +106,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleTakeBreak = () => {
+  const handleTakeBreak = async () => {
     if (isOfflineMode) {
       attendanceService.enqueueOfflineAction({
         type: 'BREAK_START',
@@ -108,7 +118,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.takeBreak(employeeId);
+      await attendanceService.transitionRemote('break', employeeId);
       dispatch(addNotification({ message: 'Break started.', type: 'info' }));
       dispatch(syncLocalData({ employeeId }));
     } catch (err: any) {
@@ -116,7 +126,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleResume = () => {
+  const handleResume = async () => {
     if (isOfflineMode) {
       attendanceService.enqueueOfflineAction({
         type: 'BREAK_END',
@@ -128,7 +138,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.resumeWork(employeeId);
+      await attendanceService.transitionRemote('resume', employeeId);
       dispatch(addNotification({ message: 'Resumed work.', type: 'success' }));
       dispatch(syncLocalData({ employeeId }));
     } catch (err: any) {
@@ -136,7 +146,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleCheckOut = () => {
+  const handleCheckOut = async () => {
     if (isOfflineMode) {
       attendanceService.enqueueOfflineAction({
         type: 'CHECK_OUT',
@@ -148,7 +158,7 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
 
     try {
-      attendanceService.checkOut(employeeId);
+      await attendanceService.transitionRemote('check-out', employeeId);
       dispatch(addNotification({ message: 'Checked out successfully!', type: 'success' }));
       dispatch(syncLocalData({ employeeId }));
     } catch (err: any) {
@@ -156,8 +166,8 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
     }
   };
 
-  const handleSyncOffline = () => {
-    const res = attendanceService.syncOfflineActions();
+  const handleSyncOffline = async () => {
+    const res = await attendanceService.syncOfflineActionsRemote();
     if (res.errors.length > 0) {
       dispatch(addNotification({ message: `Sync completed with errors: ${res.errors.join(', ')}`, type: 'warning' }));
     } else {
@@ -236,9 +246,9 @@ export const LiveCheckInWidget: React.FC<LiveCheckInWidgetProps> = ({
               disabled={!!activeRecord}
               className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none cursor-pointer"
             >
-              <option value="Regular">Regular Shift (09:00 - 18:00)</option>
-              <option value="Flexible">Flexible Shift (No Timing Boundaries)</option>
-              <option value="Overnight">Night Shift (21:00 - 06:00 Cross-Midnight)</option>
+              {availableShifts.map((shift) => (
+                <option key={shift.name} value={shift.name}>{shift.name} Shift ({shift.startTime} - {shift.endTime})</option>
+              ))}
             </select>
           </div>
 

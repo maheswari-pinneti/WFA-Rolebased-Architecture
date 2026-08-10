@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserCheck, Mail, MapPin, Zap, CheckCircle2, Shield } from 'lucide-react';
+import { employeeApi } from '../../../api/endpoints/employee.api';
+import { workforceApi, Task } from '../../../api/endpoints/workforce.api';
+import { Employee } from '../../../shared/types/common.types';
 
 export const TeamMembersPage: React.FC = () => {
-  const members = [
-    { name: 'Alex Mercer', role: 'Full Stack Developer', status: 'ACTIVE', task: 'Optimizing RBAC Policy Engine', velocity: '94%', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' },
-    { name: 'Rachel Kim', role: 'Data Analyst', status: 'ACTIVE', task: 'Q2 Attrition Prediction Model', velocity: '98%', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
-    { name: 'Samantha Wu', role: 'HR Specialist', status: 'IN_MEETING', task: 'Engineering Recruiter Screening', velocity: '91%', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150' },
-  ];
+  const [members, setMembers] = useState<Array<{ name: string; role: string; status: string; task: string; velocity: string; avatar?: string }>>([]);
+  useEffect(() => {
+    Promise.all([employeeApi.getEmployees(), workforceApi.getTasks()]).then(([employees, tasks]) => {
+      setMembers((employees as Employee[]).map((employee) => ({
+        name: employee.name,
+        role: employee.designation || employee.role,
+        status: employee.status,
+        task: (tasks as Task[]).find((task) => task.assigneeId === employee.id)?.title || 'No active task',
+        velocity: `${Math.round(employee.performanceScore || 0)}%`,
+        avatar: employee.avatar
+      })));
+    }).catch(() => setMembers([]));
+  }, []);
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -25,7 +36,7 @@ export const TeamMembersPage: React.FC = () => {
 
       {/* Members Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {members.map((m, idx) => (
+        {members.length === 0 ? <p className="text-sm text-[var(--text-muted)]">No team members are available in your scope.</p> : members.map((m, idx) => (
           <div key={idx} className="glass-panel p-5 rounded-2xl border-[var(--border-color)] space-y-4">
             <div className="flex items-center gap-3">
               <img src={m.avatar} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-blue-500 shadow-md" />

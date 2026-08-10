@@ -33,14 +33,7 @@ export const AttendanceManagement: React.FC = () => {
     (dispatch as AppDispatch)(fetchAttendanceDataThunk(employeeId));
   }, [dispatch, employeeId]);
 
-  // Combine static fallback logs with dynamic records from localstorage for complete dashboard feel
-  const staticLogs: AttendanceRecord[] = [
-    { id: 'static-1', employeeId: 'emp-101', employeeName: 'Marcus Vance', department: 'Engineering & Technology', date: '2026-08-05', checkInTime: '2026-08-05T09:12:00Z', checkOutTime: '2026-08-05T18:00:00Z', breaks: [], shiftType: 'Regular', workMode: 'Remote', status: 'Checked Out' },
-    { id: 'static-2', employeeId: 'emp-102', employeeName: 'Chloe Bennett', department: 'HR & People Operations', date: '2026-08-05', checkInTime: '2026-08-05T09:00:00Z', checkOutTime: '2026-08-05T17:00:00Z', breaks: [], shiftType: 'Regular', workMode: 'Remote', status: 'Checked Out' },
-    { id: 'static-3', employeeId: 'emp-103', employeeName: 'Liam Thorne', department: 'Finance & Compliance', date: '2026-08-05', checkInTime: '2026-08-05T09:01:00Z', checkOutTime: '2026-08-05T17:30:00Z', breaks: [], shiftType: 'Regular', workMode: 'Office', status: 'Checked Out' }
-  ];
-
-  const allRecords = [...records, ...staticLogs];
+  const allRecords = records;
 
   const filteredLogs = allRecords.filter((log) => {
     const hasAccess = canAccessDepartment(log.department);

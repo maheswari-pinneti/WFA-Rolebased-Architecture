@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { FileText, CheckCircle2, XCircle, Clock, Calendar, Shield } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
+import { LeaveRequest, workforceApi } from '../../../api/endpoints/workforce.api';
 
 export const LeaveManagement: React.FC = () => {
-  const [requests, setRequests] = useState([
-    { id: 'req-1', employee: 'Alex Mercer', type: 'ANNUAL', startDate: '2026-08-10', endDate: '2026-08-15', days: 5, status: 'PENDING', reason: 'Family vacation' },
-    { id: 'req-2', employee: 'Marcus Vance', type: 'SICK', startDate: '2026-08-03', endDate: '2026-08-04', days: 2, status: 'APPROVED', reason: 'Medical checkup' },
-    { id: 'req-3', employee: 'Chloe Bennett', type: 'MATERNITY', startDate: '2026-09-01', endDate: '2026-11-30', days: 90, status: 'APPROVED', reason: 'Maternity leave' },
-    { id: 'req-4', employee: 'Liam Thorne', type: 'UNPAID', startDate: '2026-08-20', endDate: '2026-08-22', days: 3, status: 'PENDING', reason: 'Personal event' },
-  ]);
+  const [requests, setRequests] = useState<LeaveRequest[]>([]);
 
-  const handleAction = (id: string, newStatus: 'APPROVED' | 'REJECTED') => {
-    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r)));
+  const loadRequests = async () => setRequests(await workforceApi.getLeaveRequests());
+  useEffect(() => { void loadRequests().catch(() => setRequests([])); }, []);
+
+  const handleAction = async (id: string, newStatus: 'APPROVED' | 'REJECTED') => {
+    await workforceApi.reviewLeaveRequest(id, newStatus);
+    await loadRequests();
   };
 
   return (
@@ -50,7 +50,7 @@ export const LeaveManagement: React.FC = () => {
               <tbody className="divide-y divide-slate-800/60">
                 {requests.map((req) => (
                   <tr key={req.id} className="hover:bg-slate-800/20">
-                    <td className="py-3 px-4 font-bold text-slate-100">{req.employee}</td>
+                    <td className="py-3 px-4 font-bold text-slate-100">{req.employeeName}</td>
                     <td className="py-3 px-4">
                       <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
                         {req.type}
@@ -59,7 +59,7 @@ export const LeaveManagement: React.FC = () => {
                     <td className="py-3 px-4 font-mono text-xs text-slate-300">
                       {req.startDate} to {req.endDate}
                     </td>
-                    <td className="py-3 px-4 font-bold text-slate-200">{req.days} Days</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">{Math.max(1, Math.ceil((new Date(req.endDate).getTime() - new Date(req.startDate).getTime()) / 86400000) + 1)} Days</td>
                     <td className="py-3 px-4 text-slate-400 text-xs">{req.reason}</td>
                     <td className="py-3 px-4">
                       <span

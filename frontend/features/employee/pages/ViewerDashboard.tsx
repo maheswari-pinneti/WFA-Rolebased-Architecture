@@ -1,6 +1,6 @@
 import React from 'react';
 import { Eye, BarChart3, TrendingUp, ShieldAlert, CheckCircle2 } from 'lucide-react';
-import { DepartmentOverviewBar } from '../../analytics/charts/DepartmentOverviewBar';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 export const ViewerDashboard: React.FC = () => {
   return (
@@ -62,13 +62,7 @@ export const ViewerDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Overview Chart */}
-      <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-        <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-          <BarChart3 size={18} className="text-blue-400" /> Organizational Performance Overview
-        </h3>
-        <DepartmentOverviewBar />
-      </div>
+      <AnalyticsOverview title="Read-Only Workforce Intelligence" subtitle="Live organization analytics with modification rights disabled" compact />
     </div>
   );
 };

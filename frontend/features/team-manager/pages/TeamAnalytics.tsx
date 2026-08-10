@@ -2,8 +2,7 @@ import React from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
-import { PerformanceChart } from '../../analytics/charts/PerformanceChart';
-import { AttendanceChart } from '../../analytics/charts/AttendanceChart';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 export const TeamAnalytics: React.FC = () => {
   return (
@@ -14,10 +13,7 @@ export const TeamAnalytics: React.FC = () => {
           <p className="text-sm text-slate-400">Deep-dive metrics into team output, commit velocity, and attendance</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PerformanceChart />
-          <AttendanceChart />
-        </div>
+        <AnalyticsOverview title="Team Performance & Attendance" subtitle="Live performance, attendance, productivity and skill coverage for your authorized scope" compact />
       </div>
     </RoleGuard>
   );

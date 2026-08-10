@@ -3,7 +3,6 @@ import { AuthState, User } from '../types/auth.types';
 import { authService } from '../services/auth.service';
 import { Role } from '../../security/roles/roles';
 import { PERMISSION_MATRIX } from '../../security/policies/permissionMatrix';
-import usersData from '../../mocks/data/users.json';
 
 const initialSession = authService.getStoredSession();
 
@@ -39,11 +38,9 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setRole: (state, action: PayloadAction<Role>) => {
-      if (state.user) {
-        state.user.role = action.payload;
-        state.user.permissions = PERMISSION_MATRIX[action.payload] || [];
-        localStorage.setItem('wfa_user_data', JSON.stringify(state.user));
-      }
+      // Role is issued by the backend and must never be changed client-side.
+      void state;
+      void action;
     },
     clearError: (state) => {
       state.error = null;
@@ -55,9 +52,27 @@ export const authSlice = createSlice({
       state.error = null;
     },
     loginSuccessAction: (state, action: PayloadAction<{ user: User; token: string }>) => {
+      const payloadUser = action.payload?.user;
+      if (!payloadUser) {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.error = 'The server returned an incomplete user session. Please sign in again.';
+        return;
+      }
+      if (!Object.values(Role).includes(payloadUser.role)) {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.error = 'The server returned an invalid role. Please sign in again.';
+        return;
+      }
       state.isLoading = false;
       state.isAuthenticated = true;
-      state.user = action.payload.user;
+      state.user = {
+        ...payloadUser,
+        permissions: Array.isArray(payloadUser.permissions) ? payloadUser.permissions : []
+      };
       state.token = action.payload.token;
       state.error = null;
     }
@@ -73,9 +88,17 @@ export const authSlice = createSlice({
         const payload = action.payload as any;
         if (payload && payload.requiresMfa) {
           state.isAuthenticated = false;
+        } else if (!payload?.user || !Object.values(Role).includes(payload.user.role)) {
+          state.isAuthenticated = false;
+          state.user = null;
+          state.token = null;
+          state.error = 'The server returned an invalid user session. Please sign in again.';
         } else {
           state.isAuthenticated = true;
-          state.user = payload ? payload.user : null;
+          state.user = payload?.user ? {
+            ...payload.user,
+            permissions: Array.isArray(payload.user.permissions) ? payload.user.permissions : []
+          } : null;
           state.token = payload ? payload.token : null;
         }
       })

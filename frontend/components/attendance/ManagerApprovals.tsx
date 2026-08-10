@@ -56,7 +56,7 @@ export const ManagerApprovals: React.FC = () => {
     return true;
   });
 
-  const handleReview = (reqId: string, status: 'Approved' | 'Rejected') => {
+  const handleReview = async (reqId: string, status: 'Approved' | 'Rejected') => {
     const reqComment = comment[reqId]?.trim() || '';
     if (status === 'Rejected' && !reqComment) {
       dispatch(addNotification({ message: 'Please provide a comment for rejection.', type: 'warning' }));
@@ -64,12 +64,7 @@ export const ManagerApprovals: React.FC = () => {
     }
 
     try {
-      attendanceService.reviewCorrectionRequest(
-        reqId,
-        status,
-        reqComment || `${status} by ${reviewerName}`,
-        reviewerName
-      );
+      await attendanceService.reviewCorrectionRemote(reqId, status, reqComment || `${status} by ${reviewerName}`);
       dispatch(addNotification({ message: `Request successfully ${status.toLowerCase()}!`, type: 'success' }));
       dispatch(syncLocalData({ employeeId }));
     } catch (err: any) {

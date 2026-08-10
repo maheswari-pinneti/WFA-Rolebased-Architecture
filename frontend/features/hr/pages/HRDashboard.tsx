@@ -6,11 +6,7 @@ import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
 import { EmployeeTable } from '../../../components/tables/EmployeeTable';
-
-// Custom HR Charts
-import { WorkforceTrendLine } from '../../analytics/charts/WorkforceTrendLine';
-import { AttritionDonut } from '../../analytics/charts/AttritionDonut';
-import { SalaryAnalyticsBar } from '../../analytics/charts/SalaryAnalyticsBar';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 import { UserCheck, Users, Briefcase, FileText, Plus, Clock, HeartHandshake, Star, AlertTriangle, DollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -74,7 +70,7 @@ export const HRDashboard: React.FC = () => {
           </div>
         </div>
 
-
+        <AnalyticsOverview title="HR Workforce Intelligence" subtitle="Organization-wide workforce lifecycle, attendance, skill coverage and retention analytics" />
 
         {/* 8 Reusable HR KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -216,29 +212,6 @@ export const HRDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Users size={18} className="text-emerald-400" /> Retention Rate & Attrition Donut Analysis
-            </h3>
-            <AttritionDonut />
-          </div>
-        </div>
-
-        {/* Section 2: Workforce Growth Timeline & Salary Analytics Bar */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Users size={18} className="text-blue-400" /> Monthly Workforce Growth Timeline
-            </h3>
-            <WorkforceTrendLine />
-          </div>
-
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <DollarSign size={18} className="text-amber-400" /> Department Salary & Compensation Analytics
-            </h3>
-            <SalaryAnalyticsBar />
-          </div>
         </div>
 
         {/* Section 3: Employee Table */}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Building2, BarChart3, TrendingUp, Users, Download } from 'lucide-react';
-import { DepartmentOverviewBar } from '../../analytics/charts/DepartmentOverviewBar';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 export const DeptHeadDashboard: React.FC = () => {
   return (
@@ -62,13 +62,7 @@ export const DeptHeadDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Chart Section */}
-      <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-        <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-          <BarChart3 size={18} className="text-indigo-400" /> Department Sub-Team Productivity & Allocation
-        </h3>
-        <DepartmentOverviewBar />
-      </div>
+      <AnalyticsOverview title="Department Sub-Team Intelligence" subtitle="Live department comparison, productivity and retention-risk analytics" compact />
     </div>
   );
 };

@@ -168,9 +168,6 @@ class AttendanceService {
     this.saveRecords(records);
     this.logAction(params.employeeId, 'CHECK_IN', `Checked in using ${params.workMode} mode on ${params.shiftType} shift`);
 
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/check-in', params).catch(() => {});
-
     return newRecord;
   }
 
@@ -192,8 +189,6 @@ class AttendanceService {
     this.saveRecords(records);
     this.logAction(employeeId, 'BREAK_START', 'Started break');
 
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/break', { employeeId }).catch(() => {});
   }
 
   resumeWork(employeeId: string) {
@@ -212,8 +207,6 @@ class AttendanceService {
     this.saveRecords(records);
     this.logAction(employeeId, 'BREAK_END', 'Resumed work');
 
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/resume', { employeeId }).catch(() => {});
   }
 
   checkOut(employeeId: string) {
@@ -238,8 +231,6 @@ class AttendanceService {
     this.saveRecords(records);
     this.logAction(employeeId, 'CHECK_OUT', 'Checked out from active session');
 
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/check-out', { employeeId }).catch(() => {});
   }
 
   // Offline queue mechanisms
@@ -384,9 +375,6 @@ class AttendanceService {
     this.saveCorrections(corrections);
     this.logAction(params.employeeId, 'CORRECTION_REQUESTED', `Submitted correction request for ${params.date}`);
 
-    // Sync to backend in background
-    apiClient.post('/v1/attendance/corrections', params).catch(() => {});
-
     return newReq;
   }
 
@@ -432,8 +420,62 @@ class AttendanceService {
 
     this.logAction(req.employeeId, `CORRECTION_${status.toUpperCase()}`, `Manager reviewed correction request: ${status}`);
 
-    // Sync to backend in background
-    apiClient.put(`/v1/attendance/corrections/${reqId}`, { status, managerComment: comment }).catch(() => {});
+  }
+
+  private unwrapResponse<T>(response: { data?: { success?: boolean; data?: T; message?: string } }): T {
+    if (response.data?.success) return response.data.data as T;
+    throw new Error(response.data?.message || 'Attendance request failed.');
+  }
+
+  async checkInRemote(params: Parameters<AttendanceService['checkIn']>[0]): Promise<AttendanceRecord> {
+    const response = await apiClient.post('/v1/attendance/check-in', params);
+    const record = this.unwrapResponse<AttendanceRecord>(response);
+    const records = this.getRecords().filter((item) => item.id !== record.id);
+    this.saveRecords([...records, record]);
+    return record;
+  }
+
+  async transitionRemote(action: 'break' | 'resume' | 'check-out', employeeId: string): Promise<AttendanceRecord> {
+    const response = await apiClient.post(`/v1/attendance/${action}`, { employeeId });
+    const record = this.unwrapResponse<AttendanceRecord>(response);
+    const records = this.getRecords().filter((item) => item.id !== record.id);
+    this.saveRecords([...records, record]);
+    return record;
+  }
+
+  async submitCorrectionRemote(params: Parameters<AttendanceService['submitCorrectionRequest']>[0]): Promise<CorrectionRequest> {
+    const response = await apiClient.post('/v1/attendance/corrections', params);
+    const result = this.unwrapResponse<{ id: string; status: CorrectionRequest['status'] }>(response);
+    const request: CorrectionRequest = { ...params, ...result, createdAt: new Date().toISOString() };
+    this.saveCorrections([request, ...this.getCorrections().filter((item) => item.id !== request.id)]);
+    return request;
+  }
+
+  async reviewCorrectionRemote(reqId: string, status: 'Approved' | 'Rejected', comment: string): Promise<void> {
+    this.unwrapResponse(await apiClient.put(`/v1/attendance/corrections/${reqId}`, { status, managerComment: comment }));
+  }
+
+  async syncOfflineActionsRemote(): Promise<{ syncedCount: number; errors: string[] }> {
+    const queue = this.getOfflineQueue();
+    const remaining: any[] = [];
+    const errors: string[] = [];
+    let syncedCount = 0;
+
+    for (const action of queue) {
+      try {
+        if (action.type === 'CHECK_IN') await this.checkInRemote(action.payload);
+        else if (action.type === 'BREAK_START') await this.transitionRemote('break', action.payload.employeeId);
+        else if (action.type === 'BREAK_END') await this.transitionRemote('resume', action.payload.employeeId);
+        else if (action.type === 'CHECK_OUT') await this.transitionRemote('check-out', action.payload.employeeId);
+        syncedCount += 1;
+      } catch (err: any) {
+        remaining.push(action);
+        errors.push(err.message || 'Error processing sync action');
+      }
+    }
+
+    this.saveOfflineQueue(remaining);
+    return { syncedCount, errors };
   }
 }
 

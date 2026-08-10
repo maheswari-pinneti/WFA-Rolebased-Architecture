@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../../auth/hooks/useAuth';
-import { apiClient } from '../../../services/api';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
@@ -10,12 +9,7 @@ import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillD
 import { MinimalKpiCard } from '../../../components/ui/MinimalKpiCard';
 
 // 6 Distinct Recharts Modules (Each uses a completely different chart type)
-import { WorkforceGrowthLine } from '../../analytics/charts/WorkforceGrowthLine'; // 1. Dual Area Gradient Line Chart
-import { AttendanceOverviewBar } from '../../analytics/charts/AttendanceOverviewBar'; // 2. Vertical Stacked Bar Chart
-import { DepartmentDistribution } from '../../analytics/charts/DepartmentDistribution'; // 3. Donut / Pie Chart
-import { EmployeeEngagementRadar } from '../../analytics/charts/EmployeeEngagementRadar'; // 4. 6-Axis Radar Spiderweb Chart
-import { PerformanceAreaChart } from '../../analytics/charts/PerformanceAreaChart'; // 5. Composed Bar + Line Combo Chart
-import { SalaryAnalyticsStackedBar } from '../../analytics/charts/SalaryAnalyticsStackedBar'; // 6. Horizontal Stacked Bar Chart
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 import {
   Users,
@@ -41,29 +35,6 @@ export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
   const [timeRange, setTimeRange] = useState<'Day' | 'Week' | 'Month'>('Month');
-
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      setIsLoading(true);
-      try {
-        const response = await apiClient.get('/v1/analytics');
-        if (response.data && response.data.success) {
-          setAnalyticsData(response.data.data);
-        } else {
-          setError(response.data?.message || 'Failed to fetch analytics');
-        }
-      } catch (err: any) {
-        setError(err.message || 'An error occurred fetching analytics');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchAnalytics();
-  }, []);
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
     setDrillDownData({
@@ -252,74 +223,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* 6 DISTINCT SVG RECHARTS SECTION (EACH CHART TYPE IS COMPLETELY DIFFERENT) */}
-        <div className="space-y-6 pt-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-400">
-              6 DISTINCT ENTERPRISE ANALYTICS RECHARTS (ZERO DUPES)
-            </h3>
-            <span className="text-xs font-mono font-bold text-slate-400">
-              6 Visualization Types
-            </span>
-          </div>
-
-          {/* CHART ROW 1: 1. Dual Area Line Chart + 2. Vertical Stacked Column Bar Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            {/* Chart 1: WorkforceGrowthLine (Dual Area Gradient Line Chart) */}
-            <div className="lg:col-span-8">
-              <WorkforceGrowthLine data={analyticsData?.growthData} isLoading={isLoading} error={error} />
-            </div>
-
-            {/* Chart 2: AttendanceOverviewBar (Vertical Stacked Column Bar Chart) */}
-            <div className="lg:col-span-4 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-3">
-              <div className="border-b border-slate-800 pb-3">
-                <h4 className="text-base font-extrabold text-white">2. Weekly Shift Attendance (Stacked Bar)</h4>
-                <p className="text-xs text-slate-400">Vertical stacked bars per day (M T W T F S S)</p>
-              </div>
-              <AttendanceOverviewBar />
-            </div>
-
-          </div>
-
-          {/* CHART ROW 2: 3. Donut Pie Chart + 4. 6-Axis Spiderweb Radar Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            {/* Chart 3: DepartmentDistribution (Donut Pie Chart) */}
-            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
-              <div className="border-b border-slate-800 pb-3 mb-2">
-                <h4 className="text-base font-extrabold text-white">3. Department Headcount Share (Donut Chart)</h4>
-                <p className="text-xs text-slate-400">Circular pie/donut distribution across 5 core divisions</p>
-              </div>
-              <DepartmentDistribution />
-            </div>
-
-            {/* Chart 4: EmployeeEngagementRadar (6-Axis Radar Spiderweb Chart) */}
-            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
-              <div className="border-b border-slate-800 pb-3 mb-2">
-                <h4 className="text-base font-extrabold text-white">4. Workforce Engagement Index (Radar Chart)</h4>
-                <p className="text-xs text-slate-400">6-axis spiderweb polygon across leadership & skill competencies</p>
-              </div>
-              <EmployeeEngagementRadar />
-            </div>
-
-          </div>
-
-          {/* CHART ROW 3: 5. Composed Bar + Line Combo Chart + 6. Horizontal Stacked Bar Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            {/* Chart 5: PerformanceAreaChart (Composed Bar + Line Combo Chart) */}
-            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
-              <PerformanceAreaChart />
-            </div>
-
-            {/* Chart 6: SalaryAnalyticsStackedBar (Horizontal Stacked Bar Chart) */}
-            <div className="lg:col-span-6 p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl">
-              <SalaryAnalyticsStackedBar />
-            </div>
-
-          </div>
-        </div>
+        <AnalyticsOverview title="Executive Workforce Intelligence" subtitle="Organization-wide workforce, attendance, skills, productivity and risk analytics" />
 
         {/* Recent Enterprise Activity Stream & Celebrations */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

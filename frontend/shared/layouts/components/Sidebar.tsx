@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useTheme } from '../../../design-system/theme/theme';
-import { Role } from '../../../security/roles/roles';
+import { ROLE_LABELS, Role } from '../../../security/roles/roles';
+import { StacklyLogo } from '../../../components/common/StacklyLogo';
 import {
   LayoutDashboard,
   Users,
@@ -39,7 +40,13 @@ import {
   HelpCircle,
   Award,
   AlertTriangle,
-  Star
+  Star,
+  PanelLeftClose,
+  PanelLeftOpen,
+  LockKeyhole,
+  Moon,
+  Sun,
+  ChevronRight,
 } from 'lucide-react';
 
 export interface NavigationItem {
@@ -64,6 +71,14 @@ interface SidebarProps {
   setMobileOpen: (open: boolean) => void;
   onOpenSupport: () => void;
 }
+
+const ROLE_ACCENTS: Record<Role, { className: string; shortLabel: string }> = {
+  [Role.ADMIN]: { className: 'sidebar-accent-admin', shortLabel: 'Admin workspace' },
+  [Role.HR]: { className: 'sidebar-accent-hr', shortLabel: 'People operations' },
+  [Role.MANAGER]: { className: 'sidebar-accent-manager', shortLabel: 'Department workspace' },
+  [Role.TEAM_LEAD]: { className: 'sidebar-accent-team-lead', shortLabel: 'Team workspace' },
+  [Role.EMPLOYEE]: { className: 'sidebar-accent-employee', shortLabel: 'Employee workspace' },
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
@@ -443,8 +458,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     ],
   };
 
-  const { theme } = useTheme();
-  const currentCategories = roleCategorizedNavMap[role as Role] || roleCategorizedNavMap[Role.EMPLOYEE];
+  const { theme, toggleTheme } = useTheme();
+  const activeRole = role as Role;
+  const currentCategories = roleCategorizedNavMap[activeRole] || roleCategorizedNavMap[Role.EMPLOYEE];
+  const roleAccent = ROLE_ACCENTS[activeRole] || ROLE_ACCENTS[Role.EMPLOYEE];
+  const roleLabel = ROLE_LABELS[activeRole] || ROLE_LABELS[Role.EMPLOYEE];
   const isDark = theme === 'dark';
 
   const getBadgeStyle = (variant: 'blue' | 'purple' | 'amber' | 'emerald' | 'rose') => {
@@ -475,65 +493,112 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Modern Clean Enterprise SaaS Left Sidebar */}
+      {/* Role-aware workspace navigation */}
       <aside
-        className={`app-sidebar ${
-          isDark ? 'bg-[#0B1120] text-slate-100 border-slate-800 shadow-2xl' : 'bg-white text-slate-800 border-slate-200 shadow-md'
-        } border-r flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
-          collapsed ? 'w-[64px]' : 'w-[220px]'
+        aria-label="Primary navigation"
+        className={`app-sidebar ${roleAccent.className} border-r flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
+          collapsed ? 'sidebar-is-collapsed w-[78px]' : 'sidebar-is-expanded w-[272px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Sidebar Branding Header */}
-        {!collapsed && (
-          <div className={`px-5 py-4 border-b ${isDark ? 'border-slate-800/80' : 'border-slate-150'}`}>
-            <div className="text-sm font-black tracking-widest text-blue-500">STACKLY</div>
-            <div className="text-[9px] font-black uppercase tracking-wider text-slate-400 mt-0.5">Workforce Intelligence</div>
+        <div className="sidebar-brand">
+          <div className="sidebar-brand-top">
+            <div className="sidebar-brand-mark" aria-hidden="true">
+              <StacklyLogo size={34} showText={false} useImg={false} />
+            </div>
+
+            {!collapsed && (
+              <div className="sidebar-brand-copy">
+                <div className="sidebar-brand-name">STACKLY</div>
+                <div className="sidebar-brand-tagline">Workforce intelligence</div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="sidebar-collapse-button"
+              onClick={() => setCollapsed((previous) => !previous)}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+            </button>
           </div>
-        )}
+
+          {!collapsed && (
+            <div className="sidebar-workspace-card">
+              <div className="sidebar-workspace-icon">
+                <Layers size={15} />
+              </div>
+              <div className="sidebar-workspace-copy">
+                <span className="sidebar-workspace-kicker">Current workspace</span>
+                <strong>{roleAccent.shortLabel}</strong>
+              </div>
+              <span className="sidebar-live-pill"><span /> Live</span>
+            </div>
+          )}
+
+          {!collapsed && (
+            <div className="sidebar-role-chip" title={roleLabel}>
+              <ShieldCheck size={14} />
+              <span>{roleLabel}</span>
+            </div>
+          )}
+        </div>
 
         {/* Sidebar Navigation Items List */}
-        <nav className="sidebar-nav flex-1 overflow-y-auto px-3 py-3 space-y-1 w-full scrollbar-thin">
+        <nav className="sidebar-nav sidebar-nav-scroll flex-1 overflow-y-auto w-full scrollbar-thin">
           {currentCategories.map((cat: NavigationCategory, groupIdx: number) => {
             return (
               <React.Fragment key={groupIdx}>
                 {/* Subtle Divider Line Between Logical Groups */}
                 {groupIdx > 0 && !collapsed && (
-                  <div className={`my-2 border-t ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`} />
+                  <div className="sidebar-group-separator" />
                 )}
 
                 {/* Section Header Title */}
                 {!collapsed && cat.category && cat.category !== 'General' && cat.category !== 'Dashboard' && cat.category !== 'Settings' && cat.category !== 'Help & Support' && (
-                  <div className={`px-3.5 pt-3 pb-1.5 text-[10px] font-black tracking-wider uppercase ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                  <div className="sidebar-section-label">
+                    <span />
                     {cat.category}
                   </div>
                 )}
 
                 {/* Clean Navigation Links */}
                 {cat.items.map((item: NavigationItem) => {
-                  const active = location.pathname === item.path;
+                  const active = item.path !== '#support' && (
+                    location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
+                  );
 
                   return (
                     <Link
                       key={item.path}
                       to={item.path}
-                      onClick={() => setMobileOpen(false)}
+                      onClick={(event) => {
+                        if (item.path === '#support') {
+                          event.preventDefault();
+                          onOpenSupport();
+                        }
+                        setMobileOpen(false);
+                      }}
                       title={collapsed ? item.label : undefined}
-                      className={`sidebar-nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all duration-200 group relative no-underline text-inherit ${
+                      aria-current={active ? 'page' : undefined}
+                      className={`sidebar-nav-link flex items-center gap-3 transition-all duration-200 group relative no-underline text-inherit ${
                         active
-                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-extrabold shadow-lg shadow-blue-500/25 border border-blue-500/40'
-                          : isDark
-                            ? 'hover:bg-slate-800/60 text-slate-300 hover:text-white border border-transparent hover:border-slate-800/60'
-                            : 'hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-transparent hover:border-slate-200'
-                      } ${collapsed ? 'justify-center px-0' : ''}`}
+                          ? 'is-active'
+                          : ''
+                      } ${collapsed ? 'is-collapsed justify-center' : ''}`}
                     >
-                      <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">
+                      <span className="sidebar-icon-shell shrink-0 transition-transform duration-200 group-hover:scale-110">
                         {item.icon}
                       </span>
 
                       {!collapsed && (
-                        <span className="font-bold text-xs tracking-tight truncate flex-1 min-w-0">
-                          {item.label}
-                        </span>
+                        <>
+                          <span className="sidebar-link-label font-bold text-xs tracking-tight truncate flex-1 min-w-0">
+                            {item.label}
+                          </span>
+                          <ChevronRight size={14} className="sidebar-link-arrow shrink-0" />
+                        </>
                       )}
 
                       {/* Unread Badge Counter */}
@@ -549,9 +614,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                       {/* Collapsed Hover Tooltip */}
                       {collapsed && (
-                        <span className={`absolute left-16 px-3 py-1.5 text-xs font-bold rounded-xl border shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap flex items-center gap-2 ${
-                          isDark ? 'bg-slate-900 text-slate-100 border-slate-700' : 'bg-white text-slate-800 border-slate-200'
-                        }`}>
+                        <span className="sidebar-tooltip">
                           {item.label}
                           {item.badge && (
                             <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${getBadgeStyle(item.badge.variant)}`}>
@@ -568,6 +631,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
+        <div className={`sidebar-footer ${collapsed ? 'is-collapsed' : ''}`}>
+          {!collapsed && (
+            <div className="sidebar-security-card">
+              <div className="sidebar-security-icon"><LockKeyhole size={15} /></div>
+              <div>
+                <strong>Protected workspace</strong>
+                <span>Role-scoped access is active</span>
+              </div>
+            </div>
+          )}
+
+          <div className="sidebar-footer-actions">
+            <button
+              type="button"
+              className="sidebar-footer-button"
+              onClick={toggleTheme}
+              title={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {!collapsed && <span>{isDark ? 'Light theme' : 'Dark theme'}</span>}
+            </button>
+            {!collapsed && (
+              <button
+                type="button"
+                className="sidebar-footer-button sidebar-footer-collapse"
+                onClick={() => setCollapsed(true)}
+              >
+                <PanelLeftClose size={16} />
+                <span>Collapse menu</span>
+              </button>
+            )}
+          </div>
+        </div>
       </aside>
     </>
   );

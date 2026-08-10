@@ -2,7 +2,7 @@ import React from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
-import { PerformanceChart } from '../../analytics/charts/PerformanceChart';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 export const Productivity: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ export const Productivity: React.FC = () => {
           <p className="text-sm text-slate-400">Evaluate individual developer throughput and code quality trends</p>
         </div>
 
-        <PerformanceChart />
+        <AnalyticsOverview title="Lead Productivity Matrix" subtitle="Live productivity, performance and skill-gap analytics for your authorized team" compact />
       </div>
     </RoleGuard>
   );

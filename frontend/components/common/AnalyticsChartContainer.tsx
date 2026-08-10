@@ -7,6 +7,8 @@ interface AnalyticsChartContainerProps {
   isLoading?: boolean;
   error?: string | null;
   isEmpty?: boolean;
+  onRetry?: () => void;
+  minHeight?: number;
   children: React.ReactNode;
 }
 
@@ -16,10 +18,16 @@ export const AnalyticsChartContainer: React.FC<AnalyticsChartContainerProps> = (
   isLoading = false,
   error = null,
   isEmpty = false,
+  onRetry,
+  minHeight = 360,
   children
 }) => {
   return (
-    <div className="w-full bg-[#0a1124] border border-slate-800/80 rounded-3xl p-6 shadow-2xl font-sans text-slate-200 flex flex-col justify-between min-h-[360px] relative overflow-hidden transition-all duration-300 hover:border-slate-700/80">
+    <section
+      className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-3xl p-6 shadow-xl font-sans text-[var(--text-primary)] flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:border-blue-500/40"
+      style={{ minHeight }}
+      aria-busy={isLoading}
+    >
       
       {/* Header */}
       <div className="mb-4">
@@ -39,8 +47,13 @@ export const AnalyticsChartContainer: React.FC<AnalyticsChartContainerProps> = (
         {!isLoading && error && (
           <div className="flex flex-col items-center justify-center text-center p-4 space-y-2">
             <AlertCircle className="h-8 w-8 text-rose-500" />
-            <span className="text-xs font-bold text-slate-200">Failed to load chart</span>
+            <span className="text-xs font-bold text-[var(--text-primary)]">Failed to load chart</span>
             <span className="text-[10px] text-slate-400 max-w-[200px]">{error}</span>
+            {onRetry && (
+              <button type="button" onClick={onRetry} className="mt-2 rounded-lg bg-blue-600 px-3 py-1.5 text-[10px] font-bold text-white hover:bg-blue-500">
+                Try again
+              </button>
+            )}
           </div>
         )}
 
@@ -58,6 +71,6 @@ export const AnalyticsChartContainer: React.FC<AnalyticsChartContainerProps> = (
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };

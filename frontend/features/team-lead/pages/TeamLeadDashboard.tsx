@@ -1,32 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RoleGuard } from '../../../security/guards/RoleGuard';
 import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
-
-// Custom Team Lead Charts
-import { AttendanceAnalyticsArea } from '../../analytics/charts/AttendanceAnalyticsArea';
-import { PerformanceRadar } from '../../analytics/charts/PerformanceRadar';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
+import { employeeApi } from '../../../api/endpoints/employee.api';
+import { workforceApi, Task } from '../../../api/endpoints/workforce.api';
+import { Employee } from '../../../shared/types/common.types';
 
 import { Flame, GitPullRequest, Users, CheckCircle2, Zap, Clock, Star, FileText, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const TeamLeadDashboard: React.FC = () => {
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
+  const [directReports, setDirectReports] = useState<Array<{ name: string; role: string; task: string; velocity: string; avatar?: string }>>([]);
+  const [sprintTasks, setSprintTasks] = useState<Task[]>([]);
 
-  const directReports = [
-    { name: 'Alex Mercer', role: 'Full Stack Developer', task: 'ABAC Sensitivity Validator', velocity: '94%', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' },
-    { name: 'Rachel Kim', role: 'Data Analyst', task: 'Q2 Attrition Prediction Model', velocity: '98%', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
-    { name: 'Samantha Wu', role: 'HR Specialist', task: 'Engineering Recruiter Screening', velocity: '91%', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150' },
-  ];
-
-  const sprintTasks = [
-    { id: 'TASK-401', title: 'Implement ABAC Sensitivity Validator', assignee: 'Alex Mercer', priority: 'HIGH', status: 'IN_PROGRESS' },
-    { id: 'TASK-402', title: 'Refactor Header Security Dropdown Scroll', assignee: 'Sarah Connor', priority: 'CRITICAL', status: 'COMPLETED' },
-    { id: 'TASK-403', title: 'Audit Multi-level Route Guards', assignee: 'Marcus Vance', priority: 'MEDIUM', status: 'IN_PROGRESS' },
-    { id: 'TASK-404', title: 'Fix Duplicate Manager Access Policies', assignee: 'David Sterling', priority: 'HIGH', status: 'COMPLETED' },
-  ];
+  useEffect(() => {
+    Promise.all([employeeApi.getEmployees(), workforceApi.getTasks()]).then(([employees, tasks]) => {
+      setDirectReports((employees as Employee[]).slice(0, 8).map((employee) => ({
+        name: employee.name,
+        role: employee.designation || employee.role,
+        task: tasks.find((task) => task.assigneeId === employee.id)?.title || 'No active task',
+        velocity: `${Math.round(employee.performanceScore || 0)}%`,
+        avatar: employee.avatar
+      })));
+      setSprintTasks(tasks.slice(0, 8));
+    }).catch(() => {
+      setDirectReports([]);
+      setSprintTasks([]);
+    });
+  }, []);
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
     setDrillDownData({
@@ -67,7 +72,7 @@ export const TeamLeadDashboard: React.FC = () => {
           </div>
         </div>
 
-
+        <AnalyticsOverview title="Team Lead Intelligence" subtitle="Live team productivity, performance, attendance and skills" compact />
 
         {/* 8 Reusable Team Lead KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -188,12 +193,12 @@ export const TeamLeadDashboard: React.FC = () => {
             </div>
 
             <div className="space-y-2.5">
-              {sprintTasks.map((t) => (
+              {sprintTasks.length === 0 ? <p className="text-sm text-[var(--text-muted)]">No tasks are assigned in your team scope.</p> : sprintTasks.map((t) => (
                 <div key={t.id} className="p-3.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between text-xs">
                   <div>
                     <span className="font-mono text-[10px] text-slate-400">{t.id}</span>
                     <h4 className="font-bold text-sm text-[var(--text-primary)]">{t.title}</h4>
-                    <p className="text-xs text-slate-400">Assignee: <span className="text-blue-400 font-semibold">{t.assignee}</span></p>
+                    <p className="text-xs text-slate-400">Assignee: <span className="text-blue-400 font-semibold">{t.assigneeName}</span></p>
                   </div>
                   <span className={`badge ${t.status === 'COMPLETED' ? 'badge-success' : 'badge-info'} text-[10px] uppercase font-bold`}>
                     {t.status}
@@ -214,7 +219,7 @@ export const TeamLeadDashboard: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              {directReports.map((m, idx) => (
+              {directReports.length === 0 ? <p className="text-sm text-[var(--text-muted)]">No team members are available in your scope.</p> : directReports.map((m, idx) => (
                 <div key={idx} className="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-between text-xs">
                   <div className="flex items-center gap-3">
                     <img src={m.avatar} alt={m.name} className="w-10 h-10 rounded-full object-cover border border-cyan-500 shrink-0" />
@@ -227,23 +232,6 @@ export const TeamLeadDashboard: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Section 2: Attendance Tracking Area Chart & Squad Skill Radar */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Clock size={18} className="text-emerald-400" /> Team Attendance & Shift Hours Analytics
-            </h3>
-            <AttendanceAnalyticsArea />
-          </div>
-
-          <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Star size={18} className="text-purple-400" /> Squad Technical Capability Radar
-            </h3>
-            <PerformanceRadar />
           </div>
         </div>
 

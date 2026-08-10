@@ -1,7 +1,6 @@
 import React from 'react';
-import { BarChart3, TrendingUp, Download, PieChart, FileSpreadsheet, Sparkles } from 'lucide-react';
-import { WorkforceTrendLine } from '../charts/WorkforceTrendLine';
-import { DepartmentDistribution } from '../charts/DepartmentDistribution';
+import { BarChart3, Download, FileSpreadsheet, Sparkles } from 'lucide-react';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 export const AnalystDashboard: React.FC = () => {
   return (
@@ -63,22 +62,7 @@ export const AnalystDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Analytics Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-          <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-            <TrendingUp size={18} className="text-blue-500" /> Workforce Performance & Headcount Trends
-          </h3>
-          <WorkforceTrendLine />
-        </div>
-
-        <div className="glass-panel p-6 rounded-2xl border-[var(--border-color)] space-y-4">
-          <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-            <PieChart size={18} className="text-purple-400" /> Departmental Distribution Analysis
-          </h3>
-          <DepartmentDistribution />
-        </div>
-      </div>
+      <AnalyticsOverview title="Live Workforce Intelligence" subtitle="Scope-filtered analytics for authorized business intelligence users" />
     </div>
   );
 };

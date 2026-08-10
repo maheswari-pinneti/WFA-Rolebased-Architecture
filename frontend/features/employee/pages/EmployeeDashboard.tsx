@@ -9,8 +9,7 @@ import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillD
 import { LiveCheckInWidget } from '../../../components/attendance/LiveCheckInWidget';
 import { AttendanceCalendarView } from '../../../components/attendance/AttendanceCalendarView';
 
-// Custom Employee Charts
-import { WorkforceTrendLine } from '../../analytics/charts/WorkforceTrendLine';
+import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOverview';
 
 import { Clock, Calendar, FileText, Compass, DollarSign, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -60,8 +59,10 @@ export const EmployeeDashboard: React.FC = () => {
           </div>
         </div>
 
+        <AnalyticsOverview title="My Workforce Intelligence" subtitle="Personal attendance, performance and skill coverage" compact />
+
         {/* LIVE CHECK-IN / CHECK-OUT WIDGET & TIME TRACKER */}
-        <LiveCheckInWidget employeeName="Alex Mercer" department="Engineering & Technology" />
+        <LiveCheckInWidget />
 
 
 
@@ -123,9 +124,6 @@ export const EmployeeDashboard: React.FC = () => {
 
         {/* INTERACTIVE MONTHLY ATTENDANCE CALENDAR VIEW */}
         <AttendanceCalendarView />
-
-        {/* Employee Personal Growth Chart */}
-        <WorkforceTrendLine />
 
         {/* Drill Down Modal */}
         <DrillDownModal isOpen={!!drillDownData} data={drillDownData} onClose={() => setDrillDownData(null)} />
