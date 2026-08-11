@@ -1,8 +1,8 @@
 # Enterprise Workforce Analytics Intelligence Platform
 
-An enterprise-grade **Workforce Analytics and Intelligence Platform** built with a unified full-stack architecture using **React 18, TypeScript, Node.js, Express.js, SQLite, Redux Toolkit, React Query, and Recharts**.
+An enterprise-grade **Workforce Analytics and Intelligence Platform** built with a unified full-stack architecture using **React 18, TypeScript, Node.js, Express.js, SQLite, Redux Toolkit, TanStack React Query, Material UI, Tailwind CSS, Recharts, and real-time communication technologies**.
 
-The platform provides secure workforce management through **RBAC, ABAC, and policy-based authorization**, with dedicated dashboards for five enterprise roles.
+The platform provides secure workforce management, workforce intelligence, attendance monitoring, employee management, analytics, and enterprise authorization through **RBAC, ABAC, policy-based authorization, JWT authentication, refresh tokens, and Multi-Factor Authentication (MFA)**.
 
 ---
 
@@ -10,33 +10,55 @@ The platform provides secure workforce management through **RBAC, ABAC, and poli
 
 The Workforce Analytics Intelligence Platform provides:
 
-* 🔐 Five-tier role-based access control
-* 🛡️ RBAC, ABAC, and policy-based authorization
-* 🔑 JWT authentication with refresh-token support
-* 📱 MFA / OTP authentication flow
+* 🔐 Five-tier enterprise role architecture
+* 🛡️ RBAC — Role-Based Access Control
+* 🔎 ABAC — Attribute-Based Access Control
+* 📜 Policy-Based Access Control
+* 🔑 JWT authentication
+* 🔄 Refresh-token authentication
+* 🔐 Multi-Factor Authentication (MFA)
+* 📱 OTP verification
 * 👥 250 uniquely seeded employee records
 * 🚫 Duplicate employee ID prevention
-* 📊 Workforce and employee analytics
+* 📊 Workforce analytics
+* 📈 Employee growth and hiring analytics
+* 🏢 Department analytics
+* 👤 Employee management
+* 📋 Searchable and filterable employee directory
+* 📄 Employee pagination
+* 📤 CSV export
 * ⏱️ Attendance management
-* 📍 Geofencing and attendance verification
+* 🟢 Check-In / Check-Out
+* ☕ Break / Resume
+* 📝 Attendance corrections
 * 🔄 Offline attendance synchronization
-* 🔔 Notifications and security alerts
-* 📈 Interactive charts with loading, empty, and error states
-* 🎨 Consistent theme support across every role
+* 📍 Geofencing and attendance verification
+* 🚨 Security and geofence alerts
+* 🔔 Notifications
+* 📧 Company email notification support
+* 💬 System/message notifications
+* ⚡ Real-time attendance updates
+* ⚡ Real-time notification updates
+* 🧾 Audit logging
+* 🔒 Protected routes
+* 🛡️ Role guards
+* 🔏 Permission guards
+* 🎨 Consistent enterprise theme across all roles
 * 🌓 Light and dark mode
-* 📋 Searchable and filterable employee table
-* 📤 CSV employee/data export
-* 🧾 Attendance correction history
-* 📝 Audit logging
-* ⚡ Real-time attendance and notification updates
-* 🔒 Protected routes and permission guards
-* 📱 Responsive enterprise dashboard layout
+* 📱 Responsive dashboard layout
+* 📊 Reusable chart components
+* ⏳ Loading states
+* 📭 Empty states
+* ❌ Error states
+* 🧪 Unit and integration testing
+* 🗄️ SQLite persistence
+* 🔗 REST API integration
 
 ---
 
 # 👥 Five Role Architecture
 
-The platform supports five primary enterprise roles:
+The platform supports five enterprise roles.
 
 | Role          | Access Scope                | Dashboard              |
 | ------------- | --------------------------- | ---------------------- |
@@ -46,49 +68,114 @@ The platform supports five primary enterprise roles:
 | **TEAM LEAD** | Team-level operations       | `/team-lead/dashboard` |
 | **EMPLOYEE**  | Personal/self-service       | `/employee/dashboard`  |
 
-Each role receives its own authorized navigation, dashboard widgets, data scope, actions, and permissions.
+Each role receives:
+
+* Role-specific dashboard
+* Authorized sidebar navigation
+* Authorized API access
+* Role-specific widgets
+* Role-specific analytics
+* Role-specific data scope
+* Role-specific actions
+* Permission-aware UI
+* Theme-consistent interface
 
 ---
 
-# 📸 Dashboard Screenshots
+# 📊 Role Dashboards
 
 ## 🔴 Admin Dashboard
 
-The Admin dashboard provides organization-wide workforce visibility, user management, permissions, system analytics, audit information, and administrative controls.
+The Admin dashboard provides organization-wide visibility and administrative control.
 
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+Key capabilities include:
+
+* Organization workforce overview
+* Employee management
+* User management
+* Role and permission management
+* Department management
+* Team management
+* Workforce analytics
+* Attendance analytics
+* Audit logs
+* Security events
+* System notifications
+* Administrative settings
 
 ---
 
 ## 🟣 HR Dashboard
 
-The HR dashboard provides workforce statistics, employee management, attendance analytics, department information, hiring trends, and HR operations.
+The HR dashboard focuses on workforce and human-resource operations.
 
-![HR Dashboard](docs/screenshots/hr-dashboard.png)
+Key capabilities include:
+
+* Workforce overview
+* Employee management
+* Employee directory
+* Department analytics
+* Hiring analytics
+* Attendance analytics
+* Workforce trends
+* Employee status
+* HR notifications
+* Employee information management
 
 ---
 
 ## 🔵 Manager Dashboard
 
-The Manager dashboard focuses on department/team workforce performance, attendance, employee statistics, productivity, and team analytics.
+The Manager dashboard focuses on department and team-level workforce intelligence.
 
-![Manager Dashboard](docs/screenshots/manager-dashboard.png)
+Key capabilities include:
+
+* Team overview
+* Department workforce statistics
+* Team attendance
+* Employee performance
+* Workforce analytics
+* Attendance trends
+* Team employee directory
+* Team notifications
+* Department-level filtering
 
 ---
 
 ## 🟢 Team Lead Dashboard
 
-The Team Lead dashboard provides team-level employee information, attendance monitoring, performance information, and operational insights.
+The Team Lead dashboard provides operational team-level visibility.
 
-![Team Lead Dashboard](docs/screenshots/team-lead-dashboard.png)
+Key capabilities include:
+
+* Team members
+* Team attendance
+* Check-in/check-out monitoring
+* Team performance
+* Employee status
+* Attendance history
+* Team analytics
+* Operational notifications
 
 ---
 
 ## 🟠 Employee Dashboard
 
-The Employee dashboard provides employee self-service functionality including personal information, attendance, check-in/check-out, notifications, and individual workforce insights.
+The Employee dashboard provides self-service workforce functionality.
 
-![Employee Dashboard](docs/screenshots/employee-dashboard.png)
+Key capabilities include:
+
+* Personal dashboard
+* My profile
+* My attendance
+* Check-In
+* Break
+* Resume
+* Check-Out
+* Attendance history
+* Attendance correction requests
+* Notifications
+* Personal workforce information
 
 ---
 
@@ -101,28 +188,26 @@ WFA-Rolebased-Architecture/
 │
 ├── frontend/       # React + TypeScript application
 ├── backend/        # Node.js + Express REST API
-├── database/       # SQLite database, migrations & seed data
-├── docs/           # Documentation, architecture & dashboard screenshots
-├── public/         # Public assets and branding
+├── database/       # SQLite database, migrations and seed data
+├── docs/           # Documentation and architecture specifications
+├── public/         # Public assets, logos and icons
 ├── dist/           # Production build output
-├── tests/          # Unit, integration & E2E tests
+├── tests/          # Unit, integration and E2E tests
 ├── package.json    # Project dependencies and scripts
 └── README.md       # Project documentation
 ```
 
-### 📂 Directory Overview
+### Directory Overview
 
 | Directory     | Purpose                                                                      |
 | ------------- | ---------------------------------------------------------------------------- |
 | **frontend/** | React, TypeScript, dashboards, components, themes, routing and role-based UI |
 | **backend/**  | Express APIs, authentication, authorization, services and business logic     |
 | **database/** | SQLite database, migrations, seed data and test database                     |
-| **docs/**     | Architecture documentation, specifications and dashboard screenshots         |
+| **docs/**     | Architecture documentation and project specifications                        |
 | **public/**   | Logos, icons and static public assets                                        |
 | **dist/**     | Production-ready frontend build                                              |
 | **tests/**    | Unit, integration, authentication, RBAC and E2E tests                        |
-
-The repository follows a modular full-stack architecture separating the **frontend presentation layer, backend API/business layer, database persistence layer, documentation, testing and production assets**.
 
 ---
 
@@ -141,6 +226,7 @@ The repository follows a modular full-stack architecture separating the **fronte
 * Recharts
 * WebSocket / Socket.IO
 * Vitest
+* React Testing Library
 
 ## Backend
 
@@ -150,8 +236,10 @@ The repository follows a modular full-stack architecture separating the **fronte
 * Refresh Tokens
 * Bcrypt
 * REST APIs
-* WebSocket
+* WebSocket / Socket.IO
 * Middleware-based authorization
+* Request validation
+* Security middleware
 
 ## Database
 
@@ -161,23 +249,14 @@ The repository follows a modular full-stack architecture separating the **fronte
 * Foreign-key relationships
 * Unique constraints
 * Indexed queries
-* Transaction-based operations
-
-## Testing
-
-* Vitest
-* React Testing Library
-* API/integration tests
-* RBAC tests
-* Authentication tests
-* Attendance tests
-* Database tests
+* Transactions
+* Audit persistence
 
 ---
 
-# 🔐 Authentication & Authorization
+# 🔐 Authentication & MFA
 
-The authentication architecture follows:
+The platform implements a multi-layer authentication architecture.
 
 ```text
 Login
@@ -188,6 +267,8 @@ Password Verification
   ↓
 MFA / OTP Challenge
   ↓
+OTP Verification
+  ↓
 Access Token + Refresh Token
   ↓
 Protected Route
@@ -196,35 +277,60 @@ Role Validation
   ↓
 Permission Validation
   ↓
-Organization / Department / Team Scope
+Scope Validation
   ↓
-Dashboard
+Role Dashboard
 ```
 
-### Security Features
+### Authentication Features
 
-* Password hashing with Bcrypt
 * JWT access tokens
 * Refresh tokens
+* Multi-Factor Authentication
+* OTP verification
+* MFA challenge management
+* Password hashing with Bcrypt
 * Token expiration
-* MFA / OTP verification
-* Protected routes
-* Role guards
-* Permission guards
-* Scope-based authorization
 * Session validation
-* Logout/token invalidation
+* Logout
+* Token invalidation
+* Protected routes
+* Authentication error handling
 * Rate limiting
 * API validation
-* Audit logging
+* Authentication audit logs
+
+### MFA Flow
+
+```text
+User Login
+    ↓
+Username / Email + Password
+    ↓
+Credentials Valid?
+   / \
+ NO   YES
+ ↓     ↓
+Reject  Generate MFA/OTP Challenge
+              ↓
+         OTP Verification
+              ↓
+        OTP Valid / Invalid
+          /          \
+       Invalid       Valid
+         ↓             ↓
+      Reject      Issue Tokens
+                        ↓
+                 Access Dashboard
+```
+
+MFA provides an additional authentication layer before issuing the authenticated session.
 
 ---
 
 # 🛡️ Access Control
 
-The platform supports multiple authorization layers.
-
-### RBAC
+## RBAC
 
 ```text
 ADMIN
@@ -234,7 +340,7 @@ TEAM_LEAD
 EMPLOYEE
 ```
 
-### ABAC
+## ABAC
 
 Access can additionally depend on:
 
@@ -245,10 +351,32 @@ Team
 Employee
 Resource
 Action
-User attributes
+User Attributes
 ```
 
-### Scope Model
+## Policy-Based Authorization
+
+Policies evaluate:
+
+```text
+User
+ +
+Role
+ +
+Permission
+ +
+Resource
+ +
+Action
+ +
+Scope
+ =
+Access Decision
+```
+
+---
+
+# 🎯 Scope-Based Authorization
 
 ```text
 ADMIN
@@ -267,13 +395,15 @@ EMPLOYEE
  └── Self
 ```
 
+This ensures users cannot access workforce data outside their authorized organizational scope.
+
 ---
 
 # 👥 Employee Management
 
-The system contains **250 unique seeded employee records**.
+The platform contains **250 uniquely seeded employee records**.
 
-Employee IDs follow the format:
+Employee IDs follow:
 
 ```text
 EMP-001
@@ -283,54 +413,67 @@ EMP-003
 EMP-250
 ```
 
-The database enforces uniqueness using:
+The database enforces uniqueness through:
 
 ```sql
 UNIQUE(emp_id)
 ```
 
-Duplicate employee IDs are therefore rejected at the database level.
+This prevents duplicate employee IDs at the database level.
+
+### Employee Management Features
+
+* Create employee
+* View employee
+* Update employee
+* Employee details
+* Employee status
+* Department assignment
+* Team assignment
+* Manager assignment
+* Search
+* Filtering
+* Sorting
+* Pagination
+* Attendance status
+* CSV export
+* Duplicate ID prevention
 
 ---
 
-# 📋 Employee Table
+# 📋 Employee Directory
 
-The employee directory includes:
+The employee table contains:
 
 | Employee ID | Employee Name | Department | Designation | Employment Status | Email | Phone | Location | Joining Date | Manager | Attendance Status | Actions |
 | ----------- | ------------- | ---------- | ----------- | ----------------- | ----- | ----- | -------- | ------------ | ------- | ----------------- | ------- |
 
-The table supports:
+### Employee Table Features
 
-* Search
-* Sorting
-* Filtering
-* Pagination
-* Employee details
-* Status indicators
-* Department filtering
-* Role/designation filtering
-* Attendance status
-* CSV export
-* View/edit actions
+* 🔎 Global search
+* ↕️ Column sorting
+* 🔍 Department filtering
+* 🔍 Role/designation filtering
+* 🔍 Employment-status filtering
+* 📄 Pagination
+* 👤 Employee details
+* 🟢 Attendance status
+* ✏️ Edit actions
+* 👁️ View actions
+* 📤 CSV export
+* 🚫 Duplicate employee ID validation
 
 ---
 
 # 📊 Workforce Analytics
 
-The platform provides reusable chart components with:
+The platform provides reusable, API-driven analytics components.
 
-* Loading states
-* Empty states
-* Error states
-* Responsive layouts
-* Theme-aware styling
-* API-driven data
-
-### Analytics Included
+### Analytics
 
 * Employee growth
 * Hiring trends
+* Workforce trends
 * Attendance trends
 * Department comparison
 * Workforce distribution
@@ -338,7 +481,23 @@ The platform provides reusable chart components with:
 * Role distribution
 * Location distribution
 * Performance analytics
-* Workforce trends
+* Employee statistics
+
+### Chart States
+
+Every reusable chart supports:
+
+```text
+Loading
+   ↓
+Data Available
+   OR
+Empty
+   OR
+Error
+```
+
+Charts are responsive and theme-aware.
 
 ---
 
@@ -356,13 +515,17 @@ Resume
 Check-Out
 ```
 
-Additional functionality includes:
+### Attendance Features
 
+* Check-In
+* Break
+* Resume
+* Check-Out
 * Attendance history
+* Attendance status
 * Attendance corrections
 * Duplicate punch prevention
-* Idempotent attendance actions
-* Attendance status
+* Idempotent actions
 * Offline queue
 * Synchronization
 * Manager/team monitoring
@@ -379,7 +542,7 @@ Employee Location
        ↓
 Distance Calculation
        ↓
-MAHE Office Geofence
+Office Geofence
        ↓
 Within Allowed Radius?
       / \
@@ -388,16 +551,21 @@ Within Allowed Radius?
  Check-In  Reject / Alert
 ```
 
-Geofence violations can trigger security notifications and audit events.
+Geofence violations can generate:
+
+* Security alerts
+* Notifications
+* Audit events
+* Attendance rejection
 
 ---
 
-# 🔄 Offline Synchronization
+# 🔄 Offline Attendance Synchronization
 
-Attendance actions can be queued locally when network connectivity is unavailable.
+When network connectivity is unavailable:
 
 ```text
-Offline Action
+Attendance Action
       ↓
 Local Queue
       ↓
@@ -408,208 +576,53 @@ Synchronization
 Backend Validation
       ↓
 SQLite Persistence
+      ↓
+Real-Time Update
 ```
 
-This prevents attendance actions from being lost during temporary connectivity problems.
+This allows attendance actions to be preserved during temporary connectivity issues.
 
 ---
 
-# 🔔 Notifications & Alerts
+# 🔔 Notifications, Email & Messages
 
-The platform supports:
+The platform supports workforce notifications and security communication.
+
+### Notification Types
 
 * Attendance notifications
-* Security alerts
+* Check-in notifications
+* Check-out notifications
+* Attendance correction notifications
 * Geofence alerts
 * Duplicate punch alerts
+* Security alerts
 * System notifications
-* Notification history
-* Real-time notification updates
+* Workforce notifications
 
----
+### Communication
 
-# 🧾 Audit Logging
+Notifications can be delivered through supported enterprise communication channels, including:
 
-Important actions are recorded for traceability, including:
+* 📧 Official company email
+* 💬 In-application messages
+* 🔔 Real-time system notifications
 
-* Login
-* Logout
-* Authentication failures
-* Employee changes
-* Attendance actions
-* Attendance corrections
-* Permission-sensitive actions
-* Geofence violations
-* Security events
+**Company communication only:** Personal email addresses should not be used for project communication, notification configuration, or repository documentation.
 
----
+Company email configuration should be supplied through environment variables rather than hard-coded into the source code.
 
-# 🗄️ Database
+Example:
 
-The project uses SQLite for local relational persistence.
-
-```text
-database/
-│
-├── wfa.db
-├── wfa-test-e2e.db
-│
-├── migrations/
-│   ├── 001_create_organizations.sql
-│   ├── 002_create_users.sql
-│   ├── 003_create_roles.sql
-│   ├── 004_create_permissions.sql
-│   ├── 005_create_employees.sql
-│   ├── 006_create_departments.sql
-│   ├── 007_create_teams.sql
-│   ├── 008_create_attendance.sql
-│   ├── 009_create_notifications.sql
-│   └── 010_create_audit_logs.sql
-│
-└── seeds/
-    ├── roles.sql
-    ├── permissions.sql
-    ├── users.sql
-    ├── departments.sql
-    ├── teams.sql
-    └── employees.sql
+```env
+COMPANY_EMAIL=
+COMPANY_EMAIL_HOST=
+COMPANY_EMAIL_PORT=
+COMPANY_EMAIL_USER=
+COMPANY_EMAIL_PASSWORD=
 ```
 
----
-
-# 🔑 Default Seeded Credentials
-
-> **Development/testing credentials only. Do not use these passwords in production.**
-
-| Role                      | Email                     | Password      | Dashboard              |
-| ------------------------- | ------------------------- | ------------- | ---------------------- |
-| **System Administrator**  | `admin@thestackly.com`    | `password123` | `/admin/dashboard`     |
-| **HR Operations Manager** | `hr@thestackly.com`       | `password123` | `/hr/dashboard`        |
-| **Department Manager**    | `manager@thestackly.com`  | `password123` | `/manager/dashboard`   |
-| **Operational Team Lead** | `lead@thestackly.com`     | `password123` | `/team-lead/dashboard` |
-| **Employee Self-Service** | `employee@thestackly.com` | `password123` | `/employee/dashboard`  |
-
----
-
-# 🎨 Theme System
-
-All five role dashboards use the same enterprise design system while adapting content and permissions to the logged-in role.
-
-Supported themes:
-
-```text
-Light Mode
-Dark Mode
-```
-
-Theme-aware components include:
-
-* Sidebar
-* Header
-* KPI cards
-* Charts
-* Tables
-* Forms
-* Modals
-* Buttons
-* Dashboard cards
-* Navigation
-* Employee directory
-
----
-
-# 🧭 Role-Based Navigation
-
-Each role receives only the navigation modules permitted for that role.
-
-```text
-ADMIN
-├── Dashboard
-├── Employees
-├── Departments
-├── Teams
-├── Analytics
-├── Users
-├── Roles & Permissions
-├── Audit Logs
-└── Settings
-
-HR
-├── Dashboard
-├── Employees
-├── Attendance
-├── Departments
-├── Workforce Analytics
-└── Notifications
-
-MANAGER
-├── Dashboard
-├── My Team
-├── Attendance
-├── Team Analytics
-└── Notifications
-
-TEAM LEAD
-├── Dashboard
-├── Team
-├── Attendance
-├── Performance
-└── Notifications
-
-EMPLOYEE
-├── Dashboard
-├── My Attendance
-├── My Profile
-└── Notifications
-```
-
----
-
-# 🔌 API Architecture
-
-The frontend communicates with the backend through REST APIs.
-
-### Authentication
-
-```text
-POST /api/auth/login
-POST /api/auth/verify-otp
-POST /api/auth/refresh
-POST /api/auth/logout
-POST /api/auth/signup
-POST /api/auth/forgot-password
-```
-
-### Employees
-
-```text
-GET    /api/employees
-GET    /api/employees/:empId
-POST   /api/employees
-PUT    /api/employees/:empId
-DELETE /api/employees/:empId
-```
-
-### Attendance
-
-```text
-POST /api/attendance/check-in
-POST /api/attendance/break
-POST /api/attendance/resume
-POST /api/attendance/check-out
-GET  /api/attendance/history
-POST /api/attendance/correction
-```
-
-### Analytics
-
-```text
-GET /api/analytics/workforce
-GET /api/analytics/employees
-GET /api/analytics/attendance
-GET /api/analytics/departments
-GET /api/analytics/hiring
-```
+Sensitive credentials must never be committed to Git.
 
 ---
 
@@ -622,6 +635,8 @@ Employee Action
       ↓
 REST API
       ↓
+Backend Service
+      ↓
 SQLite
       ↓
 WebSocket Event
@@ -631,18 +646,244 @@ Dashboard
 Live UI Update
 ```
 
-Real-time events include:
+Real-time functionality includes:
 
 * Attendance updates
 * Notification updates
 * Security alerts
 * Workforce KPI updates
+* Employee status updates
+
+---
+
+# 🧾 Audit Logging
+
+Important platform activities are recorded for traceability.
+
+### Audited Events
+
+* Login
+* Logout
+* Failed authentication
+* MFA verification
+* Token refresh
+* Employee creation
+* Employee updates
+* Employee deletion
+* Attendance actions
+* Attendance corrections
+* Permission-sensitive actions
+* Geofence violations
+* Security events
+* Administrative actions
+
+---
+
+# 🎨 Enterprise Theme System
+
+All five roles use the same enterprise design system.
+
+The interface adapts content and permissions based on the authenticated role while maintaining visual consistency.
+
+### Supported Themes
+
+```text
+Light Mode
+Dark Mode
+```
+
+### Theme-Aware Components
+
+* Sidebar
+* Header
+* KPI cards
+* Charts
+* Tables
+* Forms
+* Buttons
+* Modals
+* Navigation
+* Employee directory
+* Attendance interface
+* Dashboard cards
+
+Theme changes apply consistently across all five roles.
+
+---
+
+# 🧭 Role-Based Navigation
+
+## ADMIN
+
+```text
+Dashboard
+Employees
+Departments
+Teams
+Analytics
+Users
+Roles & Permissions
+Audit Logs
+Settings
+```
+
+## HR
+
+```text
+Dashboard
+Employees
+Attendance
+Departments
+Workforce Analytics
+Notifications
+```
+
+## MANAGER
+
+```text
+Dashboard
+My Team
+Attendance
+Team Analytics
+Notifications
+```
+
+## TEAM LEAD
+
+```text
+Dashboard
+Team
+Attendance
+Performance
+Notifications
+```
+
+## EMPLOYEE
+
+```text
+Dashboard
+My Attendance
+My Profile
+Notifications
+```
+
+---
+
+# 🔌 REST API Architecture
+
+## Authentication
+
+```text
+POST /api/auth/login
+POST /api/auth/verify-otp
+POST /api/auth/refresh
+POST /api/auth/logout
+POST /api/auth/signup
+POST /api/auth/forgot-password
+```
+
+## Employees
+
+```text
+GET    /api/employees
+GET    /api/employees/:empId
+POST   /api/employees
+PUT    /api/employees/:empId
+DELETE /api/employees/:empId
+```
+
+## Attendance
+
+```text
+POST /api/attendance/check-in
+POST /api/attendance/break
+POST /api/attendance/resume
+POST /api/attendance/check-out
+GET  /api/attendance/history
+POST /api/attendance/correction
+```
+
+## Analytics
+
+```text
+GET /api/analytics/workforce
+GET /api/analytics/employees
+GET /api/analytics/attendance
+GET /api/analytics/departments
+GET /api/analytics/hiring
+```
+
+---
+
+# 🗄️ Database
+
+The platform uses SQLite for relational persistence.
+
+Core data domains include:
+
+```text
+Organizations
+Users
+Roles
+Permissions
+Employees
+Departments
+Teams
+Attendance
+Attendance Corrections
+Notifications
+MFA Challenges
+Audit Logs
+Sessions / Refresh Tokens
+```
+
+Database requirements include:
+
+* Unique employee IDs
+* Unique user emails
+* Foreign-key relationships
+* Indexed queries
+* Transaction support
+* Seed data
+* Test database
+* Audit persistence
+
+---
+
+# 🔑 Default Seeded Credentials
+
+> **Development/testing credentials only. Never use these passwords in production.**
+
+| Role                      | Company Email             | Password      | Dashboard              |
+| ------------------------- | ------------------------- | ------------- | ---------------------- |
+| **System Administrator**  | `admin@thestackly.com`    | `password123` | `/admin/dashboard`     |
+| **HR Operations Manager** | `hr@thestackly.com`       | `password123` | `/hr/dashboard`        |
+| **Department Manager**    | `manager@thestackly.com`  | `password123` | `/manager/dashboard`   |
+| **Operational Team Lead** | `lead@thestackly.com`     | `password123` | `/team-lead/dashboard` |
+| **Employee Self-Service** | `employee@thestackly.com` | `password123` | `/employee/dashboard`  |
+
+These credentials are intended strictly for development and testing.
 
 ---
 
 # 🧪 Testing
 
-The project includes unit, integration, authentication, RBAC, and database tests.
+The project includes:
+
+* Unit tests
+* Integration tests
+* Authentication tests
+* MFA tests
+* OTP tests
+* RBAC tests
+* Permission tests
+* Employee API tests
+* Database tests
+* Attendance tests
+* Geofencing tests
+* Refresh-token tests
+* Analytics tests
+* Idempotency tests
 
 Run:
 
@@ -650,34 +891,18 @@ Run:
 npm run test
 ```
 
-Example test areas:
-
-```text
-Authentication
-RBAC
-Permission Guards
-Employee API
-Duplicate Employee IDs
-Attendance
-Attendance Idempotency
-Geofencing
-Refresh Tokens
-Analytics
-Database Persistence
-```
-
 ---
 
-# 📥 Quick Start
+# 📥 Getting Started
 
-### 1. Clone the repository
+## 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd WFA-Rolebased-Architecture-main
+git clone https://github.com/maheswari-pinneti/WFA-Rolebased-Architecture.git
+cd WFA-Rolebased-Architecture
 ```
 
-### 2. Install dependencies
+## 2. Install Dependencies
 
 ```bash
 npm install
@@ -693,40 +918,59 @@ cd ../backend
 npm install
 ```
 
-### 3. Configure environment
+## 3. Configure Environment
 
-Create the required `.env` files from `.env.example`.
+Create environment files from the provided examples.
 
-Never commit production secrets.
+```bash
+cp .env.example .env
+```
 
-### 4. Initialize the database
+Configure company/service credentials only through environment variables.
 
-Run the database migration/seed commands configured in the project.
+Do not add:
+
+* Personal email addresses
+* Personal phone numbers
+* Passwords
+* JWT secrets
+* API keys
+* Database passwords
+* Private tokens
+
+to the Git repository.
+
+## 4. Initialize Database
+
+Run the configured migration and seed commands.
 
 The development database should contain:
 
 ```text
-250 unique employee records
+250 unique employees
 5 role accounts
 Departments
 Teams
 Permissions
+MFA configuration
 Attendance data
+Notification data
+Audit records
 ```
 
-### 5. Start development servers
+## 5. Start Development
 
 ```bash
 npm run dev
 ```
 
-### 6. Run tests
+## 6. Run Tests
 
 ```bash
 npm run test
 ```
 
-### 7. Production build
+## 7. Build Production Version
 
 ```bash
 npm run build
@@ -734,42 +978,136 @@ npm run build
 
 ---
 
+# 🔀 Git Workflow
+
+The project follows structured Git practices for development and maintenance.
+
+### Check Repository Status
+
+```bash
+git status
+```
+
+### Check Changed Files
+
+```bash
+git diff
+```
+
+### Add Changes
+
+```bash
+git add .
+```
+
+### Commit Changes
+
+```bash
+git commit -m "feat: complete workforce analytics security and data integration"
+```
+
+### Push Changes
+
+```bash
+git push origin main
+```
+
+### Pull Latest Changes
+
+```bash
+git pull origin main
+```
+
+### Useful Commit Categories
+
+```text
+feat     → New functionality
+fix      → Bug fixes
+refactor → Code restructuring
+style    → UI/theme changes
+security → Security improvements
+data     → Database/seed changes
+test     → Testing changes
+docs     → Documentation changes
+chore    → Configuration/dependency changes
+```
+
+Example:
+
+```bash
+git commit -m "feat: add MFA refresh token and seeded employee integration"
+```
+
+---
+
+# 🛠️ Development Improvements
+
+The project includes continuous improvements across:
+
+* Missing file resolution
+* Build error fixes
+* TypeScript error fixes
+* API integration
+* Database integration
+* Employee seed data
+* Duplicate employee validation
+* Employee table improvements
+* Theme consistency
+* Sidebar and layout corrections
+* Logo and branding corrections
+* Authentication improvements
+* MFA integration
+* Refresh-token support
+* Notification integration
+* Real-time updates
+* Attendance synchronization
+* Security improvements
+* Responsive UI fixes
+* Testing improvements
+
+---
+
 # ✅ Feature Classification
 
-| Feature                      | Status        |
-| ---------------------------- | ------------- |
-| Five role dashboards         | ✅ Completed   |
-| RBAC                         | ✅ Completed   |
-| ABAC                         | ✅ Implemented |
-| PBAC / policy authorization  | ✅ Implemented |
-| Protected routes             | ✅ Completed   |
-| Permission guards            | ✅ Completed   |
-| JWT authentication           | ✅ Completed   |
-| Refresh-token authentication | ✅ Completed   |
-| MFA / OTP                    | ✅ Completed   |
-| SQLite persistence           | ✅ Completed   |
-| 250 seeded employees         | ✅ Completed   |
-| Unique employee IDs          | ✅ Completed   |
-| Employee table               | ✅ Completed   |
-| Employee search/filter       | ✅ Completed   |
-| Employee pagination          | ✅ Completed   |
-| Dashboard analytics          | ✅ Completed   |
-| Chart loading states         | ✅ Completed   |
-| Chart empty states           | ✅ Completed   |
-| Chart error states           | ✅ Completed   |
-| Attendance actions           | ✅ Completed   |
-| Attendance corrections       | ✅ Completed   |
-| Offline synchronization      | ✅ Completed   |
-| Attendance idempotency       | ✅ Completed   |
-| Geofencing                   | ✅ Completed   |
-| Audit logging                | ✅ Completed   |
-| Notifications                | ✅ Completed   |
-| Real-time updates            | ✅ Implemented |
-| Light/Dark theme             | ✅ Completed   |
-| Role-specific navigation     | ✅ Completed   |
-| Responsive dashboard         | ✅ Completed   |
-| CSV export                   | ✅ Completed   |
-| Unit/integration tests       | ✅ Implemented |
+| Feature                               | Status          |
+| ------------------------------------- | --------------- |
+| Five role dashboards                  | ✅ Completed     |
+| RBAC                                  | ✅ Completed     |
+| ABAC                                  | ✅ Implemented   |
+| Policy-based authorization            | ✅ Implemented   |
+| Protected routes                      | ✅ Completed     |
+| Permission guards                     | ✅ Completed     |
+| JWT authentication                    | ✅ Completed     |
+| Refresh-token authentication          | ✅ Completed     |
+| **Multi-Factor Authentication (MFA)** | ✅ **Completed** |
+| **OTP verification**                  | ✅ **Completed** |
+| MFA challenge management              | ✅ Completed     |
+| SQLite persistence                    | ✅ Completed     |
+| 250 seeded employees                  | ✅ Completed     |
+| Unique employee IDs                   | ✅ Completed     |
+| Duplicate ID prevention               | ✅ Completed     |
+| Employee table                        | ✅ Completed     |
+| Employee search/filter                | ✅ Completed     |
+| Employee pagination                   | ✅ Completed     |
+| CSV export                            | ✅ Completed     |
+| Dashboard analytics                   | ✅ Completed     |
+| Chart loading states                  | ✅ Completed     |
+| Chart empty states                    | ✅ Completed     |
+| Chart error states                    | ✅ Completed     |
+| Attendance actions                    | ✅ Completed     |
+| Attendance corrections                | ✅ Completed     |
+| Offline synchronization               | ✅ Completed     |
+| Attendance idempotency                | ✅ Completed     |
+| Geofencing                            | ✅ Completed     |
+| Audit logging                         | ✅ Completed     |
+| Notifications                         | ✅ Completed     |
+| Company email notifications           | ✅ Implemented   |
+| In-app messaging                      | ✅ Implemented   |
+| Real-time updates                     | ✅ Implemented   |
+| Light/Dark theme                      | ✅ Completed     |
+| Role-specific navigation              | ✅ Completed     |
+| Responsive dashboard                  | ✅ Completed     |
+| Unit/integration tests                | ✅ Implemented   |
 
 ---
 
@@ -777,6 +1115,14 @@ npm run build
 
 ```text
 Authentication
+      ↓
+Credentials Validation
+      ↓
+Password Verification
+      ↓
+MFA / OTP Verification
+      ↓
+Access Token + Refresh Token
       ↓
 User Profile
       ↓
@@ -802,11 +1148,11 @@ Backend Authorization
       ↓
 Service Layer
       ↓
-Repository Layer
-      ↓
-SQLite
+Database
       ↓
 Audit Log
+      ↓
+Notification / Real-Time Event
 ```
 
 ---
@@ -814,7 +1160,7 @@ Audit Log
 # 📌 Production Readiness Checklist
 
 * [x] React + TypeScript frontend
-* [x] Express backend
+* [x] Node.js + Express backend
 * [x] SQLite database
 * [x] Five enterprise roles
 * [x] RBAC
@@ -822,54 +1168,133 @@ Audit Log
 * [x] Policy-based authorization
 * [x] JWT authentication
 * [x] Refresh-token flow
-* [x] MFA/OTP
+* [x] MFA
+* [x] OTP verification
 * [x] Password hashing
 * [x] Protected routes
+* [x] Permission guards
 * [x] API authorization
 * [x] 250 unique employees
 * [x] Duplicate employee ID prevention
+* [x] Employee management
+* [x] Employee search and filtering
+* [x] Employee pagination
+* [x] CSV export
 * [x] Attendance management
+* [x] Attendance corrections
 * [x] Offline synchronization
 * [x] Geofencing
 * [x] Audit logging
-* [x] Analytics
+* [x] Notifications
+* [x] Company email notification support
+* [x] In-app messaging
 * [x] Real-time updates
+* [x] Workforce analytics
 * [x] Responsive UI
 * [x] Light/Dark themes
 * [x] Role-specific dashboards
-* [x] Employee management
 * [x] Automated tests
+* [x] Git-based development workflow
 
 ---
 
-# 📂 Dashboard Screenshot Convention
+# 👩‍💻 Project Author & Contribution
 
-When updating dashboard screenshots, keep the following structure:
+## Maheswari Pinneti
 
-```text
-docs/
-└── screenshots/
-    ├── admin-dashboard.png
-    ├── hr-dashboard.png
-    ├── manager-dashboard.png
-    ├── team-lead-dashboard.png
-    └── employee-dashboard.png
-```
+**Frontend Developer — Stackly**
 
-Screenshots should show the **actual application running with the corresponding role logged in**, rather than mockups.
+### Key Contributions
+
+* React and TypeScript application development
+* Five role-based dashboard implementation
+* Responsive enterprise UI development
+* Role-based navigation
+* Protected routes
+* RBAC-aware frontend architecture
+* Permission-based UI controls
+* Light/Dark theme implementation across all five roles
+* Sidebar and header implementation
+* Enterprise layout improvements
+* Logo and company branding integration
+* Employee management interface
+* Employee table implementation
+* Search, filtering and pagination
+* 250 seeded employee data integration
+* Duplicate employee ID prevention integration
+* Workforce analytics visualization
+* Reusable KPI and chart components
+* Chart loading, empty and error states
+* Attendance UI and workflows
+* Geofencing attendance interface
+* Offline attendance synchronization
+* REST API integration
+* JWT authentication integration
+* **Multi-Factor Authentication (MFA) integration**
+* **OTP verification flow**
+* **Refresh-token authentication integration**
+* Authentication/session handling
+* Permission and authorization guards
+* Notification integration
+* Real-time dashboard updates
+* Company email/message notification integration
+* CSV export functionality
+* Frontend testing
+* Authentication and RBAC testing
+* Build-error resolution
+* TypeScript error resolution
+* UI bug fixing
+* Responsive layout corrections
+* Production UI refinement
+* Git-based feature development and maintenance
 
 ---
 
-# 🏢 Enterprise Workforce Analytics
+# 🏢 Enterprise Workforce Intelligence
 
-The platform is designed as a scalable foundation for workforce intelligence, combining secure identity management, role-aware dashboards, employee analytics, attendance intelligence, real-time operational monitoring, and enterprise authorization into a single full-stack application.
+The Workforce Analytics Intelligence Platform combines:
 
-**Architecture:** React + TypeScript + Node.js + Express + SQLite
+**Secure Authentication**
 
-**Security:** RBAC + ABAC + Policy-Based Authorization + JWT + MFA
+JWT + Refresh Tokens + MFA + OTP
 
-**Analytics:** Workforce + Attendance + Employee + Department Intelligence
+**Enterprise Authorization**
 
-**Data:** SQLite + 250 seeded unique employees
+RBAC + ABAC + Policy-Based Access Control
 
-**Real-Time:** Attendance + Notifications + Dashboard Updates
+**Workforce Intelligence**
+
+Employee + Workforce + Department + Attendance Analytics
+
+**Attendance Intelligence**
+
+Check-In + Break + Resume + Check-Out + Corrections + Geofencing
+
+**Data Management**
+
+SQLite + 250 Unique Employees + Duplicate Prevention
+
+**Real-Time Operations**
+
+Attendance + Notifications + Messages + Workforce Updates
+
+**Enterprise UI**
+
+Five Role Dashboards + Responsive Layout + Light/Dark Themes
+
+**Quality**
+
+Unit Tests + Integration Tests + Security Validation + Database Tests
+
+---
+
+## 👩‍💻 Developed By
+
+**Maheswari Pinneti**
+**Frontend Developer — Stackly**
+
+**Project:** Enterprise Workforce Analytics Intelligence Platform
+
+**Repository:** `WFA-Rolebased-Architecture`
+
+**Communication:** Official company/Stackly communication channels only.
