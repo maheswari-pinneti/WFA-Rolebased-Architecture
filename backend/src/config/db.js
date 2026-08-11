@@ -365,8 +365,8 @@ const seedReferenceData = async () => {
     }
   }
 
-  const taskCount = await get('SELECT COUNT(*) AS count FROM tasks WHERE organizationId = ?', [ORGANIZATION_ID]);
-  if (taskCount.count === 0 && employeeRows.length > 0) {
+  await run("DELETE FROM tasks WHERE id LIKE 'task-seed-%'");
+  if (employeeRows.length > 0) {
     const taskTemplates = [
       ['Implement attendance export API', 'HIGH', 'IN_PROGRESS', 8],
       ['Review quarterly performance goals', 'MEDIUM', 'TODO', 5],
@@ -376,10 +376,22 @@ const seedReferenceData = async () => {
     await prepareAndRun(
       `INSERT OR IGNORE INTO tasks (id,title,assigneeId,assigneeName,department,team,organizationId,priority,status,points,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
       taskTemplates.map((task, index) => {
-        const assignee = employeeRows[index % employeeRows.length];
-        return [`task-seed-${index + 1}`, task[0], assignee.id, `Employee ${index + 1}`, assignee.department, assignee.team, ORGANIZATION_ID, task[1], task[2], task[3], new Date().toISOString()];
+        const teamIndex = index % 6;
+        const assignee = employeeRows.find(e => {
+          const teams = ['Frontend Team', 'Product Strategy', 'Growth Team', 'People Operations', 'Customer Success', 'Finance Operations'];
+          return e.team === teams[teamIndex];
+        }) || employeeRows[index % employeeRows.length];
+        return [`task-seed-${index + 1}`, task[0], assignee.id, assignee.name, assignee.department, assignee.team, ORGANIZATION_ID, task[1], task[2], task[3], new Date().toISOString()];
       })
     );
+  }
+};
+
+const runSqlFile = async (filePath) => {
+  const sql = fs.readFileSync(filePath, 'utf8');
+  const statements = sql.split(';').map(s => s.trim()).filter(Boolean);
+  for (const statement of statements) {
+    await run(statement);
   }
 };
 
@@ -387,6 +399,27 @@ let initPromise;
 export const initDb = () => {
   if (!initPromise) {
     initPromise = (async () => {
+      // 1. Run migrations SQL files
+      const migrationsDir = path.join(dbDir, 'migrations');
+      if (fs.existsSync(migrationsDir)) {
+        const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
+        for (const file of files) {
+          await runSqlFile(path.join(migrationsDir, file));
+        }
+      }
+
+      // 2. Run seeds SQL files (if users table is empty)
+      const userCount = await get('SELECT COUNT(*) AS count FROM users').catch(() => ({ count: 0 }));
+      if (userCount.count === 0) {
+        const seedsDir = path.join(dbDir, 'seeds');
+        if (fs.existsSync(seedsDir)) {
+          const files = fs.readdirSync(seedsDir).filter(f => f.endsWith('.sql')).sort();
+          for (const file of files) {
+            await runSqlFile(path.join(seedsDir, file));
+          }
+        }
+      }
+
       await createSchema();
       await seedCoreUsers();
       await seedEmployees();

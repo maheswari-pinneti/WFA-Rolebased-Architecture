@@ -63,7 +63,7 @@ export const AttendanceManagement: React.FC = () => {
   };
 
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]} requiredPermission={Permission.ATTENDANCE_MANAGE}>
+    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD, Role.EMPLOYEE]}>
       <div className="space-y-6 animate-fadeIn font-sans pb-10">
         
         {/* Header */}
