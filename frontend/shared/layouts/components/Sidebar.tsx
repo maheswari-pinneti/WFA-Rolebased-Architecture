@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { useTheme } from '../../../design-system/theme/theme';
 import { ROLE_LABELS, Role } from '../../../security/roles/roles';
-import { StacklyLogo } from '../../../components/common/StacklyLogo';
 import {
   LayoutDashboard,
   Users,
@@ -39,7 +38,6 @@ import {
   AlertTriangle,
   Star,
   PanelLeftClose,
-  PanelLeftOpen,
   LockKeyhole,
   Moon,
   Sun,
@@ -510,82 +508,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Role-aware workspace navigation */}
       <aside
         aria-label="Primary navigation"
-        className={`app-sidebar ${roleAccent.className} border-r flex flex-col shrink-0 fixed md:sticky top-[72px] h-[calc(100vh-72px)] left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
+        style={{
+          top: '0px',
+          height: '100%'
+        }}
+        className={`app-sidebar ${roleAccent.className} border-r flex flex-col shrink-0 fixed md:sticky left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
           collapsed ? 'sidebar-is-collapsed w-[78px]' : 'sidebar-is-expanded w-[272px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        <div className="sidebar-brand">
-          <div className="sidebar-brand-top">
-            <div className="sidebar-brand-mark" aria-hidden="true">
-              <StacklyLogo size={34} showText={false} useImg={false} />
-            </div>
-
-            {!collapsed && (
-              <div className="sidebar-brand-copy">
-                <div className="sidebar-brand-name">STACKLY</div>
-                <div className="sidebar-brand-tagline">Workforce intelligence</div>
-              </div>
-            )}
-
-            <button
-              type="button"
-              className="sidebar-collapse-button"
-              onClick={() => setCollapsed((previous) => !previous)}
-              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
-            </button>
-          </div>
-
           {!collapsed && (
-            <div className="sidebar-workspace-card">
-              <div className="sidebar-workspace-icon">
-                <Layers size={15} />
+            <div className="px-4 py-3 border-b border-[var(--line)]">
+              <div className="relative w-full">
+                {/* Search Icon vertically centered */}
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                  <Search size={15} />
+                </div>
+                <input
+                  type="search"
+                  value={navigationQuery}
+                  onChange={(event) => setNavigationQuery(event.target.value)}
+                  placeholder="Search navigation"
+                  aria-label="Search navigation"
+                  style={{ paddingLeft: '2.25rem' }}
+                  className="w-full h-10 pl-9 pr-9 text-xs font-semibold text-[var(--text-primary)] bg-[var(--surface-soft)] rounded-xl border border-[var(--line)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--sidebar-accent)]"
+                />
+                {navigationQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setNavigationQuery('')}
+                    aria-label="Clear navigation search"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:text-[var(--text-primary)]"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
               </div>
-              <div className="sidebar-workspace-copy">
-                <span className="sidebar-workspace-kicker">Current workspace</span>
-                <strong>{roleAccent.shortLabel}</strong>
-              </div>
-              <span className="sidebar-live-pill"><span /> Live</span>
             </div>
           )}
-
-          {!collapsed && (
-            <div className="sidebar-role-chip" title={roleLabel}>
-              <ShieldCheck size={14} />
-              <span>{roleLabel}</span>
-            </div>
-          )}
-
-          {!collapsed && (
-            <div className="relative mt-3">
-              <Search
-                size={15}
-                aria-hidden="true"
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                type="search"
-                value={navigationQuery}
-                onChange={(event) => setNavigationQuery(event.target.value)}
-                placeholder="Search navigation"
-                aria-label="Search navigation"
-                className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] py-2 pl-9 pr-9 text-xs font-semibold text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--sidebar-accent)]"
-              />
-              {navigationQuery && (
-                <button
-                  type="button"
-                  onClick={() => setNavigationQuery('')}
-                  aria-label="Clear navigation search"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:text-[var(--text-primary)]"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Sidebar Navigation Items List */}
         <nav className="sidebar-nav sidebar-nav-scroll flex-1 overflow-y-auto w-full scrollbar-thin">
@@ -715,3 +674,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </>
   );
 };
+

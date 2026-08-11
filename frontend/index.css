@@ -1191,6 +1191,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   width: 100%;
   padding: 0.55rem 0.65rem;
   border: 1px solid transparent !important;
+  border-left: 4px solid transparent !important;
   border-radius: 0.85rem !important;
   color: var(--text-secondary) !important;
   background: transparent !important;
@@ -1204,11 +1205,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sidebar-nav-link.is-active {
   color: #ffffff !important;
   border-color: color-mix(in srgb, var(--sidebar-accent) 60%, transparent) !important;
+  border-left-color: var(--sidebar-accent) !important;
   background: linear-gradient(135deg, var(--sidebar-accent-strong), color-mix(in srgb, var(--sidebar-accent-strong) 60%, #4f46e5)) !important;
   box-shadow: 0 12px 24px color-mix(in srgb, var(--sidebar-accent-strong) 28%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
 }
 .sidebar-nav-link.is-active::before {
   content: '';
+  display: none;
   width: 0.2rem;
   height: 1.35rem;
   position: absolute;

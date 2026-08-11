@@ -132,7 +132,7 @@ export const getAnalytics = async (req, res) => {
       riskDistribution: Object.entries(riskBuckets).map(([name, value]) => ({ name, value })),
       skillsAnalysis: {
         topSkills: skillsAnalysis.filter((skill) => skill.averageLevel >= 4).slice(0, 8),
-        missingSkills: skillsAnalysis.filter((skill) => skill.averageLevel < 3).slice(0, 8),
+        missingSkills: skillsAnalysis.filter((skill) => skill.gap > 0).sort((a, b) => b.gap - a.gap).slice(0, 8),
         coverage: skillsAnalysis
       },
       teamProductivity,

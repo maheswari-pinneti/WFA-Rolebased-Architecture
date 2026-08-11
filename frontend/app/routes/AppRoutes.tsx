@@ -103,6 +103,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/hr/payroll-reports" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]}><PayrollReports /></RoleGuard>} />
                 <Route path="/hr/workforce-analytics" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]}><TeamAnalytics /></RoleGuard>} />
                 <Route path="/hr/reports" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]}><HRReports /></RoleGuard>} />
+                <Route path="/hr/departments" element={<RoleGuard allowedRoles={[Role.HR, Role.ADMIN]}><DepartmentsManagement /></RoleGuard>} />
 
                 {/* ==================== 3. DEPARTMENT MANAGER ROUTES ==================== */}
                 <Route path="/manager/dashboard" element={<RoleGuard allowedRoles={[Role.MANAGER, Role.ADMIN]}><ManagerDashboard /></RoleGuard>} />

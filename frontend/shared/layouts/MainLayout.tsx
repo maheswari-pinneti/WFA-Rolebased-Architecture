@@ -45,7 +45,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
         />
 
         {/* Main Content Region */}
-        <main className="app-main flex-1 overflow-y-auto p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+        <main className="app-main flex-1 overflow-y-auto p-4 md:p-8 w-full space-y-6">
           {children}
         </main>
       </div>

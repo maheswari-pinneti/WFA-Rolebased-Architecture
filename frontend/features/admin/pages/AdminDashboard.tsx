@@ -68,7 +68,7 @@ export const AdminDashboard: React.FC = () => {
         {/* TailAdmin Hero Greeting Banner */}
         <div className="dashboard-hero p-6 lg:p-8 rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-800 to-slate-950 text-white border border-blue-500/30 shadow-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
           <div className="space-y-2 z-10">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-xs font-bold backdrop-blur-md border border-white/20">
+            <div style={{ display: 'inline-flex', width: 'fit-content' }} className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-xs font-bold backdrop-blur-md border border-white/20">
               <Calendar size={14} className="text-blue-300" /> {currentDateFormatted}
             </div>
             <h2 className="text-2xl lg:text-3xl font-black tracking-tight">

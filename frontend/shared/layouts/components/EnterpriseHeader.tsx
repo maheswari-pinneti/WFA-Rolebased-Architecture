@@ -158,6 +158,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             placeholder="Search employees, departments, reports..."
+            style={{ paddingLeft: '2.5rem' }}
             className={`w-full rounded-2xl pl-10 pr-4 py-2 text-xs transition-all outline-none border ${
               isDark
                 ? 'bg-slate-900/90 border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:bg-slate-900'
@@ -248,7 +249,25 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({ onToggleSide
           >
             <NotificationsIcon style={{ fontSize: 18 }} />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse shadow-md">
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-4px',
+                  width: '16px',
+                  height: '16px',
+                  backgroundColor: '#f43f5e',
+                  color: 'white',
+                  borderRadius: '9999px',
+                  fontSize: '9px',
+                  fontWeight: 900,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+                className="animate-pulse"
+              >
                 {unreadCount}
               </span>
             )}
