@@ -257,8 +257,20 @@ const seedCoreUsers = async () => {
 };
 
 const seedEmployees = async () => {
+  const customEmployees = [
+    ['emp-uday', 'STK-2023-UD0001', 'Uday Kumar', 'uday@thestackly.com', 'EMPLOYEE', 'Engineering', 'Developer', 'ACTIVE', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', '2023-01-15', 86, 95, 'Frontend Team', ORGANIZATION_ID],
+    ['emp-suresh', 'STK-2022-SU0002', 'Suresh Raina', 'suresh@thestackly.com', 'EMPLOYEE', 'Engineering', 'QA Engineer', 'ACTIVE', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', '2022-06-10', 89, 94, 'DevOps Team', ORGANIZATION_ID],
+    ['emp-ravi', 'STK-2024-RA0003', 'Ravi Shastri', 'ravi@thestackly.com', 'EMPLOYEE', 'Engineering', 'Cloud Architect', 'ACTIVE', 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150', '2024-03-22', 91, 98, 'DevOps Team', ORGANIZATION_ID],
+    ['emp-suman', 'STK-2023-SU0004', 'Suman Patil', 'suman@thestackly.com', 'EMPLOYEE', 'Engineering', 'UI Designer', 'ACTIVE', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', '2023-11-05', 88, 93, 'Frontend Team', ORGANIZATION_ID]
+  ];
+  await prepareAndRun(
+    `INSERT OR IGNORE INTO employees (id,employeeCode,name,email,role,department,designation,status,avatar,joinDate,performanceScore,attendanceRate,team,organizationId)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    customEmployees
+  );
+
   const row = await get('SELECT COUNT(*) AS count FROM employees');
-  if (row.count > 0) return;
+  if (row.count > 4) return;
 
   const departments = ['Engineering', 'Product Management', 'Sales & Marketing', 'Human Resources', 'Customer Success', 'Finance & Operations'];
   const teams = ['Frontend Team', 'Product Strategy', 'Growth Team', 'People Operations', 'Customer Success', 'Finance Operations'];
@@ -267,7 +279,7 @@ const seedEmployees = async () => {
   const statuses = ['ACTIVE', 'REMOTE', 'ON_LEAVE', 'ACTIVE'];
   const rows = [];
 
-  for (let i = 1; i <= 200; i += 1) {
+  for (let i = 1; i <= 250; i += 1) {
     const departmentIndex = i % departments.length;
     rows.push([
       `emp-${i}`, `STK-${10000 + i}`, `Employee ${i}`, `employee${i}@thestackly.com`, roles[i % roles.length],

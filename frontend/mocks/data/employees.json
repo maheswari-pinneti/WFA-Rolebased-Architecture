@@ -102,5 +102,57 @@
     "performanceScore": 85,
     "attendanceRate": 94.3,
     "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150"
+  },
+  {
+    "id": "emp-uday",
+    "emp_id": "STK-2023-UD0001",
+    "name": "Uday Kumar",
+    "email": "uday@company.com",
+    "role": "EMPLOYEE",
+    "department": "Engineering",
+    "designation": "Developer",
+    "joinDate": "2023-01-15",
+    "status": "PRESENT",
+    "performanceScore": 86,
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
+  },
+  {
+    "id": "emp-suresh",
+    "emp_id": "STK-2022-SU0002",
+    "name": "Suresh Raina",
+    "email": "suresh@company.com",
+    "role": "EMPLOYEE",
+    "department": "Engineering",
+    "designation": "QA Engineer",
+    "joinDate": "2022-06-10",
+    "status": "PRESENT",
+    "performanceScore": 89,
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150"
+  },
+  {
+    "id": "emp-ravi",
+    "emp_id": "STK-2024-RA0003",
+    "name": "Ravi Shastri",
+    "email": "ravi@company.com",
+    "role": "EMPLOYEE",
+    "department": "Engineering",
+    "designation": "Cloud Architect",
+    "joinDate": "2024-03-22",
+    "status": "PRESENT",
+    "performanceScore": 91,
+    "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150"
+  },
+  {
+    "id": "emp-suman",
+    "emp_id": "STK-2023-SU0004",
+    "name": "Suman Patil",
+    "email": "suman@company.com",
+    "role": "EMPLOYEE",
+    "department": "Engineering",
+    "designation": "UI Designer",
+    "joinDate": "2023-11-05",
+    "status": "PRESENT",
+    "performanceScore": 88,
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
   }
 ]

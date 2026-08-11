@@ -6,7 +6,7 @@ import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOvervi
 
 export const Productivity: React.FC = () => {
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD]} requiredPermission={Permission.PRODUCTIVITY_VIEW}>
+    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER, Role.TEAM_LEAD]}>
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight">Lead Productivity Matrix</h2>

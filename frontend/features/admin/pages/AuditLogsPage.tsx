@@ -4,32 +4,52 @@ import { Role } from '../../../security/roles/roles';
 import { History, Download } from 'lucide-react';
 import { Button } from '../../../shared/components/Button';
 import { analyticsApi } from '../../../api/endpoints/analytics.api';
+import { auditLogger } from '../../../security/audit/auditLogger';
 
 export const AuditLogsPage: React.FC = () => {
   const [logs, setLogs] = useState<Array<{ id: string; timestamp: string; actor: string; role: string; action: string; target: string; ip: string; status: string }>>([]);
+  
   useEffect(() => {
-    analyticsApi.getAuditLogs().then((items) => setLogs(items.map((item) => ({
-      id: item.id,
-      timestamp: item.timestamp,
-      actor: item.employeeId,
-      role: 'AUDIT',
-      action: item.action,
-      target: item.details,
-      ip: 'server',
-      status: 'RECORDED'
-    })))).catch(() => setLogs([]));
+    analyticsApi.getAuditLogs()
+      .then((items) => {
+        if (!items || items.length === 0) throw new Error('No items');
+        setLogs(items.map((item) => ({
+          id: item.id,
+          timestamp: item.timestamp,
+          actor: item.employeeId,
+          role: 'AUDIT',
+          action: item.action,
+          target: item.details,
+          ip: 'server',
+          status: 'SUCCESS'
+        })));
+      })
+      .catch(() => {
+        // Fallback to local live audit logs if api fails
+        const localEvents = auditLogger.getLogs();
+        setLogs(localEvents.map((item) => ({
+          id: item.id,
+          timestamp: item.timestamp,
+          actor: item.userId,
+          role: item.userRole,
+          action: item.action,
+          target: item.details,
+          ip: item.ipAddress,
+          status: item.status
+        })));
+      });
   }, []);
 
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN]}>
-      <div className="space-y-6">
+    <RoleGuard allowedRoles={[Role.ADMIN, Role.HR]}>
+      <div className="w-full space-y-6 animate-fadeIn font-sans pb-10">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h2 className="text-2xl font-black tracking-tight flex items-center gap-2 text-[var(--text-primary)]">
               <History className="text-amber-400" size={24} />
               Enterprise Security Audit Log Trail
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-xs text-slate-400">
               Immutable forensic log stream tracking all authentication, RBAC policy edits, and data accesses.
             </p>
           </div>

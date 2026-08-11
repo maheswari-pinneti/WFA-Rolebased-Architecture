@@ -46,15 +46,15 @@ export const PermissionsManagement: React.FC = () => {
   const currentPermissions = rolePermissions[selectedRole] || [];
 
   return (
-    <RoleGuard allowedRoles={[Role.ADMIN]} requiredPermission={Permission.ROLE_MANAGE}>
-      <div className="space-y-6">
+    <RoleGuard allowedRoles={[Role.ADMIN]}>
+      <div className="w-full space-y-6 animate-fadeIn font-sans pb-10">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h2 className="text-2xl font-black tracking-tight flex items-center gap-2 text-[var(--text-primary)]">
               <Lock className="text-indigo-400" size={24} />
               Granular Permission Matrix & Access Controls
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-xs text-slate-400">
               Configure fine-grained system permissions and security scopes across enterprise roles.
             </p>
           </div>
@@ -64,7 +64,7 @@ export const PermissionsManagement: React.FC = () => {
         </div>
 
         {/* Role Selection Tabs */}
-        <div className="flex items-center gap-2 p-1.5 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 bg-slate-900/60 border border-[var(--border-color)] rounded-2xl overflow-x-auto">
           {Object.values(Role).map((r) => (
             <button
               key={r}
@@ -89,7 +89,7 @@ export const PermissionsManagement: React.FC = () => {
               placeholder="Search permission key..."
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+              className="w-full rounded-xl pl-9 pr-4 py-2 text-xs"
             />
           </div>
           <div className="text-xs text-slate-400 font-semibold">

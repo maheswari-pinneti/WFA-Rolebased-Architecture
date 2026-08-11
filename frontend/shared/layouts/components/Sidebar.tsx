@@ -516,35 +516,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           collapsed ? 'sidebar-is-collapsed w-[78px]' : 'sidebar-is-expanded w-[272px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-          {!collapsed && (
-            <div className="px-4 py-3 border-b border-[var(--line)]">
-              <div className="relative w-full">
-                {/* Search Icon vertically centered */}
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                  <Search size={15} />
-                </div>
-                <input
-                  type="search"
-                  value={navigationQuery}
-                  onChange={(event) => setNavigationQuery(event.target.value)}
-                  placeholder="Search navigation"
-                  aria-label="Search navigation"
-                  style={{ paddingLeft: '2.25rem' }}
-                  className="w-full h-10 pl-9 pr-9 text-xs font-semibold text-[var(--text-primary)] bg-[var(--surface-soft)] rounded-xl border border-[var(--line)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--sidebar-accent)]"
-                />
-                {navigationQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setNavigationQuery('')}
-                    aria-label="Clear navigation search"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:text-[var(--text-primary)]"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+
 
         {/* Sidebar Navigation Items List */}
         <nav className="sidebar-nav sidebar-nav-scroll flex-1 overflow-y-auto w-full scrollbar-thin">
@@ -638,15 +610,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         <div className={`sidebar-footer ${collapsed ? 'is-collapsed' : ''}`}>
-          {!collapsed && (
-            <div className="sidebar-security-card">
-              <div className="sidebar-security-icon"><LockKeyhole size={15} /></div>
-              <div>
-                <strong>Protected workspace</strong>
-                <span>Role-scoped access is active</span>
-              </div>
-            </div>
-          )}
 
           <div className="sidebar-footer-actions">
             <button

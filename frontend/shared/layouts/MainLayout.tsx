@@ -3,9 +3,11 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { EnterpriseHeader } from './components/EnterpriseHeader';
 import { Sidebar } from './components/Sidebar';
 import { SupportModal } from '../components/SupportModal';
+import { useTheme } from '../../design-system/theme/theme';
 
 export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { role } = useAuth();
+  const { setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [supportModalOpen, setSupportModalOpen] = useState(false);
 
@@ -20,6 +22,19 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
     localStorage.setItem('sidebar_collapsed', JSON.stringify(collapsed));
   }, [collapsed]);
 
+  // Set the default theme mode based on role recommendations ONLY when the role changes
+  useEffect(() => {
+    const lastInitializedRole = sessionStorage.getItem('wfa_initialized_role');
+    if (lastInitializedRole !== role) {
+      if (role === 'HR' || role === 'EMPLOYEE' || role === 'MANAGER') {
+        setTheme('light');
+      } else if (role === 'ADMIN' || role === 'TEAM_LEAD') {
+        setTheme('dark');
+      }
+      sessionStorage.setItem('wfa_initialized_role', role);
+    }
+  }, [role, setTheme]);
+
   const toggleSidebar = () => {
     if (window.innerWidth < 768) {
       setMobileOpen((prev) => !prev);
@@ -28,8 +43,21 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
     }
   };
 
+  const getThemeClass = (userRole: string) => {
+    switch (userRole) {
+      case 'HR': return 'earth-theme';
+      case 'EMPLOYEE': return 'arctic-theme';
+      case 'TEAM_LEAD': return 'midnight-theme';
+      case 'MANAGER': return 'indigo-theme';
+      case 'ADMIN': return 'sunset-theme';
+      default: return 'emerald-theme';
+    }
+  };
+
+  const themeClass = getThemeClass(role);
+
   return (
-    <div data-role={role} className="app-shell emerald-theme min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
+    <div data-role={role} className={`app-shell ${themeClass} min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300`}>
       {/* Fixed Enterprise Header */}
       <EnterpriseHeader onToggleSidebar={toggleSidebar} onOpenHelp={() => setSupportModalOpen(true)} />
 

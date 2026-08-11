@@ -146,7 +146,7 @@ export const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) =
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form id="support-ticket-form" onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 mb-1.5">Ticket Category</label>
@@ -187,28 +187,35 @@ export const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) =
                     className="w-full px-3 py-2 text-xs rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-blue-500 resize-none"
                   />
                 </div>
-
-                <div className="flex justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="btn btn-secondary btn-sm"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn btn-primary btn-sm flex items-center gap-2"
-                  >
-                    <Send size={14} />
-                    {isSubmitting ? 'Submitting...' : 'Send Support Ticket'}
-                  </button>
-                </div>
               </form>
             )}
           </div>
         </div>
+
+        {/* Modal Footer (Sticky Actions) */}
+        {!submitted && (
+          <div className="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)] flex justify-end gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2.5 rounded-xl border border-[var(--border-color)] text-xs font-bold text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all flex items-center justify-center"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const form = document.getElementById('support-ticket-form') as HTMLFormElement;
+                if (form) form.requestSubmit();
+              }}
+              disabled={isSubmitting}
+              className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              <Send size={14} />
+              {isSubmitting ? 'Submitting...' : 'Send Support Ticket'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

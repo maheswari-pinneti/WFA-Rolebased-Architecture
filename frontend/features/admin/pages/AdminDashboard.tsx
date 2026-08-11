@@ -81,13 +81,13 @@ export const AdminDashboard: React.FC = () => {
 
           {/* Quick Actions Buttons */}
           <div className="flex flex-wrap items-center gap-2.5 z-10">
-            <Link to="/employees#add" className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2">
+            <Link to="/admin/employees" className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2">
               <UserPlus size={16} /> Add Employee
             </Link>
-            <Link to="/attendance" className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold border border-white/20 backdrop-blur-md transition-all flex items-center gap-2">
+            <Link to="/admin/attendance-overview" className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold border border-white/20 backdrop-blur-md transition-all flex items-center gap-2">
               <Clock size={16} /> View Attendance
             </Link>
-            <Link to="/reports" className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-extrabold shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2">
+            <Link to="/admin/reports" className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-extrabold shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2">
               <FileSpreadsheet size={16} /> Generate Report
             </Link>
           </div>

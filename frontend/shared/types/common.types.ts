@@ -15,6 +15,9 @@ export type Column<T> = ColumnDefinition<T>;
 
 export interface Employee {
   id: string;
+  emp_id?: string;
+  first_name?: string;
+  last_name?: string;
   name: string;
   email: string;
   role: string;
@@ -29,6 +32,11 @@ export interface Employee {
   performanceScore?: number;
   attendanceRate?: number;
   joinDate?: string;
+  joining_date?: string;
+  employment_status?: 'Active' | 'Inactive' | 'On Leave' | 'Terminated' | string;
+  manager_id?: string;
+  manager_name?: string;
+  attendance_status?: 'Present' | 'Absent' | 'Late' | 'Remote' | 'Leave' | string;
 }
 
 export interface ModalProps {

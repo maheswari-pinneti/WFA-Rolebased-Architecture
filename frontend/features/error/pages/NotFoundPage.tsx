@@ -7,7 +7,7 @@ export const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center animate-fadeIn font-sans">
+    <div className="w-full flex flex-col items-center justify-center p-6 text-center animate-fadeIn font-sans" style={{ minHeight: '80vh' }}>
       <div className="glass-panel p-8 md:p-12 max-w-lg w-full space-y-6 relative overflow-hidden shadow-2xl border-[var(--border-color)]">
         {/* Top Logo */}
         <div className="flex justify-center">

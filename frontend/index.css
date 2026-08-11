@@ -452,18 +452,29 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   padding: clamp(1.25rem, 3vw, 2.5rem) !important;
 }
 
-.main-body { min-width: 0; }
+.main-body {
+  min-width: 0;
+  gap: 0 !important;
+}
 
 .app-sidebar {
-  top: 6.5rem !important;
-  height: calc(100vh - 6.5rem) !important;
+  top: 4rem !important;
+  height: calc(100vh - 4rem) !important;
   background: linear-gradient(180deg, #0b1424 0%, #07101d 100%) !important;
   border-color: rgba(148, 163, 184, 0.12) !important;
   box-shadow: 14px 0 40px rgba(2, 8, 23, 0.18) !important;
+  margin: 0 !important;
+  margin-top: -1px !important;
+  border-radius: 0 !important;
+  align-self: stretch !important;
 }
 
 .app-sidebar .p-3 { padding: 1rem !important; }
-.app-sidebar nav { padding-inline: 0.85rem !important; }
+.app-sidebar nav {
+  padding-inline: 0.85rem !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
 .app-sidebar nav a {
   min-height: 2.75rem;
   border-radius: 0.9rem !important;
@@ -1345,5 +1356,225 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .emerald-theme [class*="bg-blue-600"],
 .emerald-theme [class*="bg-indigo-600"],
 .emerald-theme [class*="bg-purple-600"] {
+  background-color: var(--dashboard-accent-strong) !important;
+}
+
+/* 1. Earthy Aurora Theme (HR Manager - Calm & Organic Light Mode) */
+.earth-theme {
+  --dashboard-accent: #588157;
+  --dashboard-accent-strong: #3a5a40;
+  --dashboard-accent-soft: rgba(88, 129, 87, 0.12);
+}
+[data-theme='light'] .earth-theme, .earth-theme[data-theme='light'] {
+  --bg-primary: #FAF8F5 !important;
+  --bg-secondary: #F3EEE3 !important;
+  --bg-tertiary: #EBDCB9 !important;
+  --text-primary: #2D3B2D !important;
+  --text-muted: #6E7A6E !important;
+}
+.earth-theme .dashboard-hero {
+  background: linear-gradient(135deg, #3a5a40 0%, #588157 52%, #ebdcb9 100%) !important;
+  border-color: rgba(88, 129, 87, 0.35) !important;
+}
+.earth-theme [class*="text-blue-"],
+.earth-theme [class*="text-indigo-"],
+.earth-theme [class*="text-purple-"],
+.earth-theme [class*="text-cyan-"],
+.earth-theme [class*="text-teal-"] {
+  color: var(--dashboard-accent) !important;
+}
+.earth-theme [class*="border-blue-"],
+.earth-theme [class*="border-indigo-"],
+.earth-theme [class*="border-purple-"],
+.earth-theme [class*="border-cyan-"],
+.earth-theme [class*="border-teal-"] {
+  border-color: rgba(88, 129, 87, 0.3) !important;
+}
+.earth-theme [class*="bg-blue-"],
+.earth-theme [class*="bg-indigo-"],
+.earth-theme [class*="bg-purple-"],
+.earth-theme [class*="bg-cyan-"],
+.earth-theme [class*="bg-teal-"] {
+  background-color: var(--dashboard-accent-soft) !important;
+}
+.earth-theme [class*="bg-blue-600"],
+.earth-theme [class*="bg-indigo-600"],
+.earth-theme [class*="bg-purple-600"] {
+  background-color: var(--dashboard-accent-strong) !important;
+}
+
+/* 2. Arctic Minimalist Theme (Employee - Clean & Light Mode) */
+.arctic-theme {
+  --dashboard-accent: #3a86c8;
+  --dashboard-accent-strong: #1e5fa0;
+  --dashboard-accent-soft: rgba(58, 134, 200, 0.12);
+}
+[data-theme='light'] .arctic-theme, .arctic-theme[data-theme='light'] {
+  --bg-primary: #F5F9FC !important;
+  --bg-secondary: #EEF4FA !important;
+  --bg-tertiary: #E0ECF7 !important;
+  --text-primary: #1E2D3D !important;
+  --text-muted: #5E6F82 !important;
+}
+.arctic-theme .dashboard-hero {
+  background: linear-gradient(135deg, #1e2d3d 0%, #3a86c8 52%, #e0ecf7 100%) !important;
+  border-color: rgba(58, 134, 200, 0.35) !important;
+}
+.arctic-theme [class*="text-blue-"],
+.arctic-theme [class*="text-indigo-"],
+.arctic-theme [class*="text-purple-"],
+.arctic-theme [class*="text-cyan-"],
+.arctic-theme [class*="text-teal-"] {
+  color: var(--dashboard-accent) !important;
+}
+.arctic-theme [class*="border-blue-"],
+.arctic-theme [class*="border-indigo-"],
+.arctic-theme [class*="border-purple-"],
+.arctic-theme [class*="border-cyan-"],
+.arctic-theme [class*="border-teal-"] {
+  border-color: rgba(58, 134, 200, 0.3) !important;
+}
+.arctic-theme [class*="bg-blue-"],
+.arctic-theme [class*="bg-indigo-"],
+.arctic-theme [class*="bg-purple-"],
+.arctic-theme [class*="bg-cyan-"],
+.arctic-theme [class*="bg-teal-"] {
+  background-color: var(--dashboard-accent-soft) !important;
+}
+.arctic-theme [class*="bg-blue-600"],
+.arctic-theme [class*="bg-indigo-600"],
+.arctic-theme [class*="bg-purple-600"] {
+  background-color: var(--dashboard-accent-strong) !important;
+}
+
+/* 3. Midnight Slate Theme (Team Lead - Modern & Focused Dark Mode) */
+.midnight-theme {
+  --dashboard-accent: #00a8a8;
+  --dashboard-accent-strong: #008080;
+  --dashboard-accent-soft: rgba(0, 168, 168, 0.12);
+}
+[data-theme='dark'] .midnight-theme, .midnight-theme[data-theme='dark'] {
+  --bg-primary: #11141A !important;
+  --bg-secondary: #1A1F29 !important;
+  --bg-tertiary: #242C3B !important;
+  --text-primary: #E6EBF5 !important;
+  --text-muted: #8FA0B5 !important;
+}
+.midnight-theme .dashboard-hero {
+  background: linear-gradient(135deg, #11141a 0%, #1a1f29 52%, #008080 100%) !important;
+  border-color: rgba(0, 168, 168, 0.35) !important;
+}
+.midnight-theme [class*="text-blue-"],
+.midnight-theme [class*="text-indigo-"],
+.midnight-theme [class*="text-purple-"],
+.midnight-theme [class*="text-cyan-"],
+.midnight-theme [class*="text-teal-"] {
+  color: var(--dashboard-accent) !important;
+}
+.midnight-theme [class*="border-blue-"],
+.midnight-theme [class*="border-indigo-"],
+.midnight-theme [class*="border-purple-"],
+.midnight-theme [class*="border-cyan-"],
+.midnight-theme [class*="border-teal-"] {
+  border-color: rgba(0, 168, 168, 0.3) !important;
+}
+.midnight-theme [class*="bg-blue-"],
+.midnight-theme [class*="bg-indigo-"],
+.midnight-theme [class*="bg-purple-"],
+.midnight-theme [class*="bg-cyan-"],
+.midnight-theme [class*="bg-teal-"] {
+  background-color: var(--dashboard-accent-soft) !important;
+}
+.midnight-theme [class*="bg-blue-600"],
+.midnight-theme [class*="bg-indigo-600"],
+.midnight-theme [class*="bg-purple-600"] {
+  background-color: var(--dashboard-accent-strong) !important;
+}
+
+/* 4. Corporate Indigo Theme (Team Manager - Structured & Clear Light Mode) */
+.indigo-theme {
+  --dashboard-accent: #4f46e5;
+  --dashboard-accent-strong: #3730a3;
+  --dashboard-accent-soft: rgba(79, 70, 229, 0.12);
+}
+[data-theme='light'] .indigo-theme, .indigo-theme[data-theme='light'] {
+  --bg-primary: #F8FAFC !important;
+  --bg-secondary: #F1F5F9 !important;
+  --bg-tertiary: #E2E8F0 !important;
+  --text-primary: #0F172A !important;
+  --text-muted: #475569 !important;
+}
+.indigo-theme .dashboard-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #4f46e5 52%, #e2e8f0 100%) !important;
+  border-color: rgba(79, 70, 229, 0.35) !important;
+}
+.indigo-theme [class*="text-blue-"],
+.indigo-theme [class*="text-indigo-"],
+.indigo-theme [class*="text-purple-"],
+.indigo-theme [class*="text-cyan-"],
+.indigo-theme [class*="text-teal-"] {
+  color: var(--dashboard-accent) !important;
+}
+.indigo-theme [class*="border-blue-"],
+.indigo-theme [class*="border-indigo-"],
+.indigo-theme [class*="border-purple-"],
+.indigo-theme [class*="border-cyan-"],
+.indigo-theme [class*="border-teal-"] {
+  border-color: rgba(79, 70, 229, 0.3) !important;
+}
+.indigo-theme [class*="bg-blue-"],
+.indigo-theme [class*="bg-indigo-"],
+.indigo-theme [class*="bg-purple-"],
+.indigo-theme [class*="bg-cyan-"],
+.indigo-theme [class*="bg-teal-"] {
+  background-color: var(--dashboard-accent-soft) !important;
+}
+.indigo-theme [class*="bg-blue-600"],
+.indigo-theme [class*="bg-indigo-600"],
+.indigo-theme [class*="bg-purple-600"] {
+  background-color: var(--dashboard-accent-strong) !important;
+}
+
+/* 5. Cyber Sunset Theme (Admin / Super Admin - Vibrant Alert Dark Mode) */
+.sunset-theme {
+  --dashboard-accent: #ff6b6b;
+  --dashboard-accent-strong: #ff4757;
+  --dashboard-accent-soft: rgba(255, 107, 107, 0.12);
+}
+[data-theme='dark'] .sunset-theme, .sunset-theme[data-theme='dark'] {
+  --bg-primary: #0B0C10 !important;
+  --bg-secondary: #1F2833 !important;
+  --bg-tertiary: #2A3D45 !important;
+  --text-primary: #C5C6C7 !important;
+  --text-muted: #66FCF1 !important;
+}
+.sunset-theme .dashboard-hero {
+  background: linear-gradient(135deg, #0b0c10 0%, #1f2833 52%, #ff4757 100%) !important;
+  border-color: rgba(255, 107, 107, 0.35) !important;
+}
+.sunset-theme [class*="text-blue-"],
+.sunset-theme [class*="text-indigo-"],
+.sunset-theme [class*="text-purple-"],
+.sunset-theme [class*="text-cyan-"],
+.sunset-theme [class*="text-teal-"] {
+  color: var(--dashboard-accent) !important;
+}
+.sunset-theme [class*="border-blue-"],
+.sunset-theme [class*="border-indigo-"],
+.sunset-theme [class*="border-purple-"],
+.sunset-theme [class*="border-cyan-"],
+.sunset-theme [class*="border-teal-"] {
+  border-color: rgba(255, 107, 107, 0.3) !important;
+}
+.sunset-theme [class*="bg-blue-"],
+.sunset-theme [class*="bg-indigo-"],
+.sunset-theme [class*="bg-purple-"],
+.sunset-theme [class*="bg-cyan-"],
+.sunset-theme [class*="bg-teal-"] {
+  background-color: var(--dashboard-accent-soft) !important;
+}
+.sunset-theme [class*="bg-blue-600"],
+.sunset-theme [class*="bg-indigo-600"],
+.sunset-theme [class*="bg-purple-600"] {
   background-color: var(--dashboard-accent-strong) !important;
 }
