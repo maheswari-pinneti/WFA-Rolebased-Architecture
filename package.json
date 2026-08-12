@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run --no-file-parallelism",
     "test:coverage": "vitest run --coverage --no-file-parallelism",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit"
   },
@@ -36,6 +37,7 @@
     "sqlite3": "^6.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/node": "^20.11.20",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",

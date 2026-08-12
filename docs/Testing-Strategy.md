@@ -1,6 +1,6 @@
 # Testing Strategy & Quality Assurance
 
-This document details the quality assurance procedures, the test runner, and the exact specifications of the 16 unit and integration tests written for the **Workforce Analytics Platform**.
+This document details the quality assurance procedures, the test runner, and the exact specifications of the 30 unit and integration tests written for the **Workforce Analytics Platform**.
 
 ---
 
@@ -27,7 +27,7 @@ npm run build
 
 ---
 
-## 📋 Comprehensive List of the 16 Tests
+## 📋 Comprehensive List of the 30 Tests
 
 The test suite is structured inside the [tests/unit/](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/tests/unit) directory:
 
@@ -70,3 +70,20 @@ Verifies clocking actions, geographical calculations, and state machine boundari
     - Validates that break intervals are deducted from overall duration to compute net working hours.
 16. **"should queue attendance actions offline and process them upon synchronization"**:
     - Verifies that offline clock actions are saved to `localStorage` queue and successfully synced when network is restored.
+
+### C. Backend API Integration & Authorization Tests (`tests/unit/api.test.ts`)
+Verifies Express routes, HTTP methods, payloads, headers, tokens, and data validation.
+
+17-28. **12 API & Controller Security Tests**:
+   - Authenticate ADMIN, HR, MANAGER, TEAM_LEAD, and EMPLOYEE.
+   - Enforce DBAC/RBAC scope-based data isolation for department/team listings.
+   - Prevent parameter tampering and invalid status transitions.
+
+### D. E2E User Flow Tests (`tests/unit/e2e.test.ts`)
+Validates complete multi-step lifecycle scenarios.
+
+29. **"Flow: Login -> Check-In -> Break -> Resume -> Check-Out -> View History"**:
+    - Asserts seamless authentication, clocking, state transition, activity log persisting, and history listing.
+30. **"should enforce geofence, duplicate check-in, and double-checkout restrictions"**:
+    - Asserts robust system defense when boundary parameters or actions are violated.
+

@@ -509,8 +509,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside
         aria-label="Primary navigation"
         style={{
-          top: '0px',
-          height: '100%'
+          top: '4rem',
+          height: 'calc(100vh - 4rem)'
         }}
         className={`app-sidebar ${roleAccent.className} border-r flex flex-col shrink-0 fixed md:sticky left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
           collapsed ? 'sidebar-is-collapsed w-[78px]' : 'sidebar-is-expanded w-[272px]'

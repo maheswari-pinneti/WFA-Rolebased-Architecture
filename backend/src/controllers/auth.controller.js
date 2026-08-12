@@ -95,6 +95,10 @@ export const login = (req, res) => {
   });
 };
 
+/**
+ * POST /api/auth/verify-mfa
+ * Verify temporary token against OTP code.
+ */
 export const verifyMfa = async (req, res) => {
   const { tempToken, code } = req.body;
   if (!tempToken || !code) {
@@ -104,14 +108,14 @@ export const verifyMfa = async (req, res) => {
   try {
     const decoded = jwt.verify(tempToken, JWT_SECRET);
     
-    // Call the pluggable persistent verification service
+    // Call persistent OTP verification service
     const verifyResult = await mfaService.verifyOtp(decoded.email, code);
     if (!verifyResult.success) {
       logAudit('anonymous', 'FAILED_MFA_VERIFICATION', `Failed MFA verification for ${decoded.email}: ${verifyResult.message}`);
       return res.status(400).json({ success: false, message: verifyResult.message });
     }
 
-    // Success, load full user
+    // Success, load full user profile
     db.get("SELECT * FROM users WHERE email = ?", [decoded.email], (err, user) => {
       if (err || !user) return res.status(404).json({ success: false, message: 'User not found' });
 
@@ -131,3 +135,47 @@ export const verifyMfa = async (req, res) => {
     return res.status(403).json({ success: false, message: 'MFA session expired or invalid' });
   }
 };
+
+/**
+ * POST /api/auth/logout
+ * Terminates session. As JWT is stateless locally, we audit the logout action 
+ * and let the client discard the token from local storage.
+ */
+export const logout = (req, res) => {
+  if (req.user) {
+    logAudit(req.user.id, 'LOGOUT', `User ${req.user.email} initiated logout`);
+  }
+  return res.json({ success: true, message: 'Logout successful' });
+};
+
+/**
+ * GET /api/auth/me
+ * Retrieves current authenticated user profile matching the verified token.
+ */
+export const getMe = (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: 'Unauthorized: User context missing' });
+  }
+  return res.json({
+    success: true,
+    data: toUser(req.user)
+  });
+};
+
+/**
+ * POST /api/auth/refresh
+ * Renews the access token for active sessions to prevent timeout expiration.
+ */
+export const refresh = (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: 'Unauthorized: Cannot refresh token without context' });
+  }
+  const newToken = signUser(req.user);
+  return res.json({
+    success: true,
+    data: {
+      token: newToken
+    }
+  });
+};
+

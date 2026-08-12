@@ -458,16 +458,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .app-sidebar {
-  top: 4rem !important;
-  height: calc(100vh - 4rem) !important;
+  top: 4.5rem !important; /* Alignment flush with header height */
+  height: calc(100vh - 4.5rem) !important;
   background: linear-gradient(180deg, #0b1424 0%, #07101d 100%) !important;
   border-color: rgba(148, 163, 184, 0.12) !important;
   box-shadow: 14px 0 40px rgba(2, 8, 23, 0.18) !important;
   margin: 0 !important;
-  margin-top: -1px !important;
+  margin-top: 0 !important;
   border-radius: 0 !important;
   align-self: stretch !important;
 }
+
 
 .app-sidebar .p-3 { padding: 1rem !important; }
 .app-sidebar nav {
@@ -1043,6 +1044,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background: var(--surface) !important;
   border-right: 1px solid var(--line) !important;
   box-shadow: 18px 0 48px rgba(2, 8, 23, 0.12) !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0;
+}
+.app-sidebar * {
+  box-sizing: border-box;
+}
+.main-body {
+  display: flex;
+  width: 100%;
+}
+.app-main {
+  flex-grow: 1;
+  box-sizing: border-box;
 }
 .app-sidebar::before {
   content: '';
@@ -1200,6 +1216,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sidebar-nav-link {
   min-height: 2.85rem;
   width: 100%;
+  margin: 4px 0;
+  box-sizing: border-box !important;
   padding: 0.55rem 0.65rem;
   border: 1px solid transparent !important;
   border-left: 4px solid transparent !important;
@@ -1219,6 +1237,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   border-left-color: var(--sidebar-accent) !important;
   background: linear-gradient(135deg, var(--sidebar-accent-strong), color-mix(in srgb, var(--sidebar-accent-strong) 60%, #4f46e5)) !important;
   box-shadow: 0 12px 24px color-mix(in srgb, var(--sidebar-accent-strong) 28%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  border-radius: 8px !important;
+  width: calc(100% - 16px) !important;
+  margin: 4px auto !important;
 }
 .sidebar-nav-link.is-active::before {
   content: '';

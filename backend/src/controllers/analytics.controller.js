@@ -145,3 +145,167 @@ export const getAnalytics = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Unable to load analytics data.' });
   }
 };
+
+/**
+ * GET /api/dashboard/summary
+ * Quick KPI numbers (Headcount, Shift Attendance, Late Arrivals, Risk Flags).
+ */
+export const getDashboardSummary = async (req, res) => {
+  try {
+    const employeeScope = getScope(req.user, 'e');
+    const attendanceScope = getScope(req.user, 'a');
+    const attendanceQueryScope = { ...attendanceScope, where: attendanceScope.where.replace('a.id', 'a.employeeId') };
+
+    const [employees, attendance] = await Promise.all([
+      all(`SELECT e.id, e.performanceScore, e.attendanceRate FROM employees e WHERE ${employeeScope.where}`, employeeScope.params),
+      all(`SELECT a.employeeId, a.status, a.checkInTime FROM attendance_records a WHERE ${attendanceQueryScope.where}`, attendanceQueryScope.params)
+    ]);
+
+    const totalHeadcount = employees.length;
+    const activePresent = attendance.filter((record) => record.status !== 'Checked Out').length;
+    const lateCount = attendance.filter((record) => record.checkInTime && new Date(record.checkInTime).getHours() >= 9 && new Date(record.checkInTime).getMinutes() > 15).length;
+    
+    let riskCount = 0;
+    employees.forEach((employee) => {
+      if ((employee.performanceScore || 0) < 75 || (employee.attendanceRate || 0) < 85) {
+        riskCount += 1;
+      }
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        totalHeadcount,
+        activePresent,
+        lateArrivals: lateCount,
+        riskFlags: riskCount,
+        attendanceRate: totalHeadcount ? Math.round((activePresent / totalHeadcount) * 100) : 0
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/dashboard/workforce
+ * Mode distribution (remote vs in-office etc).
+ */
+export const getWorkforceDistribution = async (req, res) => {
+  try {
+    const attendanceScope = getScope(req.user, 'a');
+    const rows = await all(
+      `SELECT a.workMode AS name, COUNT(DISTINCT a.employeeId) AS value 
+       FROM attendance_records a WHERE ${attendanceScope.where} GROUP BY a.workMode`,
+      attendanceScope.params
+    );
+    return res.json({ success: true, data: rows.length ? rows : [{ name: 'No data', value: 0 }] });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/dashboard/headcount
+ * Retrieves headcount distribution details.
+ */
+export const getHeadcountAnalytics = async (req, res) => {
+  try {
+    const employeeScope = getScope(req.user, 'e');
+    const rows = await all(
+      `SELECT e.department AS name, COUNT(*) AS value 
+       FROM employees e WHERE ${employeeScope.where} GROUP BY e.department`,
+      employeeScope.params
+    );
+    return res.json({ success: true, data: rows });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/dashboard/risk
+ * Retrieves risk-flag distribution details.
+ */
+export const getRiskAnalytics = async (req, res) => {
+  try {
+    const employeeScope = getScope(req.user, 'e');
+    const employees = await all(
+      `SELECT e.id, e.performanceScore, e.attendanceRate FROM employees e WHERE ${employeeScope.where}`,
+      employeeScope.params
+    );
+    const riskBuckets = { 'High Risk': 0, 'Medium Risk': 0, 'Low Risk': 0 };
+    employees.forEach((employee) => {
+      if ((employee.performanceScore || 0) < 75 || (employee.attendanceRate || 0) < 85) riskBuckets['High Risk'] += 1;
+      else if ((employee.performanceScore || 0) < 85 || (employee.attendanceRate || 0) < 95) riskBuckets['Medium Risk'] += 1;
+      else riskBuckets['Low Risk'] += 1;
+    });
+    return res.json({
+      success: true,
+      data: Object.entries(riskBuckets).map(([name, value]) => ({ name, value }))
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/analytics/employee-growth
+ * Retrieves workforce hiring trends over time.
+ */
+export const getEmployeeGrowth = async (req, res) => {
+  try {
+    const employeeScope = getScope(req.user, 'e');
+    const growth = await buildGrowth(employeeScope);
+    return res.json({ success: true, data: growth });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/analytics/attendance-trend
+ * Weekdays attendance analytics.
+ */
+export const getAttendanceTrend = async (req, res) => {
+  try {
+    const employeeScope = getScope(req.user, 'e');
+    const attendanceScope = getScope(req.user, 'a');
+    const attendanceQueryScope = { ...attendanceScope, where: attendanceScope.where.replace('a.id', 'a.employeeId') };
+
+    const [employees, attendance] = await Promise.all([
+      all(`SELECT e.id FROM employees e WHERE ${employeeScope.where}`, employeeScope.params),
+      all(`SELECT a.checkInTime, a.status FROM attendance_records a WHERE ${attendanceQueryScope.where}`, attendanceQueryScope.params)
+    ]);
+
+    const totalHeadcount = employees.length;
+    const trend = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((name, index) => {
+      const dayRecords = attendance.filter((record) => new Date(record.checkInTime || 0).getDay() === (index + 1));
+      const present = dayRecords.filter((record) => record.status !== 'Checked Out' || record.checkInTime).length;
+      return { name, present, absent: Math.max(0, totalHeadcount - present) };
+    });
+    return res.json({ success: true, data: trend });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/analytics/performance
+ * Returns performance details scoped by quarter.
+ */
+export const getPerformanceAnalytics = async (req, res) => {
+  try {
+    const performanceScope = getScope(req.user, 'p');
+    const performanceQueryScope = { ...performanceScope, where: performanceScope.where.replace('p.id', 'p.employeeId') };
+    const rows = await all(
+      `SELECT p.quarter AS name, ROUND(AVG(p.kpiScore), 1) AS performance, ROUND(AVG(p.targetScore), 1) AS target, ROUND(AVG(p.productivityScore), 1) AS productivity
+       FROM performance_records p WHERE ${performanceQueryScope.where} GROUP BY p.quarter ORDER BY p.quarter`,
+      performanceQueryScope.params
+    );
+    return res.json({ success: true, data: rows });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+

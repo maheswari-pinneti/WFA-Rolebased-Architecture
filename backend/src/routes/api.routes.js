@@ -3,6 +3,9 @@ import * as authController from '../controllers/auth.controller.js';
 import * as attendanceController from '../controllers/attendance.controller.js';
 import * as analyticsController from '../controllers/analytics.controller.js';
 import * as workforceController from '../controllers/workforce.controller.js';
+import * as employeeController from '../controllers/employee.controller.js';
+import * as organizationController from '../controllers/organization.controller.js';
+import * as auditController from '../controllers/audit.controller.js';
 import { authenticateToken, authorizeRoles, authorizePermissions, enforceScope } from '../middleware/auth.js';
 import db from '../config/db.js';
 
@@ -11,6 +14,10 @@ const router = express.Router();
 // Auth Routes
 router.post('/auth/login', authController.login);
 router.post('/auth/mfa-verify', authController.verifyMfa);
+router.post('/auth/logout', authenticateToken, authController.logout);
+router.get('/auth/me', authenticateToken, authController.getMe);
+router.post('/auth/refresh', authenticateToken, authController.refresh);
+
 
 // Employees Directory (enforces scope filter internally or via middleware)
 router.get('/employees', authenticateToken, enforceScope, (req, res) => {
@@ -54,7 +61,24 @@ router.put('/employees/:id/status', authenticateToken, enforceScope, authorizePe
   });
 });
 
+// Employee CRUD Route mappings
+router.get('/employees/:id', authenticateToken, enforceScope, employeeController.getEmployeeById);
+router.post('/employees', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_CREATE', 'EMPLOYEE_MANAGE']), employeeController.createEmployee);
+router.put('/employees/:id', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_UPDATE', 'EMPLOYEE_MANAGE']), employeeController.updateEmployee);
+router.delete('/employees/:id', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_DELETE', 'EMPLOYEE_MANAGE']), employeeController.deleteEmployee);
+
+// Team CRUD Route mappings
+router.get('/teams', authenticateToken, employeeController.getTeams);
+router.get('/teams/:id/members', authenticateToken, enforceScope, employeeController.getTeamMembers);
+
+// Org, Dept & RBAC Route mappings
+router.get('/departments', authenticateToken, organizationController.getDepartments);
+router.get('/organizations', authenticateToken, organizationController.getOrganizations);
+router.get('/roles', authenticateToken, organizationController.getRoles);
+router.get('/permissions', authenticateToken, organizationController.getPermissions);
+
 // Attendance Punch & Session Routes
+router.get('/attendance/today', authenticateToken, attendanceController.getTodayAttendance);
 router.post('/attendance/check-in', authenticateToken, enforceScope, attendanceController.checkIn);
 router.post('/attendance/break', authenticateToken, enforceScope, attendanceController.takeBreak);
 router.post('/attendance/resume', authenticateToken, enforceScope, attendanceController.resumeWork);
@@ -62,6 +86,7 @@ router.post('/attendance/check-out', authenticateToken, enforceScope, attendance
 router.get('/attendance/records', authenticateToken, enforceScope, attendanceController.getRecords);
 router.get('/attendance/shifts', authenticateToken, attendanceController.getShifts);
 router.get('/attendance/audit-logs', authenticateToken, attendanceController.getAuditLogs);
+
 
 // Persisted leave and task workflows, scoped by organization/department/team/employee.
 router.get('/leave-requests', authenticateToken, enforceScope, workforceController.getLeaveRequests);
@@ -79,7 +104,23 @@ router.put('/attendance/corrections/:id', authenticateToken, authorizeRoles(['AD
 router.get('/analytics', authenticateToken, enforceScope, analyticsController.getAnalytics);
 router.get('/dashboard/metrics', authenticateToken, enforceScope, analyticsController.getAnalytics);
 
+// Dashboard specific endpoints
+router.get('/dashboard/summary', authenticateToken, enforceScope, analyticsController.getDashboardSummary);
+router.get('/dashboard/workforce', authenticateToken, enforceScope, analyticsController.getWorkforceDistribution);
+router.get('/dashboard/headcount', authenticateToken, enforceScope, analyticsController.getHeadcountAnalytics);
+router.get('/dashboard/risk', authenticateToken, enforceScope, analyticsController.getRiskAnalytics);
+
+// Analytics trends
+router.get('/analytics/employee-growth', authenticateToken, enforceScope, analyticsController.getEmployeeGrowth);
+router.get('/analytics/attendance-trend', authenticateToken, enforceScope, analyticsController.getAttendanceTrend);
+router.get('/analytics/performance', authenticateToken, enforceScope, analyticsController.getPerformanceAnalytics);
+
+// Audit Logs
+router.get('/audit/logs', authenticateToken, authorizeRoles(['ADMIN', 'HR']), auditController.getAuditLogs);
+router.get('/audit/logs/:id', authenticateToken, authorizeRoles(['ADMIN', 'HR']), auditController.getAuditLogDetail);
+
 // User Management (Admin Only)
+
 router.get('/users', authenticateToken, authorizeRoles(['ADMIN']), (req, res) => {
   db.all("SELECT id, name, email, role, department, team, location, title, clearanceLevel, status, permissions FROM users WHERE organizationId = ?", [req.user.organizationId || 'org-stackly'], (err, rows) => {
     if (err) return res.status(500).json({ success: false, message: err.message });

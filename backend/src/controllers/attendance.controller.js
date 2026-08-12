@@ -174,6 +174,28 @@ export const getRecords = (req, res) => {
   });
 };
 
+/**
+ * GET /api/attendance/today
+ * Retrieves the current day's active/completed attendance record for the authenticated user.
+ */
+export const getTodayAttendance = (req, res) => {
+  const employeeId = req.user.id;
+  const todayDate = new Date().toISOString().split('T')[0];
+  
+  db.get(
+    `SELECT * FROM attendance_records 
+     WHERE employeeId = ? AND date = ? AND organizationId = ? 
+     ORDER BY checkInTime DESC LIMIT 1`,
+    [employeeId, todayDate, organizationId(req)],
+    (err, row) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: err.message });
+      }
+      return res.json({ success: true, data: row ? parseRecord(row) : null });
+    }
+  );
+};
+
 export const submitCorrection = (req, res) => {
   const body = req.body || {};
   const employeeId = req.user.role === 'EMPLOYEE' ? req.user.id : body.employeeId;
