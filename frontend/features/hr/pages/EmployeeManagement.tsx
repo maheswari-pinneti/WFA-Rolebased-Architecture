@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../app/store';
 import { fetchEmployeesThunk, updateEmployeeStatusThunk } from '../store/hrSlice';
@@ -15,6 +15,15 @@ export const EmployeeManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { employees, isLoading } = useSelector((state: RootState) => state.hr);
 
+  const sortedEmployees = useMemo(() => {
+    if (!employees) return [];
+    return [...employees].sort((a, b) => {
+      const codeA = (a && (a.employeeCode || a.code)) || '';
+      const codeB = (b && (b.employeeCode || b.code)) || '';
+      return codeA.localeCompare(codeB, undefined, { numeric: true, sensitivity: 'base' });
+    });
+  }, [employees]);
+
   useEffect(() => {
     dispatch(fetchEmployeesThunk());
   }, [dispatch]);
@@ -27,16 +36,9 @@ export const EmployeeManagement: React.FC = () => {
     {
       header: 'Employee ID',
       cell: (emp: Employee) => {
-        const dateStr = emp.joining_date || emp.joinDate || '2025-01-01';
-        const year = dateStr.split('-')[0] || '2025';
-        const nameClean = (emp.name || `${emp.first_name || ''} ${emp.last_name || ''}`).trim();
-        const firstTwoLetters = nameClean.substring(0, 2).toUpperCase().padEnd(2, 'X');
-        const digits = String(emp.id).replace(/\D/g, '');
-        const indexStr = digits ? digits.padStart(4, '0') : '0001';
-        const formattedId = `STK-${year}-${firstTwoLetters}${indexStr}`;
         return (
           <span className="font-mono font-bold text-slate-300">
-            {formattedId}
+            {emp.employeeCode || emp.code || '—'}
           </span>
         );
       }
@@ -129,7 +131,7 @@ export const EmployeeManagement: React.FC = () => {
         ) : (
           <div className="glass-panel p-6 space-y-4">
             <DataTable
-              data={employees}
+              data={sortedEmployees}
               columns={columns}
               searchPlaceholder="Search by code, name, designation, department..."
               searchFilter={(emp: Employee, q: string) => {

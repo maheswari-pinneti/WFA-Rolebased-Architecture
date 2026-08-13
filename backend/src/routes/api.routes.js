@@ -23,7 +23,7 @@ router.post('/auth/refresh', authenticateToken, authController.refresh);
 router.get('/employees', authenticateToken, enforceScope, (req, res) => {
   const { role, id, department, team, organizationId = 'org-stackly' } = req.user;
   if (role === 'ADMIN' || role === 'HR') {
-    db.all("SELECT * FROM employees WHERE organizationId = ? ORDER BY name", [organizationId], (err, rows) => {
+    db.all("SELECT * FROM employees WHERE organizationId = ? ORDER BY employeeCode", [organizationId], (err, rows) => {
       if (err) return res.status(500).json({ success: false, message: err.message });
       return res.json({ success: true, data: rows });
     });
@@ -33,12 +33,12 @@ router.get('/employees', authenticateToken, enforceScope, (req, res) => {
       return res.json({ success: true, data: rows });
     });
   } else if (role === 'TEAM_LEAD') {
-    db.all("SELECT * FROM employees WHERE organizationId = ? AND department = ? AND team = ? ORDER BY name", [organizationId, department, team], (err, rows) => {
+    db.all("SELECT * FROM employees WHERE organizationId = ? AND department = ? AND team = ? ORDER BY employeeCode", [organizationId, department, team], (err, rows) => {
       if (err) return res.status(500).json({ success: false, message: err.message });
       return res.json({ success: true, data: rows });
     });
   } else {
-    db.all("SELECT * FROM employees WHERE organizationId = ? AND department = ? ORDER BY name", [organizationId, department], (err, rows) => {
+    db.all("SELECT * FROM employees WHERE organizationId = ? AND department = ? ORDER BY employeeCode", [organizationId, department], (err, rows) => {
       if (err) return res.status(500).json({ success: false, message: err.message });
       return res.json({ success: true, data: rows });
     });

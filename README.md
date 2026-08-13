@@ -839,14 +839,32 @@ Sessions / Refresh Tokens
 
 Database requirements include:
 
-* Unique employee IDs
-* Unique user emails
-* Foreign-key relationships
-* Indexed queries
-* Transaction support
-* Seed data
-* Test database
-* Audit persistence
+* **Unique Employee IDs**: Enforced via `employeeCode TEXT UNIQUE` database constraints.
+* **Unique User Emails**: Enforced via `email TEXT UNIQUE` database constraints.
+* **Foreign-Key Relationships**: Validated across organizations, users, employees, departments, and teams.
+* **Indexed Queries**: Optimized performance with indexes on critical query paths.
+* **Transaction Support**: Clean schema creation and seeding transaction rollbacks on failure.
+* **Test Database**: Separation of test state to prevent development DB pollution.
+* **Audit Persistence**: Automatic tracking of system login/logout, check-ins/outs, and corrections.
+
+### 👥 250 Stackly Employee Seed Dataset
+
+The project seeds exactly **250 employee records** distributed deterministically across various offices:
+
+| Location | Number of Employees | Continuous ID Range |
+| --- | --- | --- |
+| **Hyderabad** | 70 employees | `STK-YYYY-0001` to `STK-YYYY-0070` |
+| **Visakhapatnam** | 40 employees | `STK-YYYY-0071` to `STK-YYYY-0110` |
+| **Chennai** | 50 employees | `STK-YYYY-0111` to `STK-YYYY-0160` |
+| **Bengaluru** | 60 employees | `STK-YYYY-0161` to `STK-YYYY-0220` |
+| **Kochi** | 30 employees | `STK-YYYY-0221` to `STK-YYYY-0250` |
+| **TOTAL** | **250 employees** | **0001–0250** |
+
+#### Rules and Conventions:
+* **Employee ID format**: `STK-{YEAR_OF_JOINING}-{CONTINUOUS_4_DIGIT_NUMBER}` (e.g. `STK-2022-0001`). The continuous sequence is globally unique and location-independent.
+* **Email format**: `firstname.lastname.NNNN@thestackly.com` (lowercase) where `NNNN` corresponds to the unique 4-digit sequence, ensuring deterministic email uniqueness.
+* **Compatibility**: Employee `0250` corresponds to `usr-emp-01` (`Alex Mercer`, `employee@thestackly.com`) to preserve login compatibility for e2e tests.
+
 
 ---
 

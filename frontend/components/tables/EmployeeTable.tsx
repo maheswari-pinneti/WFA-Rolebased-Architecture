@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { fetchEmployeesThunk, updateEmployeeStatusThunk } from '../../features/hr/store/hrSlice';
@@ -45,8 +45,17 @@ export const EmployeeTable: React.FC = () => {
     return matchesSearch && matchesDept;
   });
 
-  const totalPages = Math.ceil(filteredEmployees.length / pageSize) || 1;
-  const paginatedEmployees = filteredEmployees.slice((page - 1) * pageSize, page * pageSize);
+  const sortedFilteredEmployees = useMemo(() => {
+    if (!filteredEmployees) return [];
+    return [...filteredEmployees].sort((a, b) => {
+      const codeA = (a && (a.employeeCode || a.code)) || '';
+      const codeB = (b && (b.employeeCode || b.code)) || '';
+      return codeA.localeCompare(codeB, undefined, { numeric: true, sensitivity: 'base' });
+    });
+  }, [filteredEmployees]);
+
+  const totalPages = Math.ceil(sortedFilteredEmployees.length / pageSize) || 1;
+  const paginatedEmployees = sortedFilteredEmployees.slice((page - 1) * pageSize, page * pageSize);
 
   const departments = [
     'ALL',

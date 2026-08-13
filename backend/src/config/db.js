@@ -281,6 +281,21 @@ const seedEmployees = async () => {
   for (let i = 0; i < 60; i++) locations.push('Bengaluru');
   for (let i = 0; i < 30; i++) locations.push('Kochi');
 
+  const firstNames = [
+    'Aarav', 'Vihaan', 'Vivaan', 'Ananya', 'Diya', 'Advik', 'Siddharth', 'Ishaan', 'Aanya', 'Aditi',
+    'Kabir', 'Rohan', 'Arjun', 'Rahul', 'Pranav', 'Aditya', 'Sai', 'Krishna', 'Karan', 'Sanjay',
+    'Vikram', 'Ramesh', 'Suresh', 'Anil', 'Sunil', 'Vijay', 'Rajesh', 'Harish', 'Manish', 'Amit',
+    'Pooja', 'Neha', 'Priya', 'Sneha', 'Anjali', 'Riya', 'Divya', 'Deepika', 'Kiran', 'Jyoti',
+    'Akash', 'Abhishek', 'Aman', 'Aniket', 'Ayush', 'Gaurav', 'Nitin', 'Pankaj', 'Sachin', 'Sandeep',
+    'Shalini', 'Swati', 'Meera', 'Shruti', 'Preeti', 'Kavita', 'Geeta', 'Lata', 'Sunita', 'Anita'
+  ];
+  const lastNames = [
+    'Sharma', 'Verma', 'Kumar', 'Singh', 'Patel', 'Reddy', 'Rao', 'Nair', 'Pillai', 'Joshi',
+    'Iyer', 'Iyengar', 'Gupta', 'Sen', 'Dutta', 'Das', 'Banerjee', 'Chatterjee', 'Mukherjee', 'Bose',
+    'Mehta', 'Shah', 'Trivedi', 'Pandey', 'Mishra', 'Choudhury', 'Prasad', 'Sinha', 'Kapoor', 'Khanna',
+    'Malhotra', 'Bahl', 'Gill', 'Sandhu', 'Nayar', 'Menon', 'Shetty', 'Hegde', 'Gowda', 'Naidu'
+  ];
+
   const empRows = [];
   const userRows = [];
 
@@ -290,8 +305,11 @@ const seedEmployees = async () => {
     const joiningYear = 2020 + (i % 7);
     const code = `STK-${joiningYear}-${paddedNum}`;
     
-    const name = i === 250 ? 'Alex Mercer' : `Employee ${i}`;
-    const email = i === 250 ? 'employee@thestackly.com' : `employee.${paddedNum}@thestackly.com`;
+    const firstName = firstNames[(i - 1) % firstNames.length];
+    const lastName = lastNames[Math.floor((i - 1) / firstNames.length) % lastNames.length];
+
+    const name = i === 250 ? 'Alex Mercer' : `${firstName} ${lastName}`;
+    const email = i === 250 ? 'employee@thestackly.com' : `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${paddedNum}@thestackly.com`;
     const role = 'EMPLOYEE';
     const deptIdx = i % departments.length;
     const dept = i === 250 ? 'Engineering' : departments[deptIdx];
