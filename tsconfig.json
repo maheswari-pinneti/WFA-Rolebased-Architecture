@@ -27,5 +27,5 @@
       "@/*": ["frontend/*"]
     }
   },
-  "include": ["frontend"]
+  "include": ["frontend", "vite.config.ts"]
 }
