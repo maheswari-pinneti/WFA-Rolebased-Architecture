@@ -42,7 +42,7 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   let teamLeadToken = '';
 
   const loginToken = async (email: string) => {
-    const loginRes = await client.post('/v1/auth/login', { email });
+    const loginRes = await client.post('/v1/auth/login', { email, password: 'admin' });
     const verifyRes = await client.post('/v1/auth/mfa-verify', {
       tempToken: loginRes.data.data.tempToken,
       code: loginRes.data.data.otpDevHint
@@ -51,13 +51,13 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   };
 
   it('should fail login with invalid domain', async () => {
-    const res = await client.post('/v1/auth/login', { email: 'bad@gmail.com' });
+    const res = await client.post('/v1/auth/login', { email: 'bad@gmail.com', password: 'admin' });
     expect(res.status).toBe(403);
     expect(res.data.success).toBe(false);
   });
 
   it('should authenticate admin successfully', async () => {
-    const res = await client.post('/v1/auth/login', { email: 'admin@thestackly.com' });
+    const res = await client.post('/v1/auth/login', { email: 'admin@thestackly.com', password: 'admin' });
     expect(res.status).toBe(200);
     expect(res.data.success).toBe(true);
     expect(res.data.data.requiresMfa).toBe(true);
@@ -73,7 +73,7 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   });
 
   it('should authenticate employee successfully', async () => {
-    const res = await client.post('/v1/auth/login', { email: 'employee@thestackly.com' });
+    const res = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'admin' });
     expect(res.status).toBe(200);
     expect(res.data.success).toBe(true);
     expect(res.data.data.requiresMfa).toBe(true);

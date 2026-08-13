@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import db, { logAudit } from '../config/db.js';
 import * as mfaService from '../services/mfa.service.js';
+import bcrypt from 'bcryptjs';
+import { env } from '../config/env.js';
 
-const JWT_SECRET = 'wfa_platform_secret_jwt_key_2026';
+const JWT_SECRET = env.JWT_SECRET;
 const ORGANIZATION_ID = 'org-stackly';
 
 const toUser = (user) => ({
@@ -31,9 +33,13 @@ const signUser = (user) => jwt.sign(
 
 export const login = (req, res) => {
   const rawEmail = req.body?.email;
+  const password = req.body?.password;
   const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
   if (!email) {
     return res.status(400).json({ success: false, message: 'Email is required' });
+  }
+  if (!password) {
+    return res.status(400).json({ success: false, message: 'Password is required' });
   }
 
   if (!email.endsWith('@thestackly.com') && !email.endsWith('@company.com')) {
@@ -51,6 +57,13 @@ export const login = (req, res) => {
     if (!user) {
       logAudit('anonymous', 'FAILED_AUTHENTICATION', `User not found: ${email}`);
       return res.status(404).json({ success: false, message: 'User profile not found' });
+    }
+
+    // Enforce BCrypt password hash check
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      logAudit(user.id, 'FAILED_AUTHENTICATION', `Incorrect password for ${email}`);
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
     // MFA Challenge if enabled

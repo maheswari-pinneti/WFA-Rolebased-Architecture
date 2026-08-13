@@ -8,7 +8,7 @@ export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const authState = useSelector((state: RootState) => state.auth);
 
-  const login = (email: string) => dispatch(loginUserThunk(email));
+  const login = (email: string, password?: string) => dispatch(loginUserThunk({ email, password }));
 
   const verifyMfa = async (tempToken: string, code: string) => {
     const data = await authService.verifyMfa(tempToken, code);

@@ -4,6 +4,7 @@ import { Role } from '../../../security/roles/roles';
 import { Permission } from '../../../security/permissions/permissions';
 import { KPICard } from '../../../components/cards/KPICard';
 import { DrillDownModal, DrillDownData } from '../../../shared/components/DrillDownModal';
+import { useAuth } from '../../../auth/hooks/useAuth';
 
 // Attendance System Components
 import { LiveCheckInWidget } from '../../../components/attendance/LiveCheckInWidget';
@@ -15,6 +16,7 @@ import { Clock, Calendar, FileText, Compass, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const EmployeeDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {
@@ -35,17 +37,17 @@ export const EmployeeDashboard: React.FC = () => {
         <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/50 via-slate-900 to-teal-950/40 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
           <div className="flex items-center gap-4">
             <img
-              src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150"
-              alt="Alex Mercer"
+              src={user?.avatar || "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150"}
+              alt={user?.name || "Employee"}
               className="w-14 h-14 rounded-2xl object-cover border-2 border-emerald-500 shadow-md shrink-0"
             />
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black tracking-tight text-white">Welcome back, Alex Mercer!</h2>
+                <h2 className="text-2xl font-black tracking-tight text-white">Welcome back, {user?.name || "Alex Mercer"}!</h2>
                 <span className="badge badge-success">SELF SERVICE</span>
               </div>
               <p className="text-xs text-slate-300 mt-1">
-                Full Stack Developer • Engineering & Technology Department (Frontend Team)
+                {user?.title || "Full Stack Developer"} • {user?.department || "Engineering & Technology Department (Frontend Team)"}
               </p>
             </div>
           </div>

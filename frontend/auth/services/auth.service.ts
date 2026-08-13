@@ -20,8 +20,8 @@ const normalizeUser = (value: any) => {
 };
 
 export const authService = {
-  login: async (email: string) => {
-    const response = await authApi.login(email);
+  login: async (email: string, password?: string) => {
+    const response = await authApi.login(email, password);
     // Only store session if login directly succeeded without MFA
     if (response && (response as any).token && (response as any).user) {
       const user = normalizeUser((response as any).user);

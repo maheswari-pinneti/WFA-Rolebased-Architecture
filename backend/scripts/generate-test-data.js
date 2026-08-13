@@ -64,7 +64,7 @@ async function main() {
 
     console.log('Generating 300 employees and relational hierarchy...');
     const employeesList = [];
-    const passwordHash = '$2a$10$T81n17/iPq6XhN.Wz96tqOuXvP9w7bC4T5uVbX2Rj7qD1yI/3K22.'; // Default password: admin
+    const passwordHash = '$2b$10$evn.6.RBuIQsGMgA5MxGtuJl6S8cQJ76ObN8TfMzIDd14QLGeqH5S'; // Default password: admin
 
     // 1. Create 1 Admin
     const adminName = 'System Administrator';

@@ -242,7 +242,7 @@ const seedCoreUsers = async () => {
   const row = await get('SELECT COUNT(*) AS count FROM users');
   if (row.count > 0) return;
 
-  const passHash = '$2a$10$T81n17/iPq6XhN.Wz96tqOuXvP9w7bC4T5uVbX2Rj7qD1yI/3K22.';
+  const passHash = '$2b$10$evn.6.RBuIQsGMgA5MxGtuJl6S8cQJ76ObN8TfMzIDd14QLGeqH5S';
   const users = [
     ['usr-admin-01', 'Sarah Connor', 'admin@thestackly.com', 'ADMIN', 'Executive', 'System Architecture', 'Global HQ', 'System Administrator', 5, ['USER_CREATE', 'USER_UPDATE', 'USER_DELETE', 'USER_MANAGE', 'ROLE_CREATE', 'ROLE_UPDATE', 'ROLE_DELETE', 'ROLE_MANAGE', 'PERMISSION_ASSIGN', 'EMPLOYEE_VIEW_ALL', 'EMPLOYEE_CREATE', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE', 'REPORT_VIEW_ALL', 'REPORT_EXPORT', 'SYSTEM_SETTINGS_MANAGE', 'SYSTEM_CONFIG', 'AUDIT_LOG_VIEW', 'VIEW_ALL_DATA']],
     ['usr-hr-01', 'Elena Rostova', 'hr@thestackly.com', 'HR', 'Human Resources', 'People Operations', 'New York', 'VP of HR Operations', 4, ['EMPLOYEE_VIEW', 'EMPLOYEE_CREATE', 'EMPLOYEE_UPDATE', 'EMPLOYEE_PROFILE_MANAGE', 'ATTENDANCE_VIEW_ALL', 'ATTENDANCE_MANAGE', 'LEAVE_APPROVE', 'PERFORMANCE_MANAGE', 'RECRUITMENT_MANAGE', 'REPORT_GENERATE', 'EMPLOYEE_MANAGE', 'REPORT_VIEW', 'TEAM_ANALYTICS_VIEW']],
@@ -267,28 +267,31 @@ const seedEmployees = async () => {
   await run("DELETE FROM performance_records");
   await run("DELETE FROM organizations");
 
-  const passHash = '$2a$10$T81n17/iPq6XhN.Wz96tqOuXvP9w7bC4T5uVbX2Rj7qD1yI/3K22.';
+  const passHash = '$2b$10$evn.6.RBuIQsGMgA5MxGtuJl6S8cQJ76ObN8TfMzIDd14QLGeqH5S';
   const departments = ['Engineering', 'Product Management', 'Sales & Marketing', 'Human Resources', 'Customer Success', 'Finance & Operations'];
   const teams = ['Frontend Team', 'Product Strategy', 'Growth Team', 'People Operations', 'Customer Success', 'Finance Operations'];
   const designations = ['Senior Software Engineer', 'Product Manager', 'Account Executive', 'HR Operations Manager', 'Customer Success Director', 'Financial Analyst'];
   const statuses = ['ACTIVE', 'REMOTE', 'ON_LEAVE', 'ACTIVE'];
 
-  // Geographic distribution: Bengaluru: 60, Chennai: 50, Hyderabad: 70, Kochi: 30, Visakhapatnam: 40
+  // Geographic distribution: Hyderabad: 70, Visakhapatnam: 40, Chennai: 50, Bengaluru: 60, Kochi: 30
   const locations = [];
-  for (let i = 0; i < 60; i++) locations.push('Bengaluru');
-  for (let i = 0; i < 50; i++) locations.push('Chennai');
   for (let i = 0; i < 70; i++) locations.push('Hyderabad');
-  for (let i = 0; i < 30; i++) locations.push('Kochi');
   for (let i = 0; i < 40; i++) locations.push('Visakhapatnam');
+  for (let i = 0; i < 50; i++) locations.push('Chennai');
+  for (let i = 0; i < 60; i++) locations.push('Bengaluru');
+  for (let i = 0; i < 30; i++) locations.push('Kochi');
 
   const empRows = [];
   const userRows = [];
 
   for (let i = 1; i <= 250; i++) {
     const id = i === 250 ? 'usr-emp-01' : `emp-${i}`;
-    const code = `STK-${10000 + i}`;
+    const paddedNum = String(i).padStart(4, '0');
+    const joiningYear = 2020 + (i % 7);
+    const code = `STK-${joiningYear}-${paddedNum}`;
+    
     const name = i === 250 ? 'Alex Mercer' : `Employee ${i}`;
-    const email = i === 250 ? 'employee@thestackly.com' : `employee${i}@thestackly.com`;
+    const email = i === 250 ? 'employee@thestackly.com' : `employee.${paddedNum}@thestackly.com`;
     const role = 'EMPLOYEE';
     const deptIdx = i % departments.length;
     const dept = i === 250 ? 'Engineering' : departments[deptIdx];
@@ -300,7 +303,7 @@ const seedEmployees = async () => {
     empRows.push([
       id, code, name, email, role, dept, design, status,
       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-      `202${2 + (i % 4)}-${String((i % 12) + 1).padStart(2, '0')}-15`, 80 + (i % 20), 90 + (i % 10),
+      `${joiningYear}-${String((i % 12) + 1).padStart(2, '0')}-15`, 80 + (i % 20), 90 + (i % 10),
       team, location, ORGANIZATION_ID
     ]);
 

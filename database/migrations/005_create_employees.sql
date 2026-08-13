@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS employees (
   performanceScore REAL,
   attendanceRate REAL,
   team TEXT,
+  location TEXT,
   organizationId TEXT DEFAULT 'org-stackly',
   FOREIGN KEY (organizationId) REFERENCES organizations(id)
 );

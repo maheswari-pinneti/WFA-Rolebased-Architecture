@@ -73,7 +73,7 @@ export const LoginPage: React.FC = () => {
 
   // Forms states
   const [email, setEmail] = useState('admin@thestackly.com');
-  const [password, setPassword] = useState('••••••••');
+  const [password, setPassword] = useState('admin');
   const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [employeeId, setEmployeeId] = useState('');
@@ -118,6 +118,7 @@ export const LoginPage: React.FC = () => {
   const handleRoleSelect = (roleKey: 'admin' | 'hr' | 'manager' | 'lead' | 'employee') => {
     setSelectedRole(roleKey);
     setEmail(ROLE_DETAILS[roleKey].email);
+    setPassword('admin');
     setError('');
   };
 
@@ -149,7 +150,7 @@ export const LoginPage: React.FC = () => {
     }
     setIsLoading(true);
     try {
-      const res = (await authService.login(email.trim())) as any;
+      const res = (await authService.login(email.trim(), password)) as any;
       if (res.requiresMfa) {
         setTempToken(res.tempToken);
         if (res.otpDevHint) {
@@ -179,7 +180,7 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = (await authService.login(email.trim())) as any;
+      const res = (await authService.login(email.trim(), password)) as any;
       if (res.requiresMfa) {
         setTempToken(res.tempToken);
         if (res.otpDevHint) {
@@ -190,7 +191,7 @@ export const LoginPage: React.FC = () => {
         setTimer(45);
         setSuccessMsg('OTP Code has been generated.');
       } else {
-        await login(email);
+        await login(email, password);
       }
     } catch (err: any) {
       setError(err.message || 'Login failed.');
