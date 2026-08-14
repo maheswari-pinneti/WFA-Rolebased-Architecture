@@ -399,4 +399,48 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
     expect(yearFilter.status).toBe(200);
     expect(yearFilter.data.data.employees.every((e: any) => e.joinDate.startsWith('2021-'))).toBe(true);
   });
+
+  describe('Database Schema, FK, and Seeding integrity', () => {
+    it('should verify schema constraints and table existences', async () => {
+      return new Promise<void>((resolve, reject) => {
+        db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, tables) => {
+          if (err) return reject(err);
+          const tableNames = tables.map((t: any) => t.name);
+          expect(tableNames).toContain('users');
+          expect(tableNames).toContain('employees');
+          expect(tableNames).toContain('mfa_challenges');
+          expect(tableNames).toContain('sessions');
+          expect(tableNames).toContain('refresh_tokens');
+          resolve();
+        });
+      });
+    });
+
+    it('should verify seeder loaded the deterministic admin and employee structures', async () => {
+      return new Promise<void>((resolve, reject) => {
+        db.get("SELECT count(*) as count FROM users", [], (err, row: any) => {
+          if (err) return reject(err);
+          expect(row.count).toBeGreaterThanOrEqual(5); // Admin, HR, Manager, Lead, Employee
+          resolve();
+        });
+      });
+    });
+
+    it('should enforce Foreign Key constraint checks', async () => {
+      return new Promise<void>((resolve, reject) => {
+        db.run("PRAGMA foreign_keys = ON", [], (err) => {
+          if (err) return reject(err);
+          db.run(
+            "INSERT INTO employees (id, name, email, department, designation, status, location, joinDate, organizationId) VALUES ('bad-emp', 'Jane', 'j@c.com', 'D', 'Designation', 'ACTIVE', 'Loc', '2026-08-01', 'invalid-org')",
+            [],
+            function (insertErr) {
+              expect(insertErr).toBeDefined();
+              expect(insertErr?.message).toMatch(/FOREIGN KEY constraint failed/);
+              resolve();
+            }
+          );
+        });
+      });
+    });
+  });
 });
