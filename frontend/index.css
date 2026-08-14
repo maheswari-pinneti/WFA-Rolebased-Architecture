@@ -462,7 +462,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .app-sidebar {
-  top: var(--header-height) !important; /* Alignment flush with header height */
+  top: 0 !important; /* Flush with top of main-body on desktop */
   height: calc(100vh - var(--header-height)) !important;
   background: linear-gradient(180deg, #0b1424 0%, #07101d 100%) !important;
   border-color: rgba(148, 163, 184, 0.12) !important;

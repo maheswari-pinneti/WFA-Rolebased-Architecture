@@ -508,10 +508,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Role-aware workspace navigation */}
       <aside
         aria-label="Primary navigation"
-        style={{
-          top: 'var(--header-height)',
-          height: 'calc(100vh - var(--header-height))'
-        }}
         className={`app-sidebar ${roleAccent.className} border-r flex flex-col shrink-0 fixed md:sticky left-0 z-30 transition-all duration-300 ease-in-out font-sans ${
           collapsed ? 'sidebar-is-collapsed w-[76px]' : 'sidebar-is-expanded w-[280px]'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
