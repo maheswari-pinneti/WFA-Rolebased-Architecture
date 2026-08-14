@@ -207,7 +207,7 @@ export const EmployeeManagement: React.FC = () => {
               <input
                 type="text"
                 value={search}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search employees by name or ID (e.g. 0007)..."
                 className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-blue-500 transition-colors"
               />
