@@ -19,22 +19,24 @@ if (fs.existsSync(envPath)) {
       if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
         val = val.substring(1, val.length - 1);
       }
-      process.env[key] = val;
+      if (process.env[key] === undefined) {
+        process.env[key] = val;
+      }
     }
   });
 }
 
 // Fallback or validation
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const JWT_SECRET = process.env.JWT_SECRET || (NODE_ENV === 'production' ? null : 'wfa_platform_secret_jwt_key_2026');
+const JWT_SECRET = process.env.JWT_SECRET;
 
-if (!JWT_SECRET && NODE_ENV === 'production') {
-  console.error("FATAL: JWT_SECRET environment variable is missing in production mode!");
+if (!JWT_SECRET) {
+  console.error("FATAL: JWT_SECRET environment variable is missing!");
   process.exit(1);
 }
 
 export const env = {
   NODE_ENV,
-  JWT_SECRET: JWT_SECRET || 'wfa_platform_secret_jwt_key_2026',
+  JWT_SECRET,
   PORT: process.env.PORT || 5000
 };

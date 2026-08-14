@@ -48,14 +48,14 @@ describe('E2E User Flow Tests', () => {
 
   it('Flow: Login -> Check-In -> Break -> Resume -> Check-Out -> View History', async () => {
     // 1. Login
-    const loginRes = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'admin' });
+    const loginRes = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'StacklyWFA2026!' });
     expect(loginRes.status).toBe(200);
-    // Since MFA is enabled, we get tempToken and code
+    // Since MFA is enabled, we get challengeId and code
     expect(loginRes.data.data.requiresMfa).toBe(true);
-    const { tempToken, otpDevHint } = loginRes.data.data;
+    const { challengeId, otpDevHint } = loginRes.data.data;
 
     // MFA Verify
-    const verifyRes = await client.post('/v1/auth/mfa-verify', { tempToken, code: otpDevHint });
+    const verifyRes = await client.post('/v1/auth/mfa/verify', { challengeId, otp: otpDevHint });
     expect(verifyRes.status).toBe(200);
     token = verifyRes.data.data.token;
     expect(token).toBeDefined();
@@ -98,9 +98,9 @@ describe('E2E User Flow Tests', () => {
 
   it('should enforce geofence, duplicate check-in, and double-checkout restrictions', async () => {
     // 1. Login to get token
-    const loginRes = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'admin' });
-    const { tempToken, otpDevHint } = loginRes.data.data;
-    const verifyRes = await client.post('/v1/auth/mfa-verify', { tempToken, code: otpDevHint });
+    const loginRes = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'StacklyWFA2026!' });
+    const { challengeId, otpDevHint } = loginRes.data.data;
+    const verifyRes = await client.post('/v1/auth/mfa/verify', { challengeId, otp: otpDevHint });
     const empToken = verifyRes.data.data.token;
 
     // 2. Try check-in with out-of-bounds geofence

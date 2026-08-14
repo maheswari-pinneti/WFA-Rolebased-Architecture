@@ -23,7 +23,11 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    const isAuthRoute = error.config?.url && (
+      error.config.url.includes('/auth/') ||
+      error.config.url.includes('/login')
+    );
+    if ((error.response?.status === 401 || error.response?.status === 403) && !isAuthRoute) {
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.USER_DATA);
       window.location.assign('/login');

@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS roles (
-  id TEXT PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  description TEXT,
-  clearanceLevel INTEGER DEFAULT 1
-);

@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
-import db, { ORGANIZATION_ID } from '../config/db.js';
+import db from '../database/connection.js';
+const ORGANIZATION_ID = 'org-stackly';
+
 
 import { env } from '../config/env.js';
 

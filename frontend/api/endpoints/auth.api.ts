@@ -12,7 +12,28 @@ export const authApi = {
     throw new Error(response.data?.message || 'Login failed');
   },
 
-  logout: async (): Promise<void> => {
-    // Optional backend logout call
+  verifyMfa: async (challengeId: string, otp: string): Promise<any> => {
+    const response = await apiClient.post('/v1/auth/mfa/verify', {
+      challengeId,
+      otp
+    });
+    if (response.data && response.data.success) {
+      return response.data.data;
+    }
+    throw new Error(response.data?.message || 'MFA OTP Verification failed');
+  },
+
+  resendMfa: async (challengeId: string): Promise<any> => {
+    const response = await apiClient.post('/v1/auth/mfa/resend', {
+      challengeId
+    });
+    if (response.data && response.data.success) {
+      return response.data.data;
+    }
+    throw new Error(response.data?.message || 'OTP Resend failed');
+  },
+
+  logout: async (refreshToken?: string): Promise<void> => {
+    await apiClient.post('/v1/auth/logout', { refreshToken });
   }
 };

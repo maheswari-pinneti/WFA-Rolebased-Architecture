@@ -3,7 +3,7 @@ import db from '../config/db.js';
 export const EmployeeModel = {
   findAll: (orgId) => {
     return new Promise((resolve, reject) => {
-      db.all('SELECT * FROM employees WHERE organizationId = ? ORDER BY employeeCode', [orgId], (err, rows) => {
+      db.all("SELECT * FROM employees WHERE organizationId = ? ORDER BY CAST(SUBSTR(employeeCode, -4) AS INTEGER) ASC", [orgId], (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });

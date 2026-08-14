@@ -11,38 +11,119 @@ import db from '../config/db.js';
 
 const router = express.Router();
 
+// Health Check
+router.get('/health', authController.healthCheck);
+
 // Auth Routes
 router.post('/auth/login', authController.login);
+router.post('/auth/mfa/verify', authController.verifyMfa);
 router.post('/auth/mfa-verify', authController.verifyMfa);
+router.post('/auth/mfa/resend', authController.resendMfa);
+router.post('/auth/mfa-resend', authController.resendMfa);
 router.post('/auth/logout', authenticateToken, authController.logout);
 router.get('/auth/me', authenticateToken, authController.getMe);
-router.post('/auth/refresh', authenticateToken, authController.refresh);
+router.post('/auth/refresh', authController.refresh);
 
 
-// Employees Directory (enforces scope filter internally or via middleware)
+// Employees Directory with search, filters, sorting, and pagination
 router.get('/employees', authenticateToken, enforceScope, (req, res) => {
-  const { role, id, department, team, organizationId = 'org-stackly' } = req.user;
-  if (role === 'ADMIN' || role === 'HR') {
-    db.all("SELECT * FROM employees WHERE organizationId = ? ORDER BY employeeCode", [organizationId], (err, rows) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({ success: true, data: rows });
-    });
-  } else if (role === 'EMPLOYEE') {
-    db.all("SELECT * FROM employees WHERE organizationId = ? AND id = ?", [organizationId, id], (err, rows) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({ success: true, data: rows });
-    });
-  } else if (role === 'TEAM_LEAD') {
-    db.all("SELECT * FROM employees WHERE organizationId = ? AND department = ? AND team = ? ORDER BY employeeCode", [organizationId, department, team], (err, rows) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({ success: true, data: rows });
-    });
-  } else {
-    db.all("SELECT * FROM employees WHERE organizationId = ? AND department = ? ORDER BY employeeCode", [organizationId, department], (err, rows) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({ success: true, data: rows });
-    });
+  const { role, id, department: userDept, team: userTeam, organizationId = 'org-stackly' } = req.user;
+  
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.pageSize || req.query.limit, 10) || 25;
+  const offset = (page - 1) * limit;
+  const search = req.query.search ? `%${req.query.search}%` : null;
+
+  const cleanFilter = (val) => (val && val !== 'ALL' && val !== 'All' ? val : null);
+  const location = cleanFilter(req.query.location);
+  const filterDept = cleanFilter(req.query.department);
+  const designation = cleanFilter(req.query.designation);
+  const status = cleanFilter(req.query.status);
+  const joiningYear = cleanFilter(req.query.joiningYear);
+  
+  let sortBy = req.query.sortBy || 'employeeCode';
+  if (sortBy === 'employeeId') {
+    sortBy = 'employeeCode';
   }
+  const sortOrder = (req.query.sortOrder || '').toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+  const allowedSortFields = ['id', 'employeeCode', 'name', 'department', 'designation', 'status', 'location', 'joinDate'];
+  if (!allowedSortFields.includes(sortBy)) {
+    sortBy = 'employeeCode';
+  }
+
+  let orderByClause = '';
+  if (sortBy === 'employeeCode') {
+    orderByClause = `ORDER BY CAST(SUBSTR(employeeCode, -4) AS INTEGER) ${sortOrder}`;
+  } else {
+    orderByClause = `ORDER BY ${sortBy} ${sortOrder}`;
+  }
+
+  let whereClauses = ['organizationId = ?'];
+  let params = [organizationId];
+
+  if (role === 'EMPLOYEE') {
+    whereClauses.push('id = ?');
+    params.push(id);
+  } else if (role === 'TEAM_LEAD') {
+    whereClauses.push('department = ?');
+    params.push(userDept);
+    whereClauses.push('team = ?');
+    params.push(userTeam);
+  } else if (role === 'MANAGER') {
+    whereClauses.push('department = ?');
+    params.push(userDept);
+  }
+
+  if (search) {
+    whereClauses.push('(name LIKE ? OR employeeCode LIKE ? OR email LIKE ?)');
+    params.push(search, search, search);
+  }
+  if (location) {
+    whereClauses.push('location = ?');
+    params.push(location);
+  }
+  if (filterDept && (role === 'ADMIN' || role === 'HR')) {
+    whereClauses.push('department = ?');
+    params.push(filterDept);
+  }
+  if (designation) {
+    whereClauses.push('designation = ?');
+    params.push(designation);
+  }
+  if (status) {
+    whereClauses.push('UPPER(status) = ?');
+    params.push(status.toUpperCase());
+  }
+  if (joiningYear) {
+    whereClauses.push('joinDate LIKE ?');
+    params.push(`${joiningYear}-%`);
+  }
+
+  const whereSql = whereClauses.join(' AND ');
+  const countQuery = `SELECT COUNT(*) AS count FROM employees WHERE ${whereSql}`;
+  const dataQuery = `SELECT * FROM employees WHERE ${whereSql} ${orderByClause} LIMIT ? OFFSET ?`;
+
+  db.get(countQuery, params, (err, countRow) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
+    
+    db.all(dataQuery, [...params, limit, offset], (dataErr, rows) => {
+      if (dataErr) return res.status(500).json({ success: false, message: dataErr.message });
+      
+      return res.json({
+        success: true,
+        data: {
+          employees: rows,
+          pagination: {
+            page,
+            pageSize: limit,
+            totalItems: countRow.count,
+            totalPages: Math.ceil(countRow.count / limit)
+          }
+        }
+      });
+    });
+  });
 });
 
 router.put('/employees/:id/status', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_UPDATE', 'EMPLOYEE_MANAGE']), (req, res) => {
