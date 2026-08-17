@@ -1,0 +1,7 @@
+# SQLite temporary and journal files
+*.db-journal
+*.db-shm
+*.db-wal
+
+# If you wish to exclude the main database file from Git tracking, uncomment the line below:
+# *.db
