@@ -98,3 +98,79 @@ src/
 - **Active Menu Highlight**: `bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25`
 - **Online Indicator**: Green pulsing dot (`bg-emerald-400 animate-pulse`) with `● Active` text status badge.
 - **Glassmorphism**: `backdrop-blur-md` with `border-slate-800/80`.
+
+---
+
+## 📐 Sidebar Layout & Footer Alignment Guide
+
+To ensure the sidebar extends perfectly down to the footer (without overlapping it or leaving gaps), we utilize the following targeted layout structures depending on dashboard behavior:
+
+### Method 1: The "Sticky" Sidebar (Best if the main page scrolls)
+
+If the main content is long and the sidebar should follow the user as they scroll, but stop right before the footer:
+
+```css
+.main-wrapper {
+  display: flex;
+  align-items: flex-start; /* Important for sticky to work */
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 60px; /* Adjust this to match your exact Navbar height */
+  /* Calculates height: 100% of viewport minus Navbar height */
+  height: calc(100vh - 60px); 
+  overflow-y: auto; /* Adds a scrollbar to the sidebar if its menu gets too long */
+}
+```
+
+### Method 2: The "Flex Stretch" (Best for fixed-screen dashboards)
+
+If the entire dashboard is designed to fit exactly within the screen height (like a desktop web app) and the main content has its own internal scrollbar:
+
+```css
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Locks the app to the screen height */
+  overflow: hidden; 
+}
+
+.navbar {
+  flex-shrink: 0;
+}
+
+.main-wrapper {
+  display: flex;
+  flex: 1; /* Pushes the footer down and takes up available space */
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Stretches exactly from navbar to footer */
+  overflow-y: auto;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto; /* Main content scrolls independently */
+}
+
+.footer {
+  flex-shrink: 0;
+}
+```
+
+### 💡 Quick Troubleshooting Checklist
+
+If the sidebar is not touching the footer perfectly:
+
+1. **Hidden Margins:** Inspect `.sidebar`, `.main-wrapper`, or the first child inside `.sidebar` in your browser's DevTools. Make sure there is no `margin-bottom` on the sidebar or `margin-top` on the footer.
+2. **Padding on the Wrapper:** Ensure the container holding the sidebar doesn't have padding at the bottom (e.g., `padding-bottom: 20px;`).
+3. **Absolute Positioning:** If your sidebar is currently using `position: fixed` or `position: absolute`, change it to `flex` or `sticky`. Fixed position takes it out of the document flow, making it very difficult to stop exactly at the footer.
+

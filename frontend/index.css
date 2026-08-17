@@ -478,6 +478,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     position: relative !important;
     top: 0 !important;
     height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: stretch !important;
   }
 }
 
