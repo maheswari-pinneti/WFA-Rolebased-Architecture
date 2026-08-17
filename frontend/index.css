@@ -462,8 +462,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .app-sidebar {
-  top: 0 !important; /* Flush with top of main-body on desktop */
-  height: calc(100vh - var(--header-height)) !important;
+  top: var(--header-height) !important; /* Flush with bottom of header on mobile */
+  height: calc(100vh - var(--header-height)) !important; /* Height minus header height */
   background: linear-gradient(180deg, #0b1424 0%, #07101d 100%) !important;
   border-color: rgba(148, 163, 184, 0.12) !important;
   box-shadow: 14px 0 40px rgba(2, 8, 23, 0.18) !important;
@@ -471,6 +471,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   margin-top: 0 !important;
   border-radius: 0 !important;
   align-self: stretch !important;
+}
+
+@media (min-width: 768px) {
+  .app-sidebar {
+    position: relative !important;
+    top: 0 !important;
+    height: 100% !important;
+  }
 }
 
 
@@ -1043,11 +1051,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   --sidebar-accent-strong: #2563eb;
   --sidebar-accent-soft: rgba(96, 165, 250, 0.14);
   --sidebar-ink: #dbeafe;
-  position: relative;
   overflow: hidden;
   background: var(--surface) !important;
   border-right: 1px solid var(--line) !important;
   box-shadow: 18px 0 48px rgba(2, 8, 23, 0.12) !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
   margin-right: 0 !important;
   padding-right: 0 !important;
   box-sizing: border-box !important;
@@ -1257,6 +1266,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.65);
 }
 .sidebar-nav-link.is-collapsed { padding-inline: 0; }
+.sidebar-is-collapsed .sidebar-nav {
+  padding-inline: 0.4rem !important;
+}
+.sidebar-is-collapsed .sidebar-nav-link {
+  width: 100% !important;
+  justify-content: center !important;
+  padding-inline: 0 !important;
+  margin: 4px 0 !important;
+}
+.sidebar-is-collapsed .sidebar-nav-link.is-active {
+  width: 2.85rem !important;
+  height: 2.85rem !important;
+  margin: 4px auto !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
 .sidebar-icon-shell {
   width: 2rem;
   height: 2rem;

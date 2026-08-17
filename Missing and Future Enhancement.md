@@ -1280,3 +1280,473 @@ The architecture is therefore designed to support the current **SQLite + Express
 
 **One important correction:** don't mark future items such as missed-event synchronization, event ordering, Redis/Kafka scaling, or distributed tracing as **Completed** unless they are actually implemented in your repository. Keep them as `Planned`, `Partial`, or `Future` until verified.
 ```
+
+# ⚡ Real-Time Architecture & Future Readiness
+
+The platform uses a modular real-time architecture designed to support live workforce operations while remaining extensible for future enterprise-scale infrastructure.
+
+The current implementation uses **WebSocket / Socket.IO** for real-time communication. The architecture is designed so that future infrastructure such as **Redis, Kafka, RabbitMQ, PostgreSQL, cloud services, and horizontally scaled WebSocket servers** can be introduced without changing the core business logic.
+
+---
+
+## ⚡ Real-Time Architecture
+
+```text
+                         ┌─────────────────────┐
+                         │   React Frontend    │
+                         │                     │
+                         │ Redux / React Query │
+                         └──────────┬──────────┘
+                                    │
+                         REST + WebSocket
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │ Authentication      │
+                         │ + Authorization     │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │ Express API         │
+                         │ Business Services   │
+                         └──────────┬──────────┘
+                                    │
+                         ┌──────────┴──────────┐
+                         ▼                     ▼
+                 ┌──────────────┐      ┌──────────────┐
+                 │ SQLite       │      │ Event        │
+                 │ Persistence  │      │ Publisher    │
+                 └──────────────┘      └──────┬───────┘
+                                              │
+                                              ▼
+                                      ┌────────────────┐
+                                      │ WebSocket /    │
+                                      │ Socket.IO      │
+                                      └───────┬────────┘
+                                              │
+                         ┌────────────────────┼────────────────────┐
+                         ▼                    ▼                    ▼
+                       ADMIN                  HR                  MANAGER
+                         │                    │                    │
+                         ▼                    ▼                    ▼
+                     TEAM LEAD             EMPLOYEE          Authorized Clients
+
+```
+
+---
+
+## 🔄 Real-Time Event Flow
+
+All real-time operations follow a controlled event-driven flow.
+
+```text
+User Action
+    ↓
+REST API / Application Service
+    ↓
+Authentication
+    ↓
+RBAC / ABAC / Policy Authorization
+    ↓
+Business Validation
+    ↓
+SQLite Transaction
+    ↓
+Audit Log
+    ↓
+Domain Event
+    ↓
+Event Publisher
+    ↓
+WebSocket / Socket.IO
+    ↓
+Authorized Connected Clients
+    ↓
+Redux / TanStack React Query
+    ↓
+Live UI Update
+
+```
+
+The database remains the **source of truth**. WebSocket communication is used for live event delivery and UI synchronization.
+
+---
+
+# 📡 Real-Time Event Catalog
+
+The platform defines standardized real-time events.
+
+## Attendance Events
+
+```text
+attendance.checked_in
+attendance.break_started
+attendance.resumed
+attendance.checked_out
+attendance.correction_requested
+attendance.correction_approved
+attendance.correction_rejected
+attendance.status_changed
+
+```
+
+## Employee Events
+
+```text
+employee.created
+employee.updated
+employee.deleted
+employee.status_changed
+employee.department_changed
+employee.team_changed
+
+```
+
+## Notification Events
+
+```text
+notification.created
+notification.read
+notification.dismissed
+notification.read_all
+
+```
+
+## Security Events
+
+```text
+security.geofence_violation
+security.failed_authentication
+security.invalid_mfa
+security.token_reuse
+security.permission_denied
+security.suspicious_activity
+
+```
+
+## Workforce Events
+
+```text
+workforce.kpi_updated
+workforce.employee_count_changed
+workforce.attendance_rate_changed
+workforce.department_updated
+
+```
+
+## Team Events
+
+```text
+team.member_added
+team.member_removed
+team.member_status_changed
+team.attendance_updated
+
+```
+
+## System Events
+
+```text
+system.maintenance
+system.announcement
+system.configuration_changed
+
+```
+
+---
+
+# 🧾 Real-Time Event Schema
+
+Every event follows a standardized structure.
+
+```typescript
+interface RealtimeEvent<T unknown> {
+  id: string;
+  type: string;
+  timestamp: string;
+  actorId: string;
+  organizationId: string;
+  departmentId?: string;
+  teamId?: string;
+  entityId?: string;
+  sequenceNumber?: number;
+  version?: number;
+  payload: T;
+}
+
+```
+
+### Event Example
+
+```json
+{
+  "id": "evt_01JXYZ123",
+  "type": "attendance.checked_in",
+  "timestamp": "2026-08-12T04:25:17.000Z",
+  "actorId": "user_102",
+  "organizationId": "org_001",
+  "departmentId": "dept_05",
+  "teamId": "team_12",
+  "entityId": "EMP-102",
+  "sequenceNumber": 101,
+  "version": 1,
+  "payload": {
+    "employeeId": "EMP-102",
+    "status": "CHECKED_IN"
+  }
+}
+
+```
+
+---
+
+# 🔐 Real-Time Authorization
+
+WebSocket communication follows the same enterprise authorization model as REST APIs.
+
+```text
+WebSocket Connection
+        ↓
+JWT Validation
+        ↓
+User Identity
+        ↓
+Role
+        ↓
+Permissions
+        ↓
+Organization Scope
+        ↓
+Department Scope
+        ↓
+Team Scope
+        ↓
+Event Authorization
+        ↓
+Event Delivery
+
+```
+
+### Role-Based Real-Time Scope
+
+| Role | Real-Time Scope |
+| --- | --- |
+| ADMIN | Organization-wide events |
+| HR | Authorized workforce and HR events |
+| MANAGER | Department and team events |
+| TEAM_LEAD | Team-level events |
+| EMPLOYEE | Personal/self-service events |
+
+A WebSocket connection does **not** automatically grant access to all events. Every event must be filtered according to:
+
+```text
+User + Role + Permission + Organization + Department + Team + Resource + Action = Real-Time Access Decision
+
+```
+
+---
+
+# 🔌 WebSocket Connection Lifecycle
+
+```text
+CONNECT
+   ↓
+Authenticate
+   ↓
+Authorize
+   ↓
+Register Connection
+   ↓
+Subscribe to Authorized Channels
+   ↓
+Receive Events
+   ↓
+Heartbeat / Ping
+   ↓
+Monitor Connection
+   ↓
+Disconnect
+
+```
+
+---
+
+# 🔄 Automatic Reconnection
+
+Real-time connections support automatic recovery.
+
+```text
+Connection Lost → Retry → Exponential Backoff → Reconnect → Re-authenticate → Restore Subscriptions
+
+```
+
+Recommended retry intervals: `1s → 2s → 4s → 8s → 16s → 30s maximum`. The client must avoid aggressive infinite reconnection loops.
+
+---
+
+# 🔄 Missed Event Synchronization
+
+If a client disconnects while events are generated, the client can synchronize missed changes after reconnecting.
+
+```text
+Connection Restored → Send Last Event ID → Backend Determines Missing Events → Update Client State
+
+```
+
+Example endpoint:
+
+```http
+GET /api/realtime/sync?since=<event-id>
+
+```
+
+---
+
+# 🆔 Event Idempotency
+
+Every real-time event contains a unique event ID to prevent duplicate UI updates.
+
+```typescript
+if (processedEvents.has(event.id)) {
+  return;
+}
+
+processedEvents.add(event.id);
+processEvent(event);
+
+```
+
+---
+
+# 🔢 Event Ordering
+
+Events that depend on sequence must preserve logical ordering using `sequenceNumber` and `version`. When an event gap is detected, the client triggers a synchronization request.
+
+---
+
+# 🟢 Real-Time Connection Status
+
+The frontend exposes the current real-time connection state (`🟢 Live`, `🟡 Reconnecting...`, `🔴 Offline`), which can be displayed in the enterprise header.
+
+---
+
+# ⏱️ Real-Time Attendance
+
+Attendance operations can update authorized dashboards without requiring manual page refresh.
+
+```text
+Employee Check-In → Attendance API → SQLite → Attendance Event → WebSocket → Dashboard Update
+
+```
+
+---
+
+# 🧾 Audit Logging and Real-Time Events
+
+Audit logging remains persistent and independent of WebSocket availability. The WebSocket layer is **not** the source of truth. If no client is connected, the business operation and audit record must still succeed.
+
+---
+
+# 📧 Asynchronous Company Email Notifications
+
+Company email notifications are decoupled from transactional operations. Attendance operations must not depend on successful email delivery.
+
+Sensitive credentials must never be committed to Git and should remain in environment variables (`COMPANY_EMAIL`, `COMPANY_EMAIL_HOST`, etc.).
+
+---
+
+# 🏗️ Backend Real-Time Architecture
+
+Recommended backend structure:
+
+```text
+backend/src/
+│
+├── realtime/
+│   ├── socketServer.ts
+│   ├── socketAuth.ts
+│   ├── socketAuthorization.ts
+│   ├── eventPublisher.ts
+│   ├── eventTypes.ts
+│   ├── eventRegistry.ts
+│   ├── connectionManager.ts
+│   └── subscriptionManager.ts
+
+```
+
+---
+
+# 📡 Event Publisher Abstraction
+
+The platform uses an abstraction for publishing events.
+
+```typescript
+interface EventPublisher {
+  publish(event: RealtimeEvent): Promise<void>;
+}
+
+```
+
+This allows the real-time infrastructure to evolve (e.g., from Socket.IO to Redis/Kafka) without rewriting business services.
+
+---
+
+# 🗄️ Persistence vs Real-Time State
+
+**Persistent Business Data (SQLite):** Users, Roles, Permissions, Employees, Attendance, Notifications, Audit Logs, Sessions.
+**Transient Real-Time State (WebSocket):** Connected Users, Connection IDs, Subscriptions, Presence, Live Event Delivery.
+
+Real-time connection state should not replace persistent business data.
+
+---
+
+# 🚀 Future Scalability
+
+The current architecture is designed for SQLite and a single application environment. Future enterprise deployment can evolve toward Redis, Kafka, RabbitMQ, PostgreSQL, Kubernetes, and horizontal scaling.
+
+These technologies are **future scalability options** and are not required for the current SQLite implementation.
+
+---
+
+# 📈 Real-Time Feature Roadmap
+
+| Feature | Current Status | Future Enhancement |
+| --- | --- | --- |
+| WebSocket / Socket.IO | ✅ Implemented | — |
+| Real-time attendance | ✅ Implemented | — |
+| Real-time notifications | ✅ Implemented | — |
+| Real-time employee updates | ✅ Implemented | Expand |
+| WebSocket authentication | 🔶 Partial | Harden |
+| RBAC event authorization | 🔶 Partial | Harden |
+| ABAC event authorization | 🔶 Partial | Harden |
+| Reconnection | 🔶 Partial | Complete |
+| Real-time KPI updates | ⏳ Planned | Implement |
+| Missed-event synchronization | ⏳ Planned | Implement |
+| Event idempotency | ⏳ Planned | Implement |
+| Event ordering | ⏳ Planned | Implement |
+| Live presence | ⏳ Planned | Implement |
+| Security event stream | ⏳ Planned | Expand |
+| Real-time monitoring | ⏳ Planned | Implement |
+| Event queue | ⏳ Future | Redis/Kafka/RabbitMQ |
+| Multi-instance WebSocket | ⏳ Future | Redis Adapter |
+| Horizontal scaling | ⏳ Future | Load Balancer |
+| Distributed tracing | ⏳ Future | OpenTelemetry |
+| Centralized logging | ⏳ Future | Enterprise logging |
+
+---
+
+# 📌 Real-Time Design Principles
+
+1. **SQLite remains the source of truth.**
+2. **WebSocket events are delivery mechanisms, not persistent business records.**
+3. **Every real-time connection must be authenticated.**
+4. **Every real-time event must respect RBAC, ABAC and policy-based authorization.**
+5. **Organization, department, team and employee scopes apply to real-time events.**
+6. **Events must contain unique identifiers.**
+7. **Duplicate events must be safely handled.**
+8. **Important events should support ordering/versioning.**
+9. **Disconnected clients must be able to synchronize missed changes.**
+10. **Real-time functionality must not compromise database consistency.**
+11. **Real-time infrastructure must be modular and replaceable.**
+12. **Future distributed integration should not require rewriting core logic.**
