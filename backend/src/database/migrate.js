@@ -46,5 +46,24 @@ export const migrate = async () => {
       }
     }
   }
+
+  // Create database indexes on high-traffic fields
+  const extraIndexes = [
+    "CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);",
+    "CREATE INDEX IF NOT EXISTS idx_employees_emp_id ON employees(employeeCode);",
+    "CREATE INDEX IF NOT EXISTS idx_attendance_employee ON attendance_records(employeeId);",
+    "CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance_records(date);",
+    "CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON audit_logs(timestamp);",
+    "CREATE INDEX IF NOT EXISTS idx_attendance_employee_date ON attendance_records(employeeId, date);"
+  ];
+
+  for (const indexSql of extraIndexes) {
+    try {
+      await run(indexSql);
+    } catch (indexErr) {
+      console.error(`Failed to create index: ${indexSql}`, indexErr);
+    }
+  }
+
   return true;
 };

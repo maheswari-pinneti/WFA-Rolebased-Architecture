@@ -10,19 +10,20 @@ import { authenticateToken, authorizeRoles, authorizePermissions, enforceScope }
 import db from '../config/db.js';
 
 const router = express.Router();
+import { authRateLimiter } from '../middleware/resilience.js';
 
 // Health Check
 router.get('/health', authController.healthCheck);
 
 // Auth Routes
-router.post('/auth/login', authController.login);
-router.post('/auth/mfa/verify', authController.verifyMfa);
-router.post('/auth/mfa-verify', authController.verifyMfa);
-router.post('/auth/mfa/resend', authController.resendMfa);
-router.post('/auth/mfa-resend', authController.resendMfa);
+router.post('/auth/login', authRateLimiter, authController.login);
+router.post('/auth/mfa/verify', authRateLimiter, authController.verifyMfa);
+router.post('/auth/mfa-verify', authRateLimiter, authController.verifyMfa);
+router.post('/auth/mfa/resend', authRateLimiter, authController.resendMfa);
+router.post('/auth/mfa-resend', authRateLimiter, authController.resendMfa);
 router.post('/auth/logout', authenticateToken, authController.logout);
 router.get('/auth/me', authenticateToken, authController.getMe);
-router.post('/auth/refresh', authController.refresh);
+router.post('/auth/refresh', authRateLimiter, authController.refresh);
 
 
 // Employees Directory with search, filters, sorting, and pagination

@@ -24,6 +24,37 @@ const toUser = (user) => ({
   permissions: typeof user.permissions === 'string' ? JSON.parse(user.permissions || '[]') : user.permissions
 });
 
+// Controlled concurrency queue for bcrypt comparisons to prevent event loop starvation
+const maxConcurrentHashes = 4;
+let activeHashes = 0;
+const hashQueue = [];
+
+const queueBcryptCompare = (password, hash) => {
+  return new Promise((resolve, reject) => {
+    const runCompare = async () => {
+      activeHashes++;
+      try {
+        const match = await bcrypt.compare(password, hash);
+        resolve(match);
+      } catch (err) {
+        reject(err);
+      } finally {
+        activeHashes--;
+        if (hashQueue.length > 0) {
+          const next = hashQueue.shift();
+          next();
+        }
+      }
+    };
+
+    if (activeHashes < maxConcurrentHashes) {
+      runCompare();
+    } else {
+      hashQueue.push(runCompare);
+    }
+  });
+};
+
 export const login = (req, res) => {
   const rawEmail = req.body?.email;
   const password = req.body?.password;
@@ -52,11 +83,15 @@ export const login = (req, res) => {
       return res.status(404).json({ success: false, message: 'User profile not found' });
     }
 
-    // Enforce BCrypt password hash check
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      logAudit(user.id, 'FAILED_AUTHENTICATION', `Incorrect password for ${email}`);
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    // Enforce BCrypt password hash check using controlled concurrency queue
+    try {
+      const isMatch = await queueBcryptCompare(password, user.password_hash);
+      if (!isMatch) {
+        logAudit(user.id, 'FAILED_AUTHENTICATION', `Incorrect password for ${email}`);
+        return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      }
+    } catch (compareErr) {
+      return res.status(500).json({ success: false, message: 'Encryption verification failed' });
     }
 
     // MFA Challenge if enabled
