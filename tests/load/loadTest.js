@@ -5,7 +5,8 @@ process.env.NODE_ENV = 'test';
 
 import { app } from '../../backend/src/app.js';
 import logger from '../../backend/src/config/logger.js';
-import { all } from '../../backend/src/database/connection.js';
+import { connectMongoDB } from '../../backend/src/config/mongodb.js';
+import { User } from '../../backend/src/models/User.js';
 import { env } from '../../backend/src/config/env.js';
 
 const PORT = 5102;
@@ -61,8 +62,9 @@ const runLoadTest = async () => {
   console.log(`[AUTH BENCHMARK] Finished. Success: ${authResults.success}, Fail: ${authResults.fail}, Avg Latency: ${avgAuthLatency}ms\n`);
 
   // 3. Pre-generate JWTs for concurrent users to avoid bcrypt blocking the event loop
+  await connectMongoDB();
   console.log(`[PRE-GENERATE] Fetching users from database to sign JWTs...`);
-  const dbUsers = await all("SELECT * FROM users LIMIT ?", [TARGET_CONCURRENCY]);
+  const dbUsers = await User.find({}).limit(TARGET_CONCURRENCY);
   if (dbUsers.length < TARGET_CONCURRENCY) {
     console.warn(`[WARNING] Seeding has only ${dbUsers.length} users. Using fallback generation for the remaining target.`);
   }
