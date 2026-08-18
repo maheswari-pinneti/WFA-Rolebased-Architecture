@@ -12,9 +12,33 @@ export const connectMongoDB = async () => {
   const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || 'workforce';
 
   if (!MONGODB_URI) {
-    const errorMsg = "MONGODB_URI is not defined in environment variables. Application startup aborted.";
-    console.error("\n[MongoDB Error]", errorMsg, "\n");
-    process.exit(1);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("\n[Development Fallback] MONGODB_URI not defined. Starting in-memory MongoDB Server...");
+      try {
+        const { MongoMemoryReplSet } = await import('mongodb-memory-server');
+        const mongod = await MongoMemoryReplSet.create({
+          replSet: { count: 1 },
+          instance: { startupTimeout: 40000 }
+        });
+        const uri = mongod.getUri();
+        console.log(`[Development Fallback] In-memory MongoDB Server started at: ${uri}`);
+        const conn = await mongoose.connect(uri, {
+          dbName: MONGODB_DB_NAME,
+          maxPoolSize: 50,
+          socketTimeoutMS: 45000,
+        });
+        console.log("MongoDB connected successfully (in-memory dev fallback)");
+        connectionPromise = conn;
+        return conn;
+      } catch (innerErr) {
+        console.error("Failed to start in-memory MongoDB fallback:", innerErr.message);
+        process.exit(1);
+      }
+    } else {
+      const errorMsg = "MONGODB_URI is not defined in environment variables. Application startup aborted.";
+      console.error("\n[MongoDB Error]", errorMsg, "\n");
+      process.exit(1);
+    }
   }
 
   console.log("Connecting to MongoDB Atlas...");
