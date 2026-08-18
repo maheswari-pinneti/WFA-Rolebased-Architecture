@@ -360,11 +360,11 @@ input::-webkit-credentials-auto-fill-button {
   letter-spacing: 0.03em;
 }
 
-.badge-admin { background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
-.badge-hr { background: rgba(168, 85, 247, 0.15); color: #9333ea; border: 1px solid rgba(168, 85, 247, 0.3); }
-.badge-manager { background: rgba(37, 99, 235, 0.15); color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.3); }
-.badge-lead { background: rgba(20, 184, 166, 0.15); color: #0d9488; border: 1px solid rgba(20, 184, 166, 0.3); }
-.badge-employee { background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-admin { background: rgba(94, 53, 177, 0.15); color: #5E35B1; border: 1px solid rgba(94, 53, 177, 0.3); }
+.badge-hr { background: rgba(0, 137, 123, 0.15); color: #00897B; border: 1px solid rgba(0, 137, 123, 0.3); }
+.badge-manager { background: rgba(25, 118, 210, 0.15); color: #1976D2; border: 1px solid rgba(25, 118, 210, 0.3); }
+.badge-lead { background: rgba(245, 124, 0, 0.15); color: #F57C00; border: 1px solid rgba(245, 124, 0, 0.3); }
+.badge-employee { background: rgba(67, 160, 71, 0.15); color: #43A047; border: 1px solid rgba(67, 160, 71, 0.3); }
 
 .badge-success { background: rgba(16, 185, 129, 0.15); color: #059669; }
 .badge-warning { background: rgba(245, 158, 11, 0.15); color: #d97706; }
@@ -425,6 +425,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .app-shell {
+  --sidebar-accent: var(--dashboard-accent, #10b981);
+  --sidebar-accent-strong: var(--dashboard-accent-strong, #059669);
+  --sidebar-accent-soft: var(--dashboard-accent-soft, rgba(16, 185, 129, 0.12));
   background:
     radial-gradient(circle at 84% 0%, rgba(79, 70, 229, 0.055), transparent 28rem),
     var(--bg-primary) !important;
@@ -1378,13 +1381,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 /* Shared emerald visual language for every protected dashboard. */
 .emerald-theme {
-  --dashboard-accent: #10b981;
-  --dashboard-accent-strong: #059669;
-  --dashboard-accent-soft: rgba(16, 185, 129, 0.12);
+  --dashboard-accent: #43A047;
+  --dashboard-accent-strong: #2e7d32;
+  --dashboard-accent-soft: rgba(67, 160, 71, 0.12);
 }
 .emerald-theme .dashboard-hero {
-  background: linear-gradient(135deg, #064e3b 0%, #047857 52%, #022c22 100%) !important;
-  border-color: rgba(52, 211, 153, 0.35) !important;
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 52%, #43a047 100%) !important;
+  border-color: rgba(67, 160, 71, 0.35) !important;
 }
 .emerald-theme [class*="text-blue-"],
 .emerald-theme [class*="text-indigo-"],
@@ -1398,7 +1401,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .emerald-theme [class*="border-purple-"],
 .emerald-theme [class*="border-cyan-"],
 .emerald-theme [class*="border-teal-"] {
-  border-color: rgba(52, 211, 153, 0.3) !important;
+  border-color: rgba(67, 160, 71, 0.3) !important;
 }
 .emerald-theme [class*="bg-blue-"],
 .emerald-theme [class*="bg-indigo-"],
@@ -1413,22 +1416,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background-color: var(--dashboard-accent-strong) !important;
 }
 
-/* 1. Earthy Aurora Theme (HR Manager - Calm & Organic Light Mode) */
+/* 1. Teal Theme (HR - Calm & Communicative Teal Theme) */
 .earth-theme {
-  --dashboard-accent: #588157;
-  --dashboard-accent-strong: #3a5a40;
-  --dashboard-accent-soft: rgba(88, 129, 87, 0.12);
+  --dashboard-accent: #00897B;
+  --dashboard-accent-strong: #00695c;
+  --dashboard-accent-soft: rgba(0, 137, 123, 0.12);
 }
 [data-theme='light'] .earth-theme, .earth-theme[data-theme='light'] {
-  --bg-primary: #FAF8F5 !important;
-  --bg-secondary: #F3EEE3 !important;
-  --bg-tertiary: #EBDCB9 !important;
-  --text-primary: #2D3B2D !important;
-  --text-muted: #6E7A6E !important;
+  --bg-primary: #f2f7f7 !important;
+  --bg-secondary: #ffffff !important;
+  --bg-tertiary: #e0f2f1 !important;
+  --text-primary: #004d40 !important;
+  --text-muted: #00796b !important;
+}
+[data-theme='dark'] .earth-theme, .earth-theme[data-theme='dark'] {
+  --dashboard-accent: #26a69a;
+  --dashboard-accent-strong: #00796b;
+  --dashboard-accent-soft: rgba(38, 166, 154, 0.15);
+  --bg-primary: #060c0c !important;
+  --bg-secondary: #0b1414 !important;
+  --bg-tertiary: #0e1e1e !important;
+}
+.earth-theme .app-sidebar {
+  border-right: 2px solid var(--dashboard-accent-soft) !important;
 }
 .earth-theme .dashboard-hero {
-  background: linear-gradient(135deg, #3a5a40 0%, #588157 52%, #ebdcb9 100%) !important;
-  border-color: rgba(88, 129, 87, 0.35) !important;
+  background: linear-gradient(135deg, #004d40 0%, #00695c 52%, #00897b 100%) !important;
+  border-color: rgba(0, 137, 123, 0.35) !important;
 }
 .earth-theme [class*="text-blue-"],
 .earth-theme [class*="text-indigo-"],
@@ -1442,7 +1456,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .earth-theme [class*="border-purple-"],
 .earth-theme [class*="border-cyan-"],
 .earth-theme [class*="border-teal-"] {
-  border-color: rgba(88, 129, 87, 0.3) !important;
+  border-color: rgba(0, 137, 123, 0.3) !important;
 }
 .earth-theme [class*="bg-blue-"],
 .earth-theme [class*="bg-indigo-"],
@@ -1457,22 +1471,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background-color: var(--dashboard-accent-strong) !important;
 }
 
-/* 2. Arctic Minimalist Theme (Employee - Clean & Light Mode) */
+/* 2. Emerald Theme (Employee - Clean & Dependable Green Theme) */
 .arctic-theme {
-  --dashboard-accent: #3a86c8;
-  --dashboard-accent-strong: #1e5fa0;
-  --dashboard-accent-soft: rgba(58, 134, 200, 0.12);
+  --dashboard-accent: #43A047;
+  --dashboard-accent-strong: #2e7d32;
+  --dashboard-accent-soft: rgba(67, 160, 71, 0.12);
 }
 [data-theme='light'] .arctic-theme, .arctic-theme[data-theme='light'] {
-  --bg-primary: #F5F9FC !important;
-  --bg-secondary: #EEF4FA !important;
-  --bg-tertiary: #E0ECF7 !important;
-  --text-primary: #1E2D3D !important;
-  --text-muted: #5E6F82 !important;
+  --bg-primary: #f4fbf4 !important;
+  --bg-secondary: #ffffff !important;
+  --bg-tertiary: #e8f5e9 !important;
+  --text-primary: #1b5e20 !important;
+  --text-muted: #388e3c !important;
+}
+[data-theme='dark'] .arctic-theme, .arctic-theme[data-theme='dark'] {
+  --dashboard-accent: #66bb6a;
+  --dashboard-accent-strong: #388e3c;
+  --dashboard-accent-soft: rgba(102, 187, 106, 0.15);
+  --bg-primary: #060d07 !important;
+  --bg-secondary: #0b1a0e !important;
+  --bg-tertiary: #122c17 !important;
+}
+.arctic-theme .app-sidebar {
+  border-right: 2px solid var(--dashboard-accent-soft) !important;
 }
 .arctic-theme .dashboard-hero {
-  background: linear-gradient(135deg, #1e2d3d 0%, #3a86c8 52%, #e0ecf7 100%) !important;
-  border-color: rgba(58, 134, 200, 0.35) !important;
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 52%, #43a047 100%) !important;
+  border-color: rgba(67, 160, 71, 0.35) !important;
 }
 .arctic-theme [class*="text-blue-"],
 .arctic-theme [class*="text-indigo-"],
@@ -1486,7 +1511,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .arctic-theme [class*="border-purple-"],
 .arctic-theme [class*="border-cyan-"],
 .arctic-theme [class*="border-teal-"] {
-  border-color: rgba(58, 134, 200, 0.3) !important;
+  border-color: rgba(67, 160, 71, 0.3) !important;
 }
 .arctic-theme [class*="bg-blue-"],
 .arctic-theme [class*="bg-indigo-"],
@@ -1501,22 +1526,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background-color: var(--dashboard-accent-strong) !important;
 }
 
-/* 3. Midnight Slate Theme (Team Lead - Modern & Focused Dark Mode) */
+/* 3. Vibrant Orange Theme (Team Lead - Energetic Orange Theme) */
 .midnight-theme {
-  --dashboard-accent: #00a8a8;
-  --dashboard-accent-strong: #008080;
-  --dashboard-accent-soft: rgba(0, 168, 168, 0.12);
+  --dashboard-accent: #F57C00;
+  --dashboard-accent-strong: #e65100;
+  --dashboard-accent-soft: rgba(245, 124, 0, 0.12);
+}
+[data-theme='light'] .midnight-theme, .midnight-theme[data-theme='light'] {
+  --bg-primary: #fffaf5 !important;
+  --bg-secondary: #ffffff !important;
+  --bg-tertiary: #ffe0b2 !important;
+  --text-primary: #e65100 !important;
+  --text-muted: #f57c00 !important;
 }
 [data-theme='dark'] .midnight-theme, .midnight-theme[data-theme='dark'] {
-  --bg-primary: #11141A !important;
-  --bg-secondary: #1A1F29 !important;
-  --bg-tertiary: #242C3B !important;
-  --text-primary: #E6EBF5 !important;
-  --text-muted: #8FA0B5 !important;
+  --dashboard-accent: #ffa726;
+  --dashboard-accent-strong: #f57c00;
+  --dashboard-accent-soft: rgba(255, 167, 38, 0.15);
+  --bg-primary: #0f0902 !important;
+  --bg-secondary: #1a1005 !important;
+  --bg-tertiary: #2e1c08 !important;
+}
+.midnight-theme .app-sidebar {
+  border-right: 2px solid var(--dashboard-accent-soft) !important;
 }
 .midnight-theme .dashboard-hero {
-  background: linear-gradient(135deg, #11141a 0%, #1a1f29 52%, #008080 100%) !important;
-  border-color: rgba(0, 168, 168, 0.35) !important;
+  background: linear-gradient(135deg, #5d2500 0%, #e65100 52%, #f57c00 100%) !important;
+  border-color: rgba(245, 124, 0, 0.35) !important;
 }
 .midnight-theme [class*="text-blue-"],
 .midnight-theme [class*="text-indigo-"],
@@ -1530,7 +1566,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .midnight-theme [class*="border-purple-"],
 .midnight-theme [class*="border-cyan-"],
 .midnight-theme [class*="border-teal-"] {
-  border-color: rgba(0, 168, 168, 0.3) !important;
+  border-color: rgba(245, 124, 0, 0.3) !important;
 }
 .midnight-theme [class*="bg-blue-"],
 .midnight-theme [class*="bg-indigo-"],
@@ -1545,22 +1581,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background-color: var(--dashboard-accent-strong) !important;
 }
 
-/* 4. Corporate Indigo Theme (Team Manager - Structured & Clear Light Mode) */
+/* 4. Navy Blue Theme (Manager - Responsible Navy Blue Theme) */
 .indigo-theme {
-  --dashboard-accent: #4f46e5;
-  --dashboard-accent-strong: #3730a3;
-  --dashboard-accent-soft: rgba(79, 70, 229, 0.12);
+  --dashboard-accent: #1976D2;
+  --dashboard-accent-strong: #1565c0;
+  --dashboard-accent-soft: rgba(25, 118, 210, 0.12);
 }
 [data-theme='light'] .indigo-theme, .indigo-theme[data-theme='light'] {
-  --bg-primary: #F8FAFC !important;
-  --bg-secondary: #F1F5F9 !important;
-  --bg-tertiary: #E2E8F0 !important;
-  --text-primary: #0F172A !important;
-  --text-muted: #475569 !important;
+  --bg-primary: #f4f8fc !important;
+  --bg-secondary: #ffffff !important;
+  --bg-tertiary: #bbdefb !important;
+  --text-primary: #0d47a1 !important;
+  --text-muted: #1565c0 !important;
+}
+[data-theme='dark'] .indigo-theme, .indigo-theme[data-theme='dark'] {
+  --dashboard-accent: #64b5f6;
+  --dashboard-accent-strong: #1976d2;
+  --dashboard-accent-soft: rgba(100, 181, 246, 0.15);
+  --bg-primary: #030811 !important;
+  --bg-secondary: #071224 !important;
+  --bg-tertiary: #0c203b !important;
+}
+.indigo-theme .app-sidebar {
+  border-right: 2px solid var(--dashboard-accent-soft) !important;
 }
 .indigo-theme .dashboard-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #4f46e5 52%, #e2e8f0 100%) !important;
-  border-color: rgba(79, 70, 229, 0.35) !important;
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 52%, #1976d2 100%) !important;
+  border-color: rgba(25, 118, 210, 0.35) !important;
 }
 .indigo-theme [class*="text-blue-"],
 .indigo-theme [class*="text-indigo-"],
@@ -1574,7 +1621,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .indigo-theme [class*="border-purple-"],
 .indigo-theme [class*="border-cyan-"],
 .indigo-theme [class*="border-teal-"] {
-  border-color: rgba(79, 70, 229, 0.3) !important;
+  border-color: rgba(25, 118, 210, 0.3) !important;
 }
 .indigo-theme [class*="bg-blue-"],
 .indigo-theme [class*="bg-indigo-"],
@@ -1589,22 +1636,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background-color: var(--dashboard-accent-strong) !important;
 }
 
-/* 5. Cyber Sunset Theme (Admin / Super Admin - Vibrant Alert Dark Mode) */
+/* 5. Deep Purple Theme (Admin - High Authority Deep Purple Theme) */
 .sunset-theme {
-  --dashboard-accent: #ff6b6b;
-  --dashboard-accent-strong: #ff4757;
-  --dashboard-accent-soft: rgba(255, 107, 107, 0.12);
+  --dashboard-accent: #5E35B1;
+  --dashboard-accent-strong: #4527a0;
+  --dashboard-accent-soft: rgba(94, 53, 177, 0.12);
+}
+[data-theme='light'] .sunset-theme, .sunset-theme[data-theme='light'] {
+  --bg-primary: #f6f3fc !important;
+  --bg-secondary: #ffffff !important;
+  --bg-tertiary: #d1c4e9 !important;
+  --text-primary: #311b92 !important;
+  --text-muted: #5e35b1 !important;
 }
 [data-theme='dark'] .sunset-theme, .sunset-theme[data-theme='dark'] {
-  --bg-primary: #0B0C10 !important;
-  --bg-secondary: #1F2833 !important;
-  --bg-tertiary: #2A3D45 !important;
-  --text-primary: #C5C6C7 !important;
-  --text-muted: #66FCF1 !important;
+  --dashboard-accent: #b39ddb;
+  --dashboard-accent-strong: #5e35b1;
+  --dashboard-accent-soft: rgba(179, 157, 219, 0.15);
+  --bg-primary: #07040e !important;
+  --bg-secondary: #0e081c !important;
+  --bg-tertiary: #190f33 !important;
+}
+.sunset-theme .app-sidebar {
+  border-right: 2px solid var(--dashboard-accent-soft) !important;
 }
 .sunset-theme .dashboard-hero {
-  background: linear-gradient(135deg, #0b0c10 0%, #1f2833 52%, #ff4757 100%) !important;
-  border-color: rgba(255, 107, 107, 0.35) !important;
+  background: linear-gradient(135deg, #311b92 0%, #4527a0 52%, #5e35b1 100%) !important;
+  border-color: rgba(94, 53, 177, 0.35) !important;
 }
 .sunset-theme [class*="text-blue-"],
 .sunset-theme [class*="text-indigo-"],
@@ -1618,7 +1676,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sunset-theme [class*="border-purple-"],
 .sunset-theme [class*="border-cyan-"],
 .sunset-theme [class*="border-teal-"] {
-  border-color: rgba(255, 107, 107, 0.3) !important;
+  border-color: rgba(94, 53, 177, 0.3) !important;
 }
 .sunset-theme [class*="bg-blue-"],
 .sunset-theme [class*="bg-indigo-"],
