@@ -15,8 +15,11 @@ import { AnalyticsOverview } from '../../../components/dashboard/AnalyticsOvervi
 import { Clock, Calendar, FileText, Compass, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { useAnalyticsData } from '../../../hooks/useAnalyticsData';
+
 export const EmployeeDashboard: React.FC = () => {
   const { user } = useAuth();
+  const { data } = useAnalyticsData();
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
 
   const openDrillDown = (title: string, value: string | number, subtitle: string, details: { label: string; value: string | number }[]) => {

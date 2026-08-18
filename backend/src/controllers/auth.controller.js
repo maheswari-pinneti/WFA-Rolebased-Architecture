@@ -80,7 +80,7 @@ export const login = (req, res) => {
     if (err) return res.status(500).json({ success: false, message: 'Database error' });
     if (!user) {
       logAudit('anonymous', 'FAILED_AUTHENTICATION', `User not found: ${email}`);
-      return res.status(404).json({ success: false, message: 'User profile not found' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
     // Enforce BCrypt password hash check using controlled concurrency queue

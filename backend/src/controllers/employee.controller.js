@@ -79,13 +79,13 @@ export const updateEmployee = (req, res) => {
 export const deleteEmployee = (req, res) => {
   const { id } = req.params;
   db.run(
-    'DELETE FROM employees WHERE id = ? AND organizationId = ?',
+    "UPDATE employees SET status = 'TERMINATED' WHERE id = ? AND organizationId = ?",
     [id, organizationId(req)],
     function onDelete(err) {
       if (err) return res.status(500).json({ success: false, message: err.message });
       if (!this.changes) return res.status(404).json({ success: false, message: 'Employee not found.' });
-      logAudit(req.user.id, 'EMPLOYEE_DELETE', `Deleted employee: ${id}`, organizationId(req));
-      return res.json({ success: true, message: 'Employee successfully deleted.' });
+      logAudit(req.user.id, 'EMPLOYEE_DELETE', `Soft deleted/terminated employee: ${id}`, organizationId(req));
+      return res.json({ success: true, message: 'Employee successfully terminated.' });
     }
   );
 };
