@@ -61,7 +61,7 @@ export const getAnalytics = async (req, res) => {
            FROM employees e WHERE ${employeeScope.where} GROUP BY e.department ORDER BY headcount DESC`, employeeScope.params),
       all(`SELECT e.role AS name, COUNT(*) AS value FROM employees e WHERE ${employeeScope.where} GROUP BY e.role ORDER BY value DESC`, employeeScope.params),
       all(`SELECT e.status AS name, COUNT(*) AS value FROM employees e WHERE ${employeeScope.where} GROUP BY e.status ORDER BY value DESC`, employeeScope.params),
-      all(`SELECT a.workMode AS name, COUNT(DISTINCT a.employeeId) AS value FROM attendance_records a WHERE ${attendanceScope.where} GROUP BY a.workMode`, attendanceScope.params),
+      all(`SELECT a.workMode AS name, COUNT(DISTINCT a.employeeId) AS value FROM attendance_records a WHERE ${attendanceQueryScope.where} GROUP BY a.workMode`, attendanceQueryScope.params),
       all(`SELECT p.quarter AS name, ROUND(AVG(p.kpiScore), 1) AS performance, ROUND(AVG(p.targetScore), 1) AS target, ROUND(AVG(p.productivityScore), 1) AS productivity
            FROM performance_records p WHERE ${performanceQueryScope.where} GROUP BY p.quarter ORDER BY p.quarter`, performanceQueryScope.params),
       all(`SELECT p.team AS name, ROUND(AVG(p.productivityScore), 1) AS productivity, COUNT(DISTINCT p.employeeId) AS members
@@ -194,10 +194,11 @@ export const getDashboardSummary = async (req, res) => {
 export const getWorkforceDistribution = async (req, res) => {
   try {
     const attendanceScope = getScope(req.user, 'a');
+    const attendanceQueryScope = { ...attendanceScope, where: attendanceScope.where.replace('a.id', 'a.employeeId') };
     const rows = await all(
       `SELECT a.workMode AS name, COUNT(DISTINCT a.employeeId) AS value 
-       FROM attendance_records a WHERE ${attendanceScope.where} GROUP BY a.workMode`,
-      attendanceScope.params
+       FROM attendance_records a WHERE ${attendanceQueryScope.where} GROUP BY a.workMode`,
+      attendanceQueryScope.params
     );
     return res.json({ success: true, data: rows.length ? rows : [{ name: 'No data', value: 0 }] });
   } catch (error) {

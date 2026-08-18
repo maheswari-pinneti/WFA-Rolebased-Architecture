@@ -1,4 +1,4 @@
-import sqlite3 from 'sqlite3';
+import { createConnection } from '../src/database/connection.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.resolve(__dirname, '../../database/wfa.db');
 
 console.log(`Connecting to database at: ${dbPath}`);
-const db = new sqlite3.Database(dbPath);
+const db = createConnection(dbPath);
 
 const run = (sql, params = []) => new Promise((resolve, reject) => {
   db.run(sql, params, function onRun(err) {

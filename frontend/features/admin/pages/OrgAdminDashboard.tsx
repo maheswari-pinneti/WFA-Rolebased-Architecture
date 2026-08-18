@@ -3,10 +3,12 @@ import { Building2, MapPin, Users, GitBranch } from 'lucide-react';
 
 export const OrgAdminDashboard: React.FC = () => {
   const departments = [
-    { name: 'Engineering & Technology', head: 'Arthur Pendelton', headcount: 142, location: 'San Francisco, London' },
-    { name: 'Human Resources & People Ops', head: 'Elena Rostova', headcount: 28, location: 'New York, London' },
-    { name: 'Product & Design', head: 'Sarah Connor', headcount: 45, location: 'San Francisco' },
-    { name: 'Enterprise Sales & Marketing', head: 'Alex Mercer', headcount: 86, location: 'Global HQ' },
+    { name: 'Engineering', head: 'Marcus Vance', headcount: 42, location: 'Hyderabad, Bengaluru' },
+    { name: 'Product Management', head: 'Sarah Connor', headcount: 42, location: 'Hyderabad, Visakhapatnam' },
+    { name: 'Sales & Marketing', head: 'David Sterling', headcount: 42, location: 'Chennai, Kochi' },
+    { name: 'Human Resources', head: 'Elena Rostova', headcount: 42, location: 'Bengaluru, Chennai' },
+    { name: 'Customer Success', head: 'Alex Mercer', headcount: 41, location: 'Kochi, Hyderabad' },
+    { name: 'Finance & Operations', head: 'Finance Manager', headcount: 41, location: 'Visakhapatnam, Bengaluru' }
   ];
 
   return (

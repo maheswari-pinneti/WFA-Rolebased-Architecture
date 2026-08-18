@@ -2,16 +2,40 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState, User } from '../types/auth.types';
 import { authService } from '../services/auth.service';
 import { Role } from '../../security/roles/roles';
-
-const initialSession = authService.getStoredSession();
+import { apiClient } from '../../services/api';
 
 const initialState: AuthState = {
-  user: initialSession ? initialSession.user : null,
-  token: initialSession ? initialSession.token : null,
-  isAuthenticated: Boolean(initialSession),
-  isLoading: false,
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isLoading: true,
   error: null,
 };
+
+export const initializeAuthThunk = createAsyncThunk(
+  'auth/initializeAuth',
+  async () => {
+    const session = authService.getStoredSession();
+    if (!session) {
+      return { user: null, token: null };
+    }
+    try {
+      const response = await apiClient.get('/v1/auth/me');
+      if (response.data && response.data.success && response.data.data) {
+        return {
+          user: response.data.data,
+          token: session.token
+        };
+      } else {
+        await authService.logout();
+        return { user: null, token: null };
+      }
+    } catch (err) {
+      await authService.logout();
+      return { user: null, token: null };
+    }
+  }
+);
 
 export const loginUserThunk = createAsyncThunk(
   'auth/loginUser',
@@ -73,6 +97,30 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(initializeAuthThunk.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(initializeAuthThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload?.user && action.payload?.token) {
+          state.isAuthenticated = true;
+          state.user = {
+            ...action.payload.user,
+            permissions: Array.isArray(action.payload.user.permissions) ? action.payload.user.permissions : []
+          };
+          state.token = action.payload.token;
+        } else {
+          state.isAuthenticated = false;
+          state.user = null;
+          state.token = null;
+        }
+      })
+      .addCase(initializeAuthThunk.rejected, (state) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+      })
       .addCase(loginUserThunk.pending, (state) => {
         state.isLoading = true;
         state.error = null;

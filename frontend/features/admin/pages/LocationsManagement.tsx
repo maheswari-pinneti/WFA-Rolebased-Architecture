@@ -6,11 +6,11 @@ import { Button } from '../../../shared/components/Button';
 
 export const LocationsManagement: React.FC = () => {
   const [locations] = useState([
-    { id: 'loc-1', city: 'San Francisco', country: 'United States', code: 'SFO-HQ', timezone: 'UTC-8 (PST)', headcount: 180, status: 'OPERATIONAL' },
-    { id: 'loc-2', city: 'London', country: 'United Kingdom', code: 'LDN-EU', timezone: 'UTC+0 (GMT)', headcount: 95, status: 'OPERATIONAL' },
-    { id: 'loc-3', city: 'Singapore', country: 'Singapore', code: 'SIN-APAC', timezone: 'UTC+8 (SGT)', headcount: 62, status: 'OPERATIONAL' },
-    { id: 'loc-4', city: 'Bengaluru', country: 'India', code: 'BLR-RND', timezone: 'UTC+5:30 (IST)', headcount: 140, status: 'EXPANDING' },
-    { id: 'loc-5', city: 'Berlin', country: 'Germany', code: 'BER-HUB', timezone: 'UTC+1 (CET)', headcount: 40, status: 'OPERATIONAL' },
+    { id: 'loc-1', city: 'Hyderabad', country: 'India', code: 'HYD-IN', timezone: 'UTC+5:30 (IST)', headcount: 70, status: 'OPERATIONAL' },
+    { id: 'loc-2', city: 'Bengaluru', country: 'India', code: 'BLR-IN', timezone: 'UTC+5:30 (IST)', headcount: 60, status: 'OPERATIONAL' },
+    { id: 'loc-3', city: 'Chennai', country: 'India', code: 'MAA-IN', timezone: 'UTC+5:30 (IST)', headcount: 50, status: 'OPERATIONAL' },
+    { id: 'loc-4', city: 'Visakhapatnam', country: 'India', code: 'VTZ-IN', timezone: 'UTC+5:30 (IST)', headcount: 40, status: 'OPERATIONAL' },
+    { id: 'loc-5', city: 'Kochi', country: 'India', code: 'COK-IN', timezone: 'UTC+5:30 (IST)', headcount: 30, status: 'OPERATIONAL' },
   ]);
 
   return (

@@ -82,6 +82,21 @@ const DefaultHomeRedirect: React.FC = () => {
 };
 
 export const AppRoutes: React.FC = () => {
+  const { initializeAuth, isLoading } = useAuth();
+
+  React.useEffect(() => {
+    initializeAuth();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-primary)] text-[var(--text-muted)] gap-3 font-sans">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-sm tracking-wide">Initializing secure workspace...</div>
+      </div>
+    );
+  }
+
   return (
     <Routes>
       {/* Public Auth Routes */}

@@ -1,4 +1,4 @@
-import sqlite3 from 'sqlite3';
+import { createConnection } from './backend/src/database/connection.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, 'database', 'wfa.db');
 console.log(`Connecting to: ${dbPath}`);
-const db = new sqlite3.Database(dbPath);
+const db = createConnection(dbPath);
 
 db.serialize(() => {
   // 1. Integrity check
