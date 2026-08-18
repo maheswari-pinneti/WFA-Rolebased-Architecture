@@ -35,7 +35,7 @@ The current implementation uses **WebSocket / Socket.IO** for real-time communic
                          ┌──────────┴──────────┐
                          ▼                     ▼
                  ┌──────────────┐      ┌──────────────┐
-                 │ SQLite       │      │ Event        │
+                 │ MongoDB      │      │ Event        │
                  │ Persistence  │      │ Publisher    │
                  └──────────────┘      └──────┬───────┘
                                                │
@@ -70,7 +70,7 @@ RBAC / ABAC / Policy Authorization
     ↓
 Business Validation
     ↓
-SQLite Transaction
+MongoDB Transaction / Save
     ↓
 Audit Log
     ↓
@@ -485,7 +485,7 @@ Employee Check-In
       ↓
 Attendance API
       ↓
-SQLite
+MongoDB
       ↓
 Attendance Event
       ↓
@@ -643,7 +643,7 @@ Audit logging remains persistent and independent of WebSocket availability.
 User Action
      ↓
 Business Service
-     ├── SQLite Transaction
+     ├── MongoDB Save
      ├── Audit Record
      └── Real-Time Event
 ```
@@ -820,7 +820,7 @@ This allows the real-time infrastructure to evolve without rewriting business se
 
 ## Persistent Business Data
 
-SQLite remains responsible for:
+MongoDB remains responsible for:
 
 ```text
 Users
@@ -1015,7 +1015,7 @@ Team A
 
 # 🚀 Future Scalability
 
-The current architecture is designed for SQLite and a single application environment.
+The current architecture is designed for MongoDB and a single application environment.
 
 Future enterprise deployment can evolve toward:
 
@@ -1060,7 +1060,7 @@ Distributed Tracing
 Centralized Logging
 ```
 
-These technologies are **future scalability options** and are not required for the current SQLite implementation.
+These technologies are **future scalability options** and are not required for the current MongoDB implementation.
 
 ---
 
@@ -1156,7 +1156,7 @@ Alerting
 
 The platform follows these principles:
 
-1. **SQLite remains the source of truth.**
+1. **MongoDB remains the source of truth.**
 2. **WebSocket events are delivery mechanisms, not persistent business records.**
 3. **Every real-time connection must be authenticated.**
 4. **Every real-time event must respect RBAC, ABAC and policy-based authorization.**
@@ -1243,7 +1243,7 @@ Missed Event Synchronization
 ### Enterprise Data
 
 ```text
-SQLite
+MongoDB
 +
 Transactions
 +
@@ -1274,7 +1274,7 @@ Load Balancing
 Distributed Observability
 ```
 
-The architecture is therefore designed to support the current **SQLite + Express + React + Socket.IO** implementation while providing a clear upgrade path toward a larger enterprise real-time infrastructure in the future.
+The architecture is therefore designed to support the current **MongoDB + Express + React + Socket.IO** implementation while providing a clear upgrade path toward a larger enterprise real-time infrastructure in the future.
 
 ```
 
@@ -1315,7 +1315,7 @@ The current implementation uses **WebSocket / Socket.IO** for real-time communic
                          ┌──────────┴──────────┐
                          ▼                     ▼
                  ┌──────────────┐      ┌──────────────┐
-                 │ SQLite       │      │ Event        │
+                 │ MongoDB      │      │ Event        │
                  │ Persistence  │      │ Publisher    │
                  └──────────────┘      └──────┬───────┘
                                               │
@@ -1351,7 +1351,7 @@ RBAC / ABAC / Policy Authorization
     ↓
 Business Validation
     ↓
-SQLite Transaction
+MongoDB Transaction / Save
     ↓
 Audit Log
     ↓
@@ -1636,7 +1636,7 @@ The frontend exposes the current real-time connection state (`🟢 Live`, `🟡 
 Attendance operations can update authorized dashboards without requiring manual page refresh.
 
 ```text
-Employee Check-In → Attendance API → SQLite → Attendance Event → WebSocket → Dashboard Update
+Employee Check-In → Attendance API → MongoDB → Attendance Event → WebSocket → Dashboard Update
 
 ```
 
@@ -1694,7 +1694,7 @@ This allows the real-time infrastructure to evolve (e.g., from Socket.IO to Redi
 
 # 🗄️ Persistence vs Real-Time State
 
-**Persistent Business Data (SQLite):** Users, Roles, Permissions, Employees, Attendance, Notifications, Audit Logs, Sessions.
+**Persistent Business Data (MongoDB):** Users, Roles, Permissions, Employees, Attendance, Notifications, Audit Logs, Sessions.
 **Transient Real-Time State (WebSocket):** Connected Users, Connection IDs, Subscriptions, Presence, Live Event Delivery.
 
 Real-time connection state should not replace persistent business data.
@@ -1703,9 +1703,9 @@ Real-time connection state should not replace persistent business data.
 
 # 🚀 Future Scalability
 
-The current architecture is designed for SQLite and a single application environment. Future enterprise deployment can evolve toward Redis, Kafka, RabbitMQ, PostgreSQL, Kubernetes, and horizontal scaling.
+The current architecture is designed for MongoDB and a single application environment. Future enterprise deployment can evolve toward Redis, Kafka, RabbitMQ, PostgreSQL, Kubernetes, and horizontal scaling.
 
-These technologies are **future scalability options** and are not required for the current SQLite implementation.
+These technologies are **future scalability options** and are not required for the current MongoDB implementation.
 
 ---
 
@@ -1738,7 +1738,7 @@ These technologies are **future scalability options** and are not required for t
 
 # 📌 Real-Time Design Principles
 
-1. **SQLite remains the source of truth.**
+1. **MongoDB remains the source of truth.**
 2. **WebSocket events are delivery mechanisms, not persistent business records.**
 3. **Every real-time connection must be authenticated.**
 4. **Every real-time event must respect RBAC, ABAC and policy-based authorization.**

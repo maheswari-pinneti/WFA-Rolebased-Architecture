@@ -1,6 +1,6 @@
 # 🔄 Complete End-to-End System Flowchart
 
-This flowchart visualizes the complete end-to-end user-to-database-to-UI flow. It serves as a overview mapping out the request chain from the React UI down to SQLite, and Socket.io updating the dashboard UI.
+This flowchart visualizes the complete end-to-end user-to-database-to-UI flow. It serves as a overview mapping out the request chain from the React UI down to MongoDB, and Socket.io updating the dashboard UI.
 
 ```mermaid
 flowchart LR
@@ -10,7 +10,7 @@ flowchart LR
     AUTH --> RBAC["RBAC Evaluation"]
     RBAC --> ABAC["ABAC Scope Validation"]
     ABAC --> SERVICE["Business Services"]
-    SERVICE --> DB["SQLite"]
+    SERVICE --> DB["MongoDB"]
     
     DB --> AUDIT["Audit Logs"]
     SERVICE --> SOCKET["Socket.IO Server"]
@@ -25,4 +25,4 @@ flowchart LR
 ---
 
 ### End-to-End Request Chain in One Sentence:
-> **User** $\rightarrow$ **React UI** $\rightarrow$ **Protected Route** $\rightarrow$ **REST API** $\rightarrow$ **JWT/MFA** $\rightarrow$ **RBAC** $\rightarrow$ **ABAC/Scope** $\rightarrow$ **Controller** $\rightarrow$ **Service** $\rightarrow$ **SQLite** $\rightarrow$ **Audit/Notification** $\rightarrow$ **Socket.IO** $\rightarrow$ **React UI**.
+> **User** $\rightarrow$ **React UI** $\rightarrow$ **Protected Route** $\rightarrow$ **REST API** $\rightarrow$ **JWT/MFA** $\rightarrow$ **RBAC** $\rightarrow$ **ABAC/Scope** $\rightarrow$ **Controller** $\rightarrow$ **Service** $\rightarrow$ **MongoDB** $\rightarrow$ **Audit/Notification** $\rightarrow$ **Socket.IO** $\rightarrow$ **React UI**.

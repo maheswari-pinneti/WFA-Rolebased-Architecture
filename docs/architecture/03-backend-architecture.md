@@ -39,7 +39,7 @@ flowchart TB
         RESPONSE["Response / Error Handler"]
     end
     
-    DB["SQLite Database"]
+    DB["MongoDB Database"]
     
     CLIENT --> ENTRY
     ENTRY --> ROUTES

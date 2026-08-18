@@ -12,13 +12,12 @@ To guarantee a clean separation of concerns, the project is structured as follow
 wfa-rolebased-architecture/
 ├── frontend/               # React client SPA (formerly src/)
 │   ├── components/         # Reusable presentation views & controls
-│   ├── features/           # Scoped dashboard modules (Admin, HR, etc.)
+├── frontend/           # Scoped dashboard modules (Admin, HR, etc.)
 │   ├── services/           # Api client wrappers and background sync logic
 │   └── store/              # Redux slices (auth, attendance, theme)
 ├── backend/                # Express.js REST API server
 │   └── server.js           # Server routes, middlewares, and DB logic
-├── database/               # Relational Persistence
-│   └── wfa.db              # SQLite binary database file
+├── database/               # Database documentation
 ├── tests/                  # Unified Test Suites
 │   └── attendance.test.ts  # Mock & Service integration tests
 └── package.json            # Unified dependencies and Concurrent run scripts
@@ -51,73 +50,75 @@ The backend is built as an Express.js server utilizing Node ES Modules:
 
 ---
 
-## 4. Database Architecture (SQLite)
+## 4. Database Architecture (MongoDB)
 
-The persistence layer uses a relational SQLite database schema inside `database/wfa.db`:
+The persistence layer uses a MongoDB database schema with Mongoose models:
 
 ```mermaid
 erDiagram
     users {
-        text id PK
-        text name
-        text email "UNIQUE"
-        text password_hash
-        text role
-        text department
-        text team
-        text location
-        text title
-        text status
-        text permissions
+        string id PK
+        string name
+        string email "UNIQUE"
+        string password_hash
+        string role
+        string department
+        string team
+        string location
+        string title
+        string status
+        string permissions
     }
-    attendance_records {
-        text id PK
-        text employeeId
-        text employeeName
-        text department
-        text date
-        text checkInTime
-        text checkOutTime
-        text status
-        text shiftType
-        text workMode
-        real latitude
-        real longitude
-        real accuracy
-        text idempotencyKey "UNIQUE"
+    attendancerecords {
+        string id PK
+        string employeeId FK
+        string employeeName
+        string department
+        string date
+        string checkInTime
+        string checkOutTime
+        array breaks
+        string status
+        string shiftType
+        string workMode
+        double latitude
+        double longitude
+        double accuracy
+        string idempotencyKey "UNIQUE"
     }
-    breaks {
-        text id PK
-        text recordId FK
-        text start
-        text end
+    breaksessions {
+        string id PK
+        string attendanceRecordId FK
+        string startTime
+        string endTime
+        string status
     }
-    correction_requests {
-        text id PK
-        text employeeId
-        text employeeName
-        text department
-        text date
-        text requestedCheckIn
-        text requestedCheckOut
-        text reason
-        text status
-        text managerComment
-        text reviewedBy
-        text createdAt
+    correctionrequests {
+        string id PK
+        string employeeId FK
+        string employeeName
+        string department
+        string date
+        string requestedCheckIn
+        string requestedCheckOut
+        string reason
+        string status
+        string managerComment
+        string reviewedBy
+        string createdAt
     }
-    audit_logs {
-        text id PK
-        text employeeId
-        text action
-        text details
-        text timestamp
+    auditlogs {
+        string id PK
+        string employeeId FK
+        string action
+        string details
+        string timestamp
     }
 
-    users ||--o{ attendance_records : "logs"
-    attendance_records ||--o{ breaks : "contains"
-    users ||--o{ correction_requests : "submits"
-    users ||--o{ audit_logs : "triggers"
+    users ||--o{ attendancerecords : "logs"
+    attendancerecords ||--o{ breaksessions : "contains"
+    users ||--o{ correctionrequests : "submits"
+    users ||--o{ auditlogs : "triggers"
 ```
 
 ---
@@ -127,5 +128,5 @@ erDiagram
 - **Proxy Routing**: Vite's server configuration maps client `/api` paths directly to `http://localhost:5000/api`.
 - **Hybrid Offline-First Sync**:
   - Frontend operations (Check-In, Break, Check-Out) synchronously update the client-side `localStorage` cache immediately to prevent lagging and preserve full offline capabilities.
-  - Concurrently, a background async fetch request is fired via `apiClient` to persist the action inside the SQLite database.
+  - Concurrently, a background async fetch request is fired via `apiClient` to persist the action inside the MongoDB database.
   - If a network error occurs, the action is enqueued inside an offline queue to be synchronized once connection is restored.

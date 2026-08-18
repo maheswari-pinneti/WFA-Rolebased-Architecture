@@ -9,7 +9,7 @@ This report summarizes the final completion status of all requirements, listing 
 | Requirement | Status | Implementation Details / Files |
 | --- | --- | --- |
 | **Real MFA OTP Delivery Abstraction** | **Completed** | Pluggable delivery in [mfa.service.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/services/mfa.service.js) utilizing SHA-256/Bcrypt hashing. |
-| **Persistent MFA Challenge Store** | **Completed** | Challenger status tracking in `mfa_challenges` table inside SQLite db. |
+| **Persistent MFA Challenge Store** | **Completed** | Challenger status tracking in `mfachallenges` collection inside MongoDB. |
 | **Chart UI Loading/Empty/Error States** | **Completed** | Handled in [ChartCard.tsx](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/frontend/components/dashboard/ChartCard.tsx) with skeleton loaders & error retry handles. |
 | **Workforce & Distribution Analytics APIs** | **Completed** | Integrated dynamic database metrics in [analytics.controller.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/controllers/analytics.controller.js). |
 | **Role-based Access Control (RBAC)** | **Completed** | Middleware security guards inside [auth.js](file:///c:/Users/91970/Documents/MAHE/OneDrive/Desktop/WFA-Rolebased-Architecture-main/backend/src/middleware/auth.js). |

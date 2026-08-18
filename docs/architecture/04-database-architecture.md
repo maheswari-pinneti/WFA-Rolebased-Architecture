@@ -1,117 +1,146 @@
 # 🗄️ Database Architecture
 
-This document describes the SQLite relational structure, table relationships, constraints, and data domains in the Workforce Analytics system.
+This document describes the MongoDB database schemas, collections structure, relationships, indexes, and document fields in the Workforce Analytics system.
 
-## 1. Entity Relationship (ER) Diagram
+The database uses MongoDB for persistence, utilizing the Mongoose ODM to enforce strict schemas, type verification, and indexes in JavaScript.
+
+## 1. Document Collections Overview
 
 ```mermaid
 erDiagram
-    ORGANIZATIONS ||--o{ DEPARTMENTS : contains
-    ORGANIZATIONS ||--o{ USERS : owns
-    ORGANIZATIONS ||--o{ EMPLOYEES : employs
-    DEPARTMENTS ||--o{ TEAMS : contains
-    DEPARTMENTS ||--o{ EMPLOYEES : assigns
-    TEAMS ||--o{ EMPLOYEES : contains
-    USERS }o--|| ROLES : has
-    ROLES }o--o{ PERMISSIONS : grants
-    USERS ||--o| EMPLOYEES : maps_to
-    EMPLOYEES ||--o{ ATTENDANCE : records
-    EMPLOYEES ||--o{ ATTENDANCE_CORRECTIONS : requests
-    USERS ||--o{ NOTIFICATIONS : receives
-    USERS ||--o{ MFA_CHALLENGES : verifies
-    USERS ||--o{ SESSIONS : owns
-    USERS ||--o{ AUDIT_LOGS : generates
+    users ||--o{ attendancerecords : logs
+    users ||--o{ correctionrequests : submits
+    users ||--o{ auditlogs : triggers
+    attendancerecords ||--o{ breaksessions : contains
 
-    ORGANIZATIONS {
-        int id PK
+    users {
+        string id PK
         string name
-        string status
-    }
-    USERS {
-        int id PK
-        int organization_id FK
-        int role_id FK
-        string email "UK"
+        string email "unique, indexed"
         string password_hash
-        string status
-    }
-    ROLES {
-        int id PK
-        string name "UK"
-    }
-    PERMISSIONS {
-        int id PK
-        string resource
-        string action
-    }
-    EMPLOYEES {
-        int id PK
-        int organization_id FK
-        int department_id FK
-        int team_id FK
-        string employee_code "UK"
-        string name
-        string designation
-        string email
+        string role "ADMIN | HR | MANAGER | TEAM_LEAD | EMPLOYEE"
+        string department
+        string team
         string location
-        string employment_status
-        date joining_date
+        string title
+        int clearanceLevel
+        string status "ACTIVE | INACTIVE"
+        array permissions
+        int mfa_enabled
+        string companyId "indexed"
     }
-    DEPARTMENTS {
-        int id PK
-        int organization_id FK
+
+    employees {
+        string id PK
+        string employeeCode "unique, indexed"
         string name
+        string email "unique, indexed"
+        string role
+        string department "indexed"
+        string designation
+        string status "indexed"
+        string avatar
+        string joinDate
+        int performanceScore
+        int attendanceRate
+        string team
+        string location "indexed"
+        string companyId "indexed"
     }
-    TEAMS {
-        int id PK
-        int department_id FK
-        string name
+
+    attendancerecords {
+        string id PK
+        string employeeId "indexed"
+        string employeeName
+        string department
+        string date "indexed"
+        string checkInTime
+        string checkOutTime
+        array breaks
+        string shiftType
+        string workMode "Office | Remote"
+        string status "Checked In | Checked Out | Break"
+        double latitude
+        double longitude
+        double accuracy
+        string idempotencyKey "unique"
+        string companyId "indexed"
     }
-    ATTENDANCE {
-        int id PK
-        int employee_id FK
-        datetime check_in
-        datetime break_start
-        datetime break_end
-        datetime check_out
-        string status
-    }
-    ATTENDANCE_CORRECTIONS {
-        int id PK
-        int employee_id FK
-        date attendance_date
+
+    correctionrequests {
+        string id PK
+        string employeeId "indexed"
+        string employeeName
+        string department
+        string date "indexed"
+        string requestedCheckIn
+        string requestedCheckOut
         string reason
-        string status
+        string status "PENDING | APPROVED | REJECTED"
+        string managerComment
+        string reviewedBy
+        string createdAt
+        string companyId "indexed"
     }
-    MFA_CHALLENGES {
-        int id PK
-        int user_id FK
+
+    breaksessions {
+        string id PK
+        string attendanceRecordId "indexed"
+        string startTime
+        string endTime
+        string status "ACTIVE | COMPLETED"
+        string companyId "indexed"
+    }
+
+    mfachallenges {
+        string id PK
+        string userId "indexed"
         string otp_hash
-        datetime expires_at
-        string status
+        string expires_at
+        int attempts_count
+        int max_attempts
+        string consumed_at
+        int resend_count
+        string status "Pending | Verified | Expired"
+        string companyId "indexed"
     }
-    SESSIONS {
-        int id PK
-        int user_id FK
-        string refresh_token
-        datetime expires_at
-        string status
-    }
-    NOTIFICATIONS {
-        int id PK
-        int user_id FK
-        string type
-        string message
-        boolean read
-        datetime created_at
-    }
-    AUDIT_LOGS {
-        int id PK
-        int user_id FK
-        string event_type
-        string resource
+
+    auditlogs {
+        string id PK
+        string employeeId "indexed"
         string action
-        string metadata
-        datetime created_at
+        string details
+        string timestamp
+        string companyId "indexed"
     }
 ```
+
+## 2. Collections and Indexes
+
+### Users Collection (`users`)
+- **Key Fields**: `id`, `email`, `password_hash`, `role`, `companyId`.
+- **Indexes**:
+  - `id`: Unique index for internal lookup references.
+  - `email`: Unique index for authentication queries.
+  - `companyId`: Index for multi-tenant isolation query scoping.
+
+### Employees Collection (`employees`)
+- **Key Fields**: `id`, `employeeCode`, `name`, `email`, `department`, `location`, `companyId`.
+- **Indexes**:
+  - `id`: Unique lookup index.
+  - `employeeCode`: Unique identifier index.
+  - `email`: Unique email index.
+  - `department`: Scoped queries for department filters.
+  - `location`: Queries filtering employees by office branch.
+
+### Attendance Collection (`attendancerecords`)
+- **Key Fields**: `id`, `employeeId`, `date`, `status`, `idempotencyKey`.
+- **Indexes**:
+  - `employeeId` + `date`: Compound index for daily logs lookup.
+  - `idempotencyKey`: Unique index to prevent duplicate check-in API processing.
+
+### Correction Requests Collection (`correctionrequests`)
+- **Key Fields**: `id`, `employeeId`, `date`, `status`.
+- **Indexes**:
+  - `employeeId`: Speeds up retrieval of individual submission logs.
+  - `status`: Index to quickly locate pending approvals for managers.

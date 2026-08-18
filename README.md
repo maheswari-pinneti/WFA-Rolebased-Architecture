@@ -1,6 +1,6 @@
 # Enterprise Workforce Analytics Intelligence Platform
 
-An enterprise-grade **Workforce Analytics and Intelligence Platform** built with a unified full-stack architecture using **React 18, TypeScript, Node.js, Express.js, SQLite, Redux Toolkit, TanStack React Query, Material UI, Tailwind CSS, Recharts, and real-time communication technologies**.
+An enterprise-grade **Workforce Analytics and Intelligence Platform** built with a unified full-stack architecture using **React 18, TypeScript, Node.js, Express.js, MongoDB, Redux Toolkit, TanStack React Query, Material UI, Tailwind CSS, Recharts, and real-time communication technologies**.
 
 The platform provides secure workforce management, workforce intelligence, attendance monitoring, employee management, analytics, and enterprise authorization through **RBAC, ABAC, policy-based authorization, JWT authentication, refresh tokens, and Multi-Factor Authentication (MFA)**.
 
@@ -51,7 +51,7 @@ The Workforce Analytics Intelligence Platform provides:
 * 📭 Empty states
 * ❌ Error states
 * 🧪 Unit and integration testing
-* 🗄️ SQLite persistence
+* 🗄️ MongoDB persistence
 * 🔗 REST API integration
 
 ---
@@ -188,7 +188,7 @@ WFA-Rolebased-Architecture/
 │
 ├── frontend/       # React + TypeScript application
 ├── backend/        # Node.js + Express REST API
-├── database/       # SQLite database, migrations and seed data
+├── database/       # MongoDB documentation, schemas, and configurations
 ├── docs/           # Documentation and architecture specifications
 ├── public/         # Public assets, logos and icons
 ├── dist/           # Production build output
@@ -203,7 +203,7 @@ WFA-Rolebased-Architecture/
 | ------------- | ---------------------------------------------------------------------------- |
 | **frontend/** | React, TypeScript, dashboards, components, themes, routing and role-based UI |
 | **backend/**  | Express APIs, authentication, authorization, services and business logic     |
-| **database/** | SQLite database, migrations, seed data and test database                     |
+| **database/** | MongoDB database models design, schemas, configurations, and documentation    |
 | **docs/**     | Architecture documentation and project specifications                        |
 | **public/**   | Logos, icons and static public assets                                        |
 | **dist/**     | Production-ready frontend build                                              |
@@ -243,14 +243,12 @@ WFA-Rolebased-Architecture/
 
 ## Database
 
-* SQLite
-* SQL migrations
-* Seed data
-* Foreign-key relationships
-* Unique constraints
-* Indexed queries
-* Transactions
-* Audit persistence
+* MongoDB (via Mongoose ODM)
+* Dynamic data seeding
+* Unique index constraints (e.g., employee code, user email)
+* Index-based query optimizations
+* MongoMemoryServer in-memory replica set for dev fallback
+* Audit log persistence collection
 
 ---
 
@@ -575,7 +573,7 @@ Synchronization
       ↓
 Backend Validation
       ↓
-SQLite Persistence
+MongoDB Persistence
       ↓
 Real-Time Update
 ```
@@ -602,7 +600,7 @@ The platform supports workforce notifications and security communication.
 
 ### Communication
 
-Notifications can be delivered through supported enterprise communication channels, including:
+Notifications can be delivered through dynamic enterprise communication channels, including:
 
 * 📧 Official company email
 * 💬 In-application messages
@@ -637,7 +635,7 @@ REST API
       ↓
 Backend Service
       ↓
-SQLite
+MongoDB
       ↓
 WebSocket Event
       ↓
@@ -817,7 +815,7 @@ GET /api/analytics/hiring
 
 # 🗄️ Database
 
-The platform uses SQLite for relational persistence.
+The platform uses MongoDB for data persistence.
 
 Core data domains include:
 
@@ -938,27 +936,24 @@ npm install
 
 ## 3. Configure Environment
 
-Create environment files from the provided examples.
+Create the environment file from the provided example:
 
 ```bash
 cp .env.example .env
 ```
 
-Configure company/service credentials only through environment variables.
+Configure company/service credentials only through environment variables in `.env`.
+
+> [!NOTE]
+> **Zero-Config Database Fallback**: In development (`NODE_ENV=development`), you can leave `MONGODB_URI` blank or omit it from `.env`. The backend will automatically start an in-memory MongoDB replica set using `mongodb-memory-server` and seed it automatically on startup.
 
 Do not add:
-
-* Personal email addresses
-* Personal phone numbers
-* Passwords
-* JWT secrets
-* API keys
-* Database passwords
-* Private tokens
-
+* Personal credentials or passwords
+* Real production JWT secrets
+* Production Database URLs or API keys
 to the Git repository.
 
-## 4. Initialize Database
+## 4. Initialize Database (Automatic for Fallback)
 
 Run the configured migration and seed commands.
 
@@ -1100,7 +1095,7 @@ The project includes continuous improvements across:
 | **Multi-Factor Authentication (MFA)** | ✅ **Completed** |
 | **OTP verification**                  | ✅ **Completed** |
 | MFA challenge management              | ✅ Completed     |
-| SQLite persistence                    | ✅ Completed     |
+| MongoDB persistence                   | ✅ Completed     |
 | 250 seeded employees                  | ✅ Completed     |
 | Unique employee IDs                   | ✅ Completed     |
 | Duplicate ID prevention               | ✅ Completed     |
@@ -1179,7 +1174,7 @@ Notification / Real-Time Event
 
 * [x] React + TypeScript frontend
 * [x] Node.js + Express backend
-* [x] SQLite database
+* [x] MongoDB database
 * [x] Five enterprise roles
 * [x] RBAC
 * [x] ABAC
@@ -1290,7 +1285,7 @@ Check-In + Break + Resume + Check-Out + Corrections + Geofencing
 
 **Data Management**
 
-SQLite + 250 Unique Employees + Duplicate Prevention
+MongoDB + 250 Unique Employees + Duplicate Prevention
 
 **Real-Time Operations**
 
