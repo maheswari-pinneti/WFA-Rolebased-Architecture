@@ -30,8 +30,10 @@ router.post('/auth/refresh', authRateLimiter, authController.refresh);
 router.get('/employees', authenticateToken, enforceScope, (req, res) => {
   const { role, id, department: userDept, team: userTeam, organizationId = 'org-stackly' } = req.user;
   
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.pageSize || req.query.limit, 10) || 25;
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  let limit = parseInt(req.query.pageSize || req.query.limit, 10) || 25;
+  if (limit > 100) limit = 100;
+  if (limit <= 0) limit = 25;
   const offset = (page - 1) * limit;
   const search = req.query.search ? `%${req.query.search}%` : null;
 
