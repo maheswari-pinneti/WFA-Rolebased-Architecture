@@ -87,7 +87,7 @@ export interface HeaderState {
 ## 4. API Integration Flow
 
 ```mermaid
-sequenceDocument
+sequenceDiagram
 ---
 title: "Header API & Authentication Integration Data Flow"
 ---

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS attendance_records (
   idempotencyKey TEXT UNIQUE,
   team TEXT,
   organizationId TEXT DEFAULT 'org-stackly',
-  FOREIGN KEY (employeeId) REFERENCES employees(id),
+  FOREIGN KEY (employeeId) REFERENCES employees(id) ON DELETE CASCADE,
   FOREIGN KEY (organizationId) REFERENCES organizations(id)
 );
 
@@ -35,16 +35,6 @@ CREATE TABLE IF NOT EXISTS corrections (
   createdAt TEXT,
   team TEXT,
   organizationId TEXT DEFAULT 'org-stackly',
-  FOREIGN KEY (employeeId) REFERENCES employees(id),
-  FOREIGN KEY (organizationId) REFERENCES organizations(id)
-);
-
-CREATE TABLE IF NOT EXISTS shifts (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  startTime TEXT,
-  endTime TEXT,
-  gracePeriodMinutes INTEGER DEFAULT 0,
-  organizationId TEXT DEFAULT 'org-stackly',
+  FOREIGN KEY (employeeId) REFERENCES employees(id) ON DELETE CASCADE,
   FOREIGN KEY (organizationId) REFERENCES organizations(id)
 );

@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken';
-import db, { ORGANIZATION_ID } from '../config/db.js';
+import db from '../database/connection.js';
+const ORGANIZATION_ID = 'org-stackly';
 
-const JWT_SECRET = 'wfa_platform_secret_jwt_key_2026';
+
+import { env } from '../config/env.js';
+
+const JWT_SECRET = env.JWT_SECRET;
 
 export const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];

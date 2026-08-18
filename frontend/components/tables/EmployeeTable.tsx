@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import { fetchEmployeesThunk, updateEmployeeStatusThunk } from '../../features/hr/store/hrSlice';
@@ -45,8 +45,21 @@ export const EmployeeTable: React.FC = () => {
     return matchesSearch && matchesDept;
   });
 
-  const totalPages = Math.ceil(filteredEmployees.length / pageSize) || 1;
-  const paginatedEmployees = filteredEmployees.slice((page - 1) * pageSize, page * pageSize);
+  const sortedFilteredEmployees = useMemo(() => {
+    if (!filteredEmployees) return [];
+    return [...filteredEmployees].sort((a, b) => {
+      const codeA = (a && (a.employeeCode || a.code)) || '';
+      const codeB = (b && (b.employeeCode || b.code)) || '';
+      
+      const numA = Number(codeA.match(/(\d+)$/)?.[1] ?? 0);
+      const numB = Number(codeB.match(/(\d+)$/)?.[1] ?? 0);
+      
+      return numA - numB;
+    });
+  }, [filteredEmployees]);
+
+  const totalPages = Math.ceil(sortedFilteredEmployees.length / pageSize) || 1;
+  const paginatedEmployees = sortedFilteredEmployees.slice((page - 1) * pageSize, page * pageSize);
 
   const departments = [
     'ALL',
@@ -153,16 +166,9 @@ export const EmployeeTable: React.FC = () => {
               paginatedEmployees.map((emp) => (
                 <tr key={emp.id} className="hover:bg-[var(--bg-hover)] transition-colors">
                   <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={emp.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'}
-                        alt={emp.name}
-                        className="w-9 h-9 rounded-full object-cover border border-[var(--border-color)] shrink-0"
-                      />
-                      <div>
-                        <p className="font-bold text-[var(--text-primary)]">{emp.name}</p>
-                        <p className="text-xs text-slate-400 font-mono">{emp.employeeCode || emp.code || 'WFA-1000'} • {emp.email}</p>
-                      </div>
+                    <div>
+                      <p className="font-bold text-[var(--text-primary)]">{emp.name}</p>
+                      <p className="text-xs text-slate-400 font-mono">{emp.employeeCode || emp.code || 'WFA-1000'} • {emp.email}</p>
                     </div>
                   </td>
                   <td className="px-5 py-3">

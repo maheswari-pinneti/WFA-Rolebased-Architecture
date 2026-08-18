@@ -20,8 +20,8 @@ const normalizeUser = (value: any) => {
 };
 
 export const authService = {
-  login: async (email: string) => {
-    const response = await authApi.login(email);
+  login: async (email: string, password?: string) => {
+    const response = await authApi.login(email, password);
     // Only store session if login directly succeeded without MFA
     if (response && (response as any).token && (response as any).user) {
       const user = normalizeUser((response as any).user);
@@ -33,17 +33,18 @@ export const authService = {
     return response;
   },
 
-  verifyMfa: async (tempToken: string, code: string) => {
-    const response = await apiClient.post('/v1/auth/mfa-verify', { tempToken, code });
-    if (response.data && response.data.success) {
-      const { token, user } = response.data.data;
-      const normalizedUser = normalizeUser(user);
-      if (!token || !normalizedUser) throw new Error('MFA returned an invalid user session.');
-      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(normalizedUser));
-      return { token, user: normalizedUser };
-    }
-    throw new Error(response.data?.message || 'MFA OTP Verification failed');
+  verifyMfa: async (challengeId: string, code: string) => {
+    const data = await authApi.verifyMfa(challengeId, code);
+    const { token, user } = data;
+    const normalizedUser = normalizeUser(user);
+    if (!token || !normalizedUser) throw new Error('MFA returned an invalid user session.');
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(normalizedUser));
+    return { token, user: normalizedUser };
+  },
+
+  resendMfa: async (challengeId: string) => {
+    return await authApi.resendMfa(challengeId);
   },
 
   logout: async () => {

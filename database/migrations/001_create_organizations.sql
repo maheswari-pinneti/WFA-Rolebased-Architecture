@@ -1,7 +1,0 @@
-CREATE TABLE IF NOT EXISTS organizations (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  domain TEXT,
-  status TEXT DEFAULT 'ACTIVE',
-  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-);

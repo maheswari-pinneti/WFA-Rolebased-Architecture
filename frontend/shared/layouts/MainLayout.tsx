@@ -57,12 +57,12 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   const themeClass = getThemeClass(role);
 
   return (
-    <div data-role={role} className={`app-shell ${themeClass} min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300`}>
-      {/* Fixed Enterprise Header */}
+    <div data-role={role} className={`app-shell ${themeClass} h-screen min-h-screen flex flex-col overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300`}>
+      {/* Fixed Enterprise Header at root level spanning full width */}
       <EnterpriseHeader onToggleSidebar={toggleSidebar} onOpenHelp={() => setSupportModalOpen(true)} />
 
-      {/* Main Body */}
-      <div className="main-body flex-1 flex overflow-hidden">
+      {/* Main Body Wrapper (Below Header) */}
+      <div className="flex-1 flex overflow-hidden w-full relative">
         {/* Sleek Dynamic Modular Sidebar Navigation */}
         <Sidebar
           collapsed={collapsed}
@@ -72,11 +72,21 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
           onOpenSupport={() => setSupportModalOpen(true)}
         />
 
-        {/* Main Content Region */}
-        <main className="app-main flex-1 overflow-y-auto p-4 md:p-8 w-full space-y-6">
+        {/* Main Content Area: Content */}
+        <main className="app-main flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
           {children}
         </main>
       </div>
+
+      {/* Small footprint dashboard footer spanning full width */}
+      <footer className="app-footer shrink-0 border-t border-[var(--border-color)] bg-[var(--bg-secondary)] px-6 py-4 flex items-center justify-between text-xs text-slate-400">
+        <span>&copy; {new Date().getFullYear()} Workforce Analytics. All rights reserved.</span>
+        <div className="flex items-center gap-4">
+          <span className="cursor-pointer hover:text-white transition-colors" onClick={() => setSupportModalOpen(true)}>Support</span>
+          <span>v1.0.0</span>
+        </div>
+      </footer>
+
 
       {/* Support & IT Helpdesk Modal */}
       <SupportModal

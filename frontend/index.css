@@ -1,6 +1,10 @@
 :root {
   --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
+  --header-height: 4rem; /* 64px, matching Tailwind h-16 */
+  --sidebar-width-expanded: 280px;
+  --sidebar-width-collapsed: 76px;
+
   /* Stackly Enterprise Light Theme */
   --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
@@ -427,7 +431,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .app-header {
-  height: 4.5rem !important;
+  height: var(--header-height) !important;
   padding-inline: clamp(1rem, 2.5vw, 2rem) !important;
   background: color-mix(in srgb, var(--bg-secondary) 88%, transparent) !important;
   border-color: var(--line) !important;
@@ -458,8 +462,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .app-sidebar {
-  top: 4.5rem !important; /* Alignment flush with header height */
-  height: calc(100vh - 4.5rem) !important;
+  top: var(--header-height) !important; /* Flush with bottom of header on mobile */
+  height: calc(100vh - var(--header-height)) !important; /* Height minus header height */
   background: linear-gradient(180deg, #0b1424 0%, #07101d 100%) !important;
   border-color: rgba(148, 163, 184, 0.12) !important;
   box-shadow: 14px 0 40px rgba(2, 8, 23, 0.18) !important;
@@ -467,6 +471,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   margin-top: 0 !important;
   border-radius: 0 !important;
   align-self: stretch !important;
+}
+
+@media (min-width: 768px) {
+  .app-sidebar {
+    position: relative !important;
+    top: 0 !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: stretch !important;
+  }
 }
 
 
@@ -564,8 +580,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 @media (max-width: 767px) {
   .app-main { padding: 1rem !important; }
-  .app-header { height: 4rem !important; }
-  .app-sidebar { top: 6rem !important; height: calc(100vh - 6rem) !important; }
+  .app-header { height: var(--header-height) !important; }
+  .app-sidebar { top: var(--header-height) !important; height: calc(100vh - var(--header-height)) !important; }
   .dashboard-hero { padding: 1.25rem !important; }
 }
 
@@ -1027,23 +1043,24 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 /* Refined role-aware sidebar. Keep this block last so it owns the final visual layer. */
 .app-sidebar.sidebar-is-expanded {
-  width: 272px !important;
-  min-width: 272px !important;
+  width: var(--sidebar-width-expanded) !important;
+  min-width: var(--sidebar-width-expanded) !important;
 }
 .app-sidebar.sidebar-is-collapsed {
-  width: 78px !important;
-  min-width: 78px !important;
+  width: var(--sidebar-width-collapsed) !important;
+  min-width: var(--sidebar-width-collapsed) !important;
 }
 .app-sidebar {
   --sidebar-accent: #60a5fa;
   --sidebar-accent-strong: #2563eb;
   --sidebar-accent-soft: rgba(96, 165, 250, 0.14);
   --sidebar-ink: #dbeafe;
-  position: relative;
   overflow: hidden;
   background: var(--surface) !important;
   border-right: 1px solid var(--line) !important;
   box-shadow: 18px 0 48px rgba(2, 8, 23, 0.12) !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
   margin-right: 0 !important;
   padding-right: 0 !important;
   box-sizing: border-box !important;
@@ -1253,6 +1270,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.65);
 }
 .sidebar-nav-link.is-collapsed { padding-inline: 0; }
+.sidebar-is-collapsed .sidebar-nav {
+  padding-inline: 0.4rem !important;
+}
+.sidebar-is-collapsed .sidebar-nav-link {
+  width: 100% !important;
+  justify-content: center !important;
+  padding-inline: 0 !important;
+  margin: 4px 0 !important;
+}
+.sidebar-is-collapsed .sidebar-nav-link.is-active {
+  width: 2.85rem !important;
+  height: 2.85rem !important;
+  margin: 4px auto !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
 .sidebar-icon-shell {
   width: 2rem;
   height: 2rem;
@@ -1339,8 +1372,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sidebar-footer.is-collapsed .sidebar-footer-button { flex: 0 0 auto; padding-inline: 0; }
 
 @media (max-width: 767px) {
-  .app-sidebar.sidebar-is-expanded { width: min(86vw, 20rem) !important; min-width: min(86vw, 20rem) !important; }
-  .app-sidebar.sidebar-is-collapsed { width: 78px !important; min-width: 78px !important; }
+  .app-sidebar.sidebar-is-expanded { width: min(86vw, var(--sidebar-width-expanded)) !important; min-width: min(86vw, var(--sidebar-width-expanded)) !important; }
+  .app-sidebar.sidebar-is-collapsed { width: var(--sidebar-width-collapsed) !important; min-width: var(--sidebar-width-collapsed) !important; }
 }
 
 /* Shared emerald visual language for every protected dashboard. */

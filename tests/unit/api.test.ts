@@ -42,30 +42,30 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   let teamLeadToken = '';
 
   const loginToken = async (email: string) => {
-    const loginRes = await client.post('/v1/auth/login', { email });
-    const verifyRes = await client.post('/v1/auth/mfa-verify', {
-      tempToken: loginRes.data.data.tempToken,
-      code: loginRes.data.data.otpDevHint
+    const loginRes = await client.post('/v1/auth/login', { email, password: 'StacklyWFA2026!' });
+    const verifyRes = await client.post('/v1/auth/mfa/verify', {
+      challengeId: loginRes.data.data.challengeId,
+      otp: loginRes.data.data.otpDevHint
     });
     return verifyRes.data.data.token as string;
   };
 
   it('should fail login with invalid domain', async () => {
-    const res = await client.post('/v1/auth/login', { email: 'bad@gmail.com' });
+    const res = await client.post('/v1/auth/login', { email: 'bad@gmail.com', password: 'StacklyWFA2026!' });
     expect(res.status).toBe(403);
     expect(res.data.success).toBe(false);
   });
 
   it('should authenticate admin successfully', async () => {
-    const res = await client.post('/v1/auth/login', { email: 'admin@thestackly.com' });
+    const res = await client.post('/v1/auth/login', { email: 'admin@thestackly.com', password: 'StacklyWFA2026!' });
     expect(res.status).toBe(200);
     expect(res.data.success).toBe(true);
     expect(res.data.data.requiresMfa).toBe(true);
     
     // MFA Verification step
-    const mfaRes = await client.post('/v1/auth/mfa-verify', {
-      tempToken: res.data.data.tempToken,
-      code: res.data.data.otpDevHint
+    const mfaRes = await client.post('/v1/auth/mfa/verify', {
+      challengeId: res.data.data.challengeId,
+      otp: res.data.data.otpDevHint
     });
     expect(mfaRes.status).toBe(200);
     expect(mfaRes.data.data.token).toBeDefined();
@@ -73,15 +73,15 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   });
 
   it('should authenticate employee successfully', async () => {
-    const res = await client.post('/v1/auth/login', { email: 'employee@thestackly.com' });
+    const res = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'StacklyWFA2026!' });
     expect(res.status).toBe(200);
     expect(res.data.success).toBe(true);
     expect(res.data.data.requiresMfa).toBe(true);
 
     // MFA Verification step
-    const mfaRes = await client.post('/v1/auth/mfa-verify', {
-      tempToken: res.data.data.tempToken,
-      code: res.data.data.otpDevHint
+    const mfaRes = await client.post('/v1/auth/mfa/verify', {
+      challengeId: res.data.data.challengeId,
+      otp: res.data.data.otpDevHint
     });
     expect(mfaRes.status).toBe(200);
     employeeToken = mfaRes.data.data.token;
@@ -106,6 +106,153 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   it('should reject analytics fetch without token', async () => {
     const res = await client.get('/v1/analytics');
     expect(res.status).toBe(401);
+  });
+
+  // Automated Authentication Flows Tests
+  describe('Automated Authentication Flows', () => {
+    it('GET /health → 200', async () => {
+      const res = await client.get('/v1/health');
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
+      expect(res.data.status).toBe('healthy');
+    });
+
+    it('POST /auth/login → invalid password → 401', async () => {
+      const res = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'WrongPassword123'
+      });
+      expect(res.status).toBe(401);
+      expect(res.data.success).toBe(false);
+    });
+
+    it('POST /auth/login → valid password + MFA → challenge created', async () => {
+      const res = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'StacklyWFA2026!'
+      });
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
+      expect(res.data.data.requiresMfa).toBe(true);
+      expect(res.data.data.challengeId).toBeDefined();
+    });
+
+    it('POST /auth/mfa/verify → invalid OTP → 400/401', async () => {
+      const loginRes = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'StacklyWFA2026!'
+      });
+      const challengeId = loginRes.data.data.challengeId;
+
+      const verifyRes = await client.post('/v1/auth/mfa/verify', {
+        challengeId,
+        otp: '000000'
+      });
+      expect(verifyRes.status).toBe(400);
+      expect(verifyRes.data.success).toBe(false);
+    });
+
+    it('POST /auth/mfa/resend → new challenge', async () => {
+      const loginRes = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'StacklyWFA2026!'
+      });
+      const challengeId = loginRes.data.data.challengeId;
+
+      const resendRes = await client.post('/v1/auth/mfa/resend', {
+        challengeId
+      });
+      expect(resendRes.status).toBe(200);
+      expect(resendRes.data.success).toBe(true);
+      expect(resendRes.data.data.challengeId).toBe(challengeId);
+      expect(resendRes.data.data.expiresAt).toBeDefined();
+    });
+
+    it('POST /auth/mfa/verify → valid OTP → authentication success', async () => {
+      const loginRes = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'StacklyWFA2026!'
+      });
+      const challengeId = loginRes.data.data.challengeId;
+      const otp = loginRes.data.data.otpDevHint;
+
+      const verifyRes = await client.post('/v1/auth/mfa/verify', {
+        challengeId,
+        otp
+      });
+      expect(verifyRes.status).toBe(200);
+      expect(verifyRes.data.success).toBe(true);
+      expect(verifyRes.data.data.token).toBeDefined();
+      expect(verifyRes.data.data.refreshToken).toBeDefined();
+    });
+
+    it('POST /auth/refresh → valid session → new access token', async () => {
+      const loginRes = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'StacklyWFA2026!'
+      });
+      const challengeId = loginRes.data.data.challengeId;
+      const otp = loginRes.data.data.otpDevHint;
+
+      const verifyRes = await client.post('/v1/auth/mfa/verify', {
+        challengeId,
+        otp
+      });
+      const refreshToken = verifyRes.data.data.refreshToken;
+
+      const refreshRes = await client.post('/v1/auth/refresh', {
+        refreshToken
+      });
+      expect(refreshRes.status).toBe(200);
+      expect(refreshRes.data.success).toBe(true);
+      expect(refreshRes.data.data.token).toBeDefined();
+    });
+
+    it('GET /auth/me → authenticated user', async () => {
+      const loginRes = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'StacklyWFA2026!'
+      });
+      const challengeId = loginRes.data.data.challengeId;
+      const otp = loginRes.data.data.otpDevHint;
+
+      const verifyRes = await client.post('/v1/auth/mfa/verify', {
+        challengeId,
+        otp
+      });
+      const token = verifyRes.data.data.token;
+
+      const meRes = await client.get('/v1/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      expect(meRes.status).toBe(200);
+      expect(meRes.data.success).toBe(true);
+      expect(meRes.data.data.email).toBe('employee@thestackly.com');
+    });
+
+    it('POST /auth/logout → success', async () => {
+      const loginRes = await client.post('/v1/auth/login', {
+        email: 'employee@thestackly.com',
+        password: 'StacklyWFA2026!'
+      });
+      const challengeId = loginRes.data.data.challengeId;
+      const otp = loginRes.data.data.otpDevHint;
+
+      const verifyRes = await client.post('/v1/auth/mfa/verify', {
+        challengeId,
+        otp
+      });
+      const token = verifyRes.data.data.token;
+      const refreshToken = verifyRes.data.data.refreshToken;
+
+      const logoutRes = await client.post('/v1/auth/logout', {
+        refreshToken
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      expect(logoutRes.status).toBe(200);
+      expect(logoutRes.data.success).toBe(true);
+    });
   });
 
   it('should reject user list for non-admin employee', async () => {
@@ -141,11 +288,11 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   it('should enforce department and team scopes server-side', async () => {
     const managerEmployees = await client.get('/v1/employees', { headers: { Authorization: `Bearer ${managerToken}` } });
     expect(managerEmployees.status).toBe(200);
-    expect(managerEmployees.data.data.every((employee: any) => employee.department === 'Engineering')).toBe(true);
+    expect(managerEmployees.data.data.employees.every((employee: any) => employee.department === 'Engineering')).toBe(true);
 
     const teamEmployees = await client.get('/v1/employees', { headers: { Authorization: `Bearer ${teamLeadToken}` } });
     expect(teamEmployees.status).toBe(200);
-    expect(teamEmployees.data.data.every((employee: any) => employee.team === 'Frontend Team')).toBe(true);
+    expect(teamEmployees.data.data.employees.every((employee: any) => employee.team === 'Frontend Team')).toBe(true);
 
     const crossDepartment = await client.get('/v1/attendance/records?employeeId=emp-2', {
       headers: { Authorization: `Bearer ${managerToken}` }
@@ -196,5 +343,104 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
       headers: { Authorization: `Bearer ${employeeToken}` }
     });
     expect(res.status).toBe(403);
+  });
+
+  it('should support pagination, sorting, search, and filtering in the employee directory', async () => {
+    // 1. Default numeric sorting & pagination limit of 25
+    const page1 = await client.get('/v1/employees?page=1&pageSize=25', {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(page1.status).toBe(200);
+    expect(page1.data.data.employees.length).toBe(25);
+    expect(page1.data.data.pagination.page).toBe(1);
+    expect(page1.data.data.pagination.pageSize).toBe(25);
+    expect(page1.data.data.pagination.totalItems).toBe(250);
+    expect(page1.data.data.pagination.totalPages).toBe(10);
+    
+    // Default order should be numerical sequence STK-YYYY-0001 to STK-YYYY-0025
+    expect(page1.data.data.employees[0].employeeCode).toContain('-0001');
+    expect(page1.data.data.employees[24].employeeCode).toContain('-0025');
+
+    // 2. Fetch page 2 and confirm correct offset boundaries (STK-YYYY-0026 to STK-YYYY-0050)
+    const page2 = await client.get('/v1/employees?page=2&pageSize=25', {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(page2.status).toBe(200);
+    expect(page2.data.data.employees.length).toBe(25);
+    expect(page2.data.data.employees[0].employeeCode).toContain('-0026');
+    expect(page2.data.data.employees[24].employeeCode).toContain('-0050');
+
+    // 3. Search filter by Employee ID
+    const searchId = await client.get('/v1/employees?search=0007', {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(searchId.status).toBe(200);
+    expect(searchId.data.data.employees.length).toBe(1);
+    expect(searchId.data.data.employees[0].employeeCode).toContain('-0007');
+
+    // 4. Filter by Location
+    const filterLoc = await client.get('/v1/employees?location=Bengaluru&pageSize=250', {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(filterLoc.status).toBe(200);
+    expect(filterLoc.data.data.employees.every((e: any) => e.location === 'Bengaluru')).toBe(true);
+
+    // 5. Multi-criteria filtering (Location, Status, Department)
+    const multiFilter = await client.get('/v1/employees?location=Bengaluru&status=ACTIVE&department=Engineering&pageSize=250', {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(multiFilter.status).toBe(200);
+    expect(multiFilter.data.data.employees.every((e: any) => e.location === 'Bengaluru' && e.status.toUpperCase() === 'ACTIVE' && e.department === 'Engineering')).toBe(true);
+
+    // 6. Filter by Joining Year
+    const yearFilter = await client.get('/v1/employees?joiningYear=2021&pageSize=250', {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(yearFilter.status).toBe(200);
+    expect(yearFilter.data.data.employees.every((e: any) => e.joinDate.startsWith('2021-'))).toBe(true);
+  });
+
+  describe('Database Schema, FK, and Seeding integrity', () => {
+    it('should verify schema constraints and table existences', async () => {
+      return new Promise<void>((resolve, reject) => {
+        db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, tables) => {
+          if (err) return reject(err);
+          const tableNames = tables.map((t: any) => t.name);
+          expect(tableNames).toContain('users');
+          expect(tableNames).toContain('employees');
+          expect(tableNames).toContain('mfa_challenges');
+          expect(tableNames).toContain('sessions');
+          expect(tableNames).toContain('refresh_tokens');
+          resolve();
+        });
+      });
+    });
+
+    it('should verify seeder loaded the deterministic admin and employee structures', async () => {
+      return new Promise<void>((resolve, reject) => {
+        db.get("SELECT count(*) as count FROM users", [], (err, row: any) => {
+          if (err) return reject(err);
+          expect(row.count).toBeGreaterThanOrEqual(5); // Admin, HR, Manager, Lead, Employee
+          resolve();
+        });
+      });
+    });
+
+    it('should enforce Foreign Key constraint checks', async () => {
+      return new Promise<void>((resolve, reject) => {
+        db.run("PRAGMA foreign_keys = ON", [], (err) => {
+          if (err) return reject(err);
+          db.run(
+            "INSERT INTO employees (id, name, email, department, designation, status, location, joinDate, organizationId) VALUES ('bad-emp', 'Jane', 'j@c.com', 'D', 'Designation', 'ACTIVE', 'Loc', '2026-08-01', 'invalid-org')",
+            [],
+            function (insertErr) {
+              expect(insertErr).toBeDefined();
+              expect(insertErr?.message).toMatch(/FOREIGN KEY constraint failed/);
+              resolve();
+            }
+          );
+        });
+      });
+    });
   });
 });

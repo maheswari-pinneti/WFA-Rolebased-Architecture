@@ -27,10 +27,10 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="glass-panel overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-800/40 text-slate-400 border-b border-slate-800 text-xs font-bold uppercase tracking-wider">
+    <div className="w-full max-w-full overflow-hidden">
+      <div className="w-full overflow-x-auto max-h-[65vh] overflow-y-auto">
+        <table className="w-full min-w-[1200px] text-left text-sm">
+          <thead className="bg-slate-800/40 text-slate-400 border-b border-slate-800 text-xs font-bold uppercase tracking-wider whitespace-nowrap">
             <tr>
               {columns.map((col, idx) => (
                 <th key={col.key || col.accessorKey || idx} className="py-3.5 px-4">
@@ -55,7 +55,7 @@ export function DataTable<T>({
                   }
 
                   return (
-                    <td key={col.key || col.accessorKey || idx} className="py-3.5 px-4 text-slate-200">
+                    <td key={col.key || col.accessorKey || idx} className="py-3.5 px-4 text-slate-200 whitespace-nowrap">
                       {rendered}
                     </td>
                   );

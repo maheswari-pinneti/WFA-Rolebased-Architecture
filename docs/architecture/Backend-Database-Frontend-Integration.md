@@ -60,7 +60,7 @@ erDiagram
     users {
         text id PK
         text name
-        text email UNIQUE
+        text email "UNIQUE"
         text password_hash
         text role
         text department
@@ -84,7 +84,7 @@ erDiagram
         real latitude
         real longitude
         real accuracy
-        text idempotencyKey UNIQUE
+        text idempotencyKey "UNIQUE"
     }
     breaks {
         text id PK

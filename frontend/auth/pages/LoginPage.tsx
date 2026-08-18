@@ -62,18 +62,21 @@ const ROLE_DETAILS = {
 };
 
 export const LoginPage: React.FC = () => {
-  const { login, verifyMfa, isAuthenticated, role } = useAuth();
+  const { login, verifyMfa, resendMfa, isAuthenticated, role } = useAuth();
   const navigate = useNavigate();
 
   // Active form tab: 'login' | 'otp' | 'signup'
-  const [activeTab, setActiveTab] = useState<'login' | 'otp' | 'signup'>('login');
+  const [activeTab, setActiveTab] = useState<'login' | 'otp' | 'signup'>(() => {
+    const savedTab = sessionStorage.getItem('login_active_tab');
+    return (savedTab === 'otp' || savedTab === 'signup') ? savedTab : 'login';
+  });
   
   // Selected role config
   const [selectedRole, setSelectedRole] = useState<'admin' | 'hr' | 'manager' | 'lead' | 'employee'>('admin');
 
   // Forms states
   const [email, setEmail] = useState('admin@thestackly.com');
-  const [password, setPassword] = useState('••••••••');
+  const [password, setPassword] = useState('StacklyWFA2026!');
   const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [employeeId, setEmployeeId] = useState('');
@@ -81,9 +84,14 @@ export const LoginPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  // OTP inputs
-  const [otpValues, setOtpValues] = useState<string[]>(['8', '4', '9', '2', '0', '1']);
-  const [tempToken, setTempToken] = useState<string | null>(null);
+  // OTP inputs & session states
+  const [otpValues, setOtpValues] = useState<string[]>(() => {
+    const hint = sessionStorage.getItem('mfa_otp_dev_hint');
+    return hint ? hint.split('') : ['', '', '', '', '', ''];
+  });
+  const [challengeId, setChallengeId] = useState<string | null>(() => sessionStorage.getItem('mfa_challenge_id'));
+  const [expiresAt, setExpiresAt] = useState<string | null>(() => sessionStorage.getItem('mfa_expires_at'));
+  const [timer, setTimer] = useState(0);
 
   const otpRefs = [
     useRef<HTMLInputElement>(null),
@@ -94,7 +102,6 @@ export const LoginPage: React.FC = () => {
     useRef<HTMLInputElement>(null)
   ];
 
-  const [timer, setTimer] = useState(45);
   const [rememberDevice, setRememberDevice] = useState(true);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -102,34 +109,81 @@ export const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      sessionStorage.removeItem('mfa_challenge_id');
+      sessionStorage.removeItem('mfa_expires_at');
+      sessionStorage.removeItem('mfa_otp_dev_hint');
+      sessionStorage.removeItem('login_active_tab');
       const homePath = ROLE_HOME_PATHS[role] || '/admin/dashboard';
       navigate(homePath);
     }
   }, [isAuthenticated, role, navigate]);
 
   useEffect(() => {
-    let interval: any = null;
-    if (timer > 0) {
-      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
+    if (challengeId) {
+      sessionStorage.setItem('mfa_challenge_id', challengeId);
+    } else {
+      sessionStorage.removeItem('mfa_challenge_id');
     }
+  }, [challengeId]);
+
+  useEffect(() => {
+    sessionStorage.setItem('login_active_tab', activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (expiresAt) {
+      sessionStorage.setItem('mfa_expires_at', expiresAt);
+    } else {
+      sessionStorage.removeItem('mfa_expires_at');
+    }
+  }, [expiresAt]);
+
+  useEffect(() => {
+    if (!expiresAt) {
+      setTimer(0);
+      return;
+    }
+    const updateTimer = () => {
+      const remaining = Math.max(0, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000));
+      setTimer(remaining);
+    };
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [timer]);
+  }, [expiresAt]);
+
+  useEffect(() => {
+    if (expiresAt && timer === 0) {
+      setError('OTP expired. Please request a new OTP.');
+      setOtpValues(['', '', '', '', '', '']);
+    }
+  }, [expiresAt, timer]);
 
   const handleRoleSelect = (roleKey: 'admin' | 'hr' | 'manager' | 'lead' | 'employee') => {
     setSelectedRole(roleKey);
     setEmail(ROLE_DETAILS[roleKey].email);
+    setPassword('StacklyWFA2026!');
     setError('');
   };
 
   const handleOtpChange = (index: number, value: string) => {
-    if (isNaN(Number(value))) return;
+    const digit = value.replace(/\D/g, '');
+    if (!digit && value !== '') return;
     const newOtp = [...otpValues];
-    newOtp[index] = value.substring(value.length - 1);
+    newOtp[index] = digit.substring(digit.length - 1);
     setOtpValues(newOtp);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (digit && index < 5) {
       otpRefs[index + 1].current?.focus();
+    }
+
+    // Auto-submit when exactly 6 digits entered
+    const currentCode = [...newOtp];
+    currentCode[index] = digit.substring(digit.length - 1);
+    const codeStr = currentCode.join('');
+    if (codeStr.length === 6 && !codeStr.includes('')) {
+      verifyMfaAction(codeStr);
     }
   };
 
@@ -139,26 +193,38 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleSendCode = async () => {
-    setError('');
-    setSuccessMsg('');
-    const emailDomain = email.trim().toLowerCase();
-    if (!emailDomain.endsWith('@thestackly.com') && !emailDomain.endsWith('@company.com')) {
-      setError('Only official @thestackly.com or @company.com company email addresses are permitted.');
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text').trim().replace(/\D/g, '').slice(0, 6);
+    if (text.length === 6) {
+      const newOtp = text.split('');
+      setOtpValues(newOtp);
+      otpRefs[5].current?.focus();
+      verifyMfaAction(text);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!challengeId) {
+      setError('MFA session expired or invalid. Please request a new code.');
       return;
     }
+    setError('');
+    setSuccessMsg('');
     setIsLoading(true);
     try {
-      const res = (await authService.login(email.trim())) as any;
-      if (res.requiresMfa) {
-        setTempToken(res.tempToken);
-        if (res.otpDevHint) {
-          const otpStr = res.otpDevHint.toString();
-          setOtpValues(otpStr.split(''));
-        }
-        setTimer(45);
-        setSuccessMsg('MFA verification code has been resent.');
+      const res = await resendMfa(challengeId);
+      setChallengeId(res.challengeId);
+      setExpiresAt(res.expiresAt);
+      setOtpValues(['', '', '', '', '', '']);
+      if (res.otpDevHint) {
+        const otpStr = res.otpDevHint.toString();
+        setOtpValues(otpStr.split(''));
+        sessionStorage.setItem('mfa_otp_dev_hint', otpStr);
+      } else {
+        sessionStorage.removeItem('mfa_otp_dev_hint');
       }
+      setSuccessMsg('MFA verification code has been resent.');
     } catch (err: any) {
       setError(err.message || 'Failed to resend code.');
     } finally {
@@ -179,18 +245,22 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = (await authService.login(email.trim())) as any;
+      const res = (await authService.login(email.trim(), password)) as any;
       if (res.requiresMfa) {
-        setTempToken(res.tempToken);
+        setChallengeId(res.challengeId);
+        setExpiresAt(res.expiresAt);
+        setOtpValues(['', '', '', '', '', '']);
         if (res.otpDevHint) {
           const otpStr = res.otpDevHint.toString();
           setOtpValues(otpStr.split(''));
+          sessionStorage.setItem('mfa_otp_dev_hint', otpStr);
+        } else {
+          sessionStorage.removeItem('mfa_otp_dev_hint');
         }
         setActiveTab('otp');
-        setTimer(45);
         setSuccessMsg('OTP Code has been generated.');
       } else {
-        await login(email);
+        await login(email, password);
       }
     } catch (err: any) {
       setError(err.message || 'Login failed.');
@@ -199,30 +269,33 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleOtpLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const verifyMfaAction = async (otpCode: string) => {
+    if (!challengeId) {
+      setError('MFA session expired or invalid. Please request a new code.');
+      return;
+    }
     setError('');
     setSuccessMsg('');
+    setIsLoading(true);
+    try {
+      await verifyMfa(challengeId, otpCode);
+    } catch (err: any) {
+      setError(err.message || 'Verification failed. Please try again.');
+      setOtpValues(['', '', '', '', '', '']);
+      sessionStorage.removeItem('mfa_otp_dev_hint');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  const handleOtpLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     const otpCode = otpValues.join('');
     if (otpCode.length !== 6) {
       setError('Please enter the full 6-digit verification code.');
       return;
     }
-
-    if (!tempToken) {
-      setError('MFA session expired or invalid. Please request a new code.');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await verifyMfa(tempToken, otpCode);
-    } catch (err: any) {
-      setError(err.message || 'Verification failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    await verifyMfaAction(otpCode);
   };
 
   const handleSignUpSubmit = (e: React.FormEvent) => {
@@ -467,11 +540,11 @@ export const LoginPage: React.FC = () => {
                     </div>
                     <button
                       type="button"
-                      onClick={handleSendCode}
-                      disabled={timer > 0}
+                      onClick={handleResendOtp}
+                      disabled={timer > 0 || isLoading}
                       className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 border-none cursor-pointer"
                     >
-                      {timer > 0 ? `Resend (${timer}s)` : 'Send OTP'}
+                      {timer > 0 ? `Resend (${timer}s)` : 'Resend'}
                     </button>
                   </div>
                 </div>
@@ -491,9 +564,11 @@ export const LoginPage: React.FC = () => {
                         required
                         maxLength={1}
                         value={val}
+                        disabled={timer === 0 || isLoading}
                         onChange={(e) => handleOtpChange(idx, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                        className="w-12 h-12 rounded-xl text-center text-sm font-black font-mono bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-inner"
+                        onPaste={handleOtpPaste}
+                        className="w-12 h-12 rounded-xl text-center text-sm font-black font-mono bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-inner disabled:opacity-50"
                       />
                     ))}
                   </div>
@@ -502,8 +577,9 @@ export const LoginPage: React.FC = () => {
                 <div className="flex items-center justify-between text-xs pt-1">
                   <button
                     type="button"
-                    onClick={handleSendCode}
-                    className="text-blue-500 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer"
+                    onClick={handleResendOtp}
+                    disabled={timer > 0 || isLoading}
+                    className="text-blue-500 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer disabled:opacity-50 disabled:no-underline"
                   >
                     Resend OTP code
                   </button>
@@ -514,9 +590,9 @@ export const LoginPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || timer === 0}
                   style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', color: '#ffffff' }}
-                  className="w-full py-3 rounded-xl hover:scale-[1.01] font-extrabold text-xs shadow-lg shadow-blue-500/20 transition-all border-none cursor-pointer flex items-center justify-center gap-2 pt-2"
+                  className="w-full py-3 rounded-xl hover:scale-[1.01] font-extrabold text-xs shadow-lg shadow-blue-500/20 transition-all border-none cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:scale-100"
                 >
                   {isLoading ? 'Verifying...' : 'Sign In with OTP'}
                   <ArrowRight size={14} />

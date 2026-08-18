@@ -112,7 +112,7 @@ export const getTeams = (req, res) => {
 export const getTeamMembers = (req, res) => {
   const { id } = req.params; // 'id' maps to team name in this flat structure
   db.all(
-    'SELECT * FROM employees WHERE team = ? AND organizationId = ? ORDER BY name',
+    'SELECT * FROM employees WHERE team = ? AND organizationId = ? ORDER BY CAST(SUBSTR(employeeCode, -4) AS INTEGER) ASC',
     [id, organizationId(req)],
     (err, rows) => {
       if (err) return res.status(500).json({ success: false, message: err.message });
