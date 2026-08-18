@@ -1,10 +1,14 @@
-process.env.DB_NAME = 'wfa-test-e2e.db';
+process.env.MONGODB_DB_NAME = 'workforce-test-e2e';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import axios from 'axios';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import { app } from '../../server.js';
-import db, { initDb } from '../../db.js';
+import { initDb } from '../../backend/src/config/db.js';
+import { Attendance, Correction } from '../../backend/src/models/Attendance.js';
 
 let server: any;
+let mongod: MongoMemoryServer;
 const PORT = 5098;
 const client = axios.create({
   baseURL: `http://localhost:${PORT}`,
@@ -12,15 +16,13 @@ const client = axios.create({
 });
 
 beforeAll(async () => {
+  mongod = await MongoMemoryServer.create();
+  process.env.MONGODB_URI = mongod.getUri();
+  
   await initDb();
-  await new Promise((resolve) => {
-    db.run("DELETE FROM attendance_records", () => {
-      db.run("DELETE FROM corrections", () => {
-        resolve();
-      });
-    });
-  });
-  return new Promise((resolve) => {
+  await Attendance.deleteMany({});
+  await Correction.deleteMany({});
+  return new Promise<void>((resolve) => {
     server = app.listen(PORT, () => {
       resolve();
     });
@@ -28,10 +30,18 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  return new Promise((resolve) => {
-    server.close(() => {
+  await mongoose.disconnect();
+  if (mongod) {
+    await mongod.stop();
+  }
+  return new Promise<void>((resolve) => {
+    if (server) {
+      server.close(() => {
+        resolve();
+      });
+    } else {
       resolve();
-    });
+    }
   });
 });
 

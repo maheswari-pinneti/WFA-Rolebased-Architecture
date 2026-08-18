@@ -1,49 +1,60 @@
-import db, { logAudit } from '../config/db.js';
+import { Employee } from '../models/Employee.js';
+import { Organization } from '../models/Department.js';
 
-const organizationId = (req) => req.user.organizationId || 'org-stackly';
+const getOrganizationId = (req) => req.user.organizationId || 'org-stackly';
 
 /**
  * GET /api/departments
- * Lists unique departments based on loaded employee assignments.
  */
-export const getDepartments = (req, res) => {
-  db.all(
-    'SELECT DISTINCT department AS name FROM employees WHERE organizationId = ? AND department IS NOT NULL ORDER BY department',
-    [organizationId(req)],
-    (err, rows) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({ success: true, data: rows });
-    }
-  );
+export const getDepartments = async (req, res) => {
+  try {
+    const orgId = getOrganizationId(req);
+    const depts = await Employee.distinct('department', { organizationId: orgId, department: { $ne: null, $ne: '' } });
+    const formatted = depts.sort().map(d => ({ name: d }));
+    return res.json({ success: true, data: formatted });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/**
+ * GET /api/locations
+ */
+export const getLocations = async (req, res) => {
+  try {
+    const orgId = getOrganizationId(req);
+    const locs = await Employee.distinct('location', { organizationId: orgId, location: { $ne: null, $ne: '' } });
+    const formatted = locs.sort().map(l => ({ name: l }));
+    return res.json({ success: true, data: formatted });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 /**
  * GET /api/organizations
- * Retrieves top-level organization scope details.
  */
-export const getOrganizations = (req, res) => {
-  const currentOrg = organizationId(req);
-  db.get(
-    'SELECT * FROM employees WHERE organizationId = ? LIMIT 1',
-    [currentOrg],
-    (err, row) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({
-        success: true,
-        data: [{
-          id: currentOrg,
-          name: 'Stackly Enterprise HQ',
-          domain: 'thestackly.com',
-          status: 'ACTIVE'
-        }]
-      });
-    }
-  );
+export const getOrganizations = async (req, res) => {
+  try {
+    const currentOrg = getOrganizationId(req);
+    const org = await Organization.findOne({ id: currentOrg });
+    const data = org ? [org] : [{
+      id: currentOrg,
+      name: 'Stackly Enterprise HQ',
+      domain: 'thestackly.com',
+      status: 'ACTIVE'
+    }];
+    return res.json({
+      success: true,
+      data
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 /**
  * GET /api/roles
- * Lists available user roles in the system.
  */
 export const getRoles = (req, res) => {
   return res.json({
@@ -60,7 +71,6 @@ export const getRoles = (req, res) => {
 
 /**
  * GET /api/permissions
- * Lists system permission definitions.
  */
 export const getPermissions = (req, res) => {
   return res.json({

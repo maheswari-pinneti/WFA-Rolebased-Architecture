@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import apiRouter from './routes/api.routes.js';
 import { initDb } from './config/db.js';
 import { configureResilience, globalRateLimiter } from './middleware/resilience.js';
 import logger from './config/logger.js';
-import { db } from './database/connection.js';
 
 const app = express();
 
@@ -38,20 +38,19 @@ configureResilience(app);
 // Apply Global Rate Limiting
 app.use(globalRateLimiter);
 
-// Liveness Health Check (checks if Node process is running)
+// Liveness Health Check
 app.get('/live', (req, res) => {
   res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
 });
 
-// Readiness Health Check (checks if SQLite connection is usable)
+// Readiness Health Check (checks if MongoDB connection is active)
 app.get('/ready', (req, res) => {
-  db.get('PRAGMA integrity_check;', (err, row) => {
-    if (err || !row || row.integrity_check !== 'ok') {
-      logger.error('health.readiness.failed', 'Database is not ready or integrity check failed', { error: err?.message || 'integrity check not ok' });
-      return res.status(503).json({ status: 'DOWN', reason: 'Database connection failed' });
-    }
+  if (mongoose.connection && mongoose.connection.readyState === 1) {
     res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
-  });
+  } else {
+    logger.error('health.readiness.failed', 'Database connection not ready.');
+    res.status(503).json({ status: 'DOWN', reason: 'Database connection failed' });
+  }
 });
 
 // Generic Health Check
@@ -59,17 +58,18 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
 });
 
-// Register API v1 Router
+// Register routers
 app.use('/v1', apiRouter);
+app.use('/api', apiRouter);
 
 // Database initialization
-let isDbInitialized = false;
-initDb().then(() => {
-  isDbInitialized = true;
-  logger.info('database.initialization', 'Database initialized successfully.');
-}).catch((err) => {
-  logger.error('database.initialization.failed', 'Failed to initialize database', { error: err.message });
-});
+if (process.env.NODE_ENV !== 'test') {
+  initDb().then(() => {
+    logger.info('database.initialization', 'Database initialized successfully.');
+  }).catch((err) => {
+    logger.error('database.initialization.failed', 'Failed to initialize database', { error: err.message });
+  });
+}
 
 // Global Error Handler
 app.use((err, req, res, next) => {

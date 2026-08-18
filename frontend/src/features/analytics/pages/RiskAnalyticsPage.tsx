@@ -4,20 +4,51 @@ import { Role } from '../../../security/roles/roles';
 import { MinimalKpiCard } from '../../../components/ui/MinimalKpiCard';
 import { AnalyticsDonutChart } from '../../../components/charts/AnalyticsCharts';
 import { AlertTriangle, Users, HeartCrack, Activity } from 'lucide-react';
+import { useAnalytics } from '../../../hooks/useAnalytics';
+import { useEmployees } from '../../../hooks/useEmployees';
 
 export const RiskAnalyticsPage: React.FC = () => {
-  const mockRiskDistribution = [
-    { name: 'High Risk', value: 8 },
-    { name: 'Medium Risk', value: 24 },
-    { name: 'Low Risk', value: 120 }
-  ];
+  const { data: analytics, isLoading: analyticsLoading } = useAnalytics();
+  const { employees, isLoading: employeesLoading } = useEmployees({ pageSize: 150 });
 
-  const mockRiskRoster = [
-    { name: 'Charlie Green', department: 'Product Design', riskFactor: 'High', reason: 'High overtime hours & low sprint activity', rating: 9.2 },
-    { name: 'David Miller', department: 'Core Engineering', riskFactor: 'High', reason: 'Repeated late clock-ins & consecutive absences', rating: 8.8 },
-    { name: 'Eva Long', department: 'Customer Success', riskFactor: 'Medium', reason: 'Decreased performance score trend', rating: 7.1 },
-    { name: 'Frank Wright', department: 'Enterprise Sales', riskFactor: 'Medium', reason: 'Unused paid leave balance > 30 days', rating: 6.5 }
-  ];
+  if (analyticsLoading || employeesLoading) {
+    return <div className="text-sm text-[var(--text-muted)] p-6">Loading risk analytics...</div>;
+  }
+
+  const riskDistribution = analytics?.riskDistribution || [];
+  const highRiskCount = riskDistribution.find(r => r.name === 'High Risk')?.value || 0;
+  const mediumRiskCount = riskDistribution.find(r => r.name === 'Medium Risk')?.value || 0;
+  const lowRiskCount = riskDistribution.find(r => r.name === 'Low Risk')?.value || 0;
+
+  const riskRoster = (employees || [])
+    .map(emp => {
+      let riskFactor = 'Low';
+      let rating = 3.0;
+      let reason = 'Normal fatigue metrics';
+      const performance = emp.performanceScore || 0;
+      const attendance = emp.attendanceRate || 0;
+
+      if (performance < 75 || attendance < 85) {
+        riskFactor = 'High';
+        rating = 8.5 + (100 - performance - attendance) / 40;
+        reason = performance < 75 ? 'Low Performance Score' : 'Low Attendance Rate';
+      } else if (performance < 85 || attendance < 95) {
+        riskFactor = 'Medium';
+        rating = 6.0 + (100 - performance - attendance) / 40;
+        reason = 'Overtime fatigue & attendance drop';
+      }
+
+      return {
+        name: emp.name,
+        department: emp.department,
+        riskFactor,
+        reason,
+        rating: Number(Math.min(10, rating).toFixed(1))
+      };
+    })
+    .filter(emp => emp.riskFactor !== 'Low')
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 10);
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER]}>
@@ -37,10 +68,10 @@ export const RiskAnalyticsPage: React.FC = () => {
 
         {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <MinimalKpiCard title="High Risk Staff" value="8 Employees" icon={<AlertTriangle size={26} />} iconBgColor="rose" trend="Action required" trendType="negative" />
-          <MinimalKpiCard title="Medium Risk Staff" value="24 Employees" icon={<HeartCrack size={26} />} iconBgColor="amber" trend="Monitor closely" trendType={undefined} />
-          <MinimalKpiCard title="Burnout Safety Rate" value="94.2%" icon={<Users size={26} />} iconBgColor="emerald" trend="Optimal workload limit" trendType="positive" />
-          <MinimalKpiCard title="Attrition Alert Level" value="Low" icon={<Activity size={26} />} iconBgColor="blue" trend="Stable workforce" trendType="positive" />
+          <MinimalKpiCard title="High Risk Staff" value={`${highRiskCount} Employees`} icon={<AlertTriangle size={26} />} iconBgColor="rose" trend="Action required" trendType="negative" />
+          <MinimalKpiCard title="Medium Risk Staff" value={`${mediumRiskCount} Employees`} icon={<HeartCrack size={26} />} iconBgColor="amber" trend="Monitor closely" trendType={undefined} />
+          <MinimalKpiCard title="Low Attrition Risk Staff" value={`${lowRiskCount} Employees`} icon={<Users size={26} />} iconBgColor="emerald" trend="Optimal workload limit" trendType="positive" />
+          <MinimalKpiCard title="Overall Alert Level" value={highRiskCount > 5 ? 'High' : 'Low'} icon={<Activity size={26} />} iconBgColor="blue" trend="Based on active database" trendType="positive" />
         </div>
 
         {/* Charts */}
@@ -48,7 +79,7 @@ export const RiskAnalyticsPage: React.FC = () => {
           <AnalyticsDonutChart
             title="Retention Risk Distribution"
             subtitle="Overall employee headcount by risk category"
-            data={mockRiskDistribution}
+            data={riskDistribution}
             colors={['#ef4444', '#f59e0b', '#10b981']}
           />
         </div>
@@ -68,7 +99,11 @@ export const RiskAnalyticsPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {mockRiskRoster.map((item, idx) => (
+                {riskRoster.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-3 text-center text-slate-400">No active risk flags detected in database.</td>
+                  </tr>
+                ) : riskRoster.map((item, idx) => (
                   <tr key={idx} className="border-b border-[var(--border-subtle)] hover:bg-[var(--bg-tertiary)] transition-colors">
                     <td className="p-3 font-semibold text-[var(--text-primary)]">{item.name}</td>
                     <td className="p-3 text-slate-300">{item.department}</td>

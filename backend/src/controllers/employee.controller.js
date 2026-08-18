@@ -1,122 +1,161 @@
-import db, { logAudit } from '../config/db.js';
+import { employeeService } from '../services/employee.service.js';
+import { logAudit } from '../config/db.js';
 
-const organizationId = (req) => req.user.organizationId || 'org-stackly';
+const getOrganizationId = (req) => req.user.organizationId || 'org-stackly';
 
-/**
- * GET /api/employees/:id
- * Retrieve details for a single employee record by ID.
- */
-export const getEmployeeById = (req, res) => {
-  const { id } = req.params;
-  db.get(
-    'SELECT * FROM employees WHERE id = ? AND organizationId = ?',
-    [id, organizationId(req)],
-    (err, row) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      if (!row) return res.status(404).json({ success: false, message: 'Employee not found.' });
-      return res.json({ success: true, data: row });
-    }
-  );
-};
-
-/**
- * POST /api/employees
- * Creates/Onboards a new employee in the SQLite database.
- */
-export const createEmployee = (req, res) => {
-  const { id, employeeCode, name, email, role, department, designation, status, avatar, joinDate, performanceScore, attendanceRate, team } = req.body || {};
-  if (!id || !name || !email || !department) {
-    return res.status(400).json({ success: false, message: 'Required fields: id, name, email, department.' });
+export const getEmployees = async (req, res) => {
+  try {
+    const data = await employeeService.getEmployees(req.user, req.query);
+    return res.json({ success: true, data });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
-
-  const orgId = organizationId(req);
-  const code = employeeCode || `STK-${new Date().getFullYear()}-${name.substring(0, 2).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
-
-  db.run(
-    `INSERT INTO employees (id, employeeCode, name, email, role, department, designation, status, avatar, joinDate, performanceScore, attendanceRate, team, organizationId)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, code, name, email, role || 'EMPLOYEE', department, designation || 'Specialist', status || 'ACTIVE', avatar || null, joinDate || new Date().toISOString().split('T')[0], performanceScore || 90, attendanceRate || 95, team || 'Frontend Team', orgId],
-    function onCreate(err) {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      logAudit(req.user.id, 'EMPLOYEE_CREATE', `Created employee profile for ${name} (${id})`, orgId);
-      return res.status(201).json({ success: true, data: { id, employeeCode: code, name, email, role, department, designation, status, team } });
-    }
-  );
 };
 
-/**
- * PUT /api/employees/:id
- * Updates an employee's details.
- */
-export const updateEmployee = (req, res) => {
-  const { id } = req.params;
-  const { name, email, role, department, designation, status, team } = req.body || {};
-
-  db.run(
-    `UPDATE employees 
-     SET name = COALESCE(?, name), email = COALESCE(?, email), role = COALESCE(?, role), 
-         department = COALESCE(?, department), designation = COALESCE(?, designation), 
-         status = COALESCE(?, status), team = COALESCE(?, team)
-     WHERE id = ? AND organizationId = ?`,
-    [name, email, role, department, designation, status, team, id, organizationId(req)],
-    function onUpdate(err) {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      if (!this.changes) return res.status(404).json({ success: false, message: 'Employee not found.' });
-
-      db.get('SELECT * FROM employees WHERE id = ? AND organizationId = ?', [id, organizationId(req)], (getErr, row) => {
-        if (getErr) return res.status(500).json({ success: false, message: getErr.message });
-        logAudit(req.user.id, 'EMPLOYEE_UPDATE', `Updated employee profile: ${id}`, organizationId(req));
-        return res.json({ success: true, data: row });
-      });
+export const getEmployeeById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const employee = await employeeService.getEmployeeById(id, getOrganizationId(req));
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
     }
-  );
+    return res.json({ success: true, data: employee });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
-/**
- * DELETE /api/employees/:id
- * Removes/Deactivates an employee from the roster.
- */
-export const deleteEmployee = (req, res) => {
-  const { id } = req.params;
-  db.run(
-    "UPDATE employees SET status = 'TERMINATED' WHERE id = ? AND organizationId = ?",
-    [id, organizationId(req)],
-    function onDelete(err) {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      if (!this.changes) return res.status(404).json({ success: false, message: 'Employee not found.' });
-      logAudit(req.user.id, 'EMPLOYEE_DELETE', `Soft deleted/terminated employee: ${id}`, organizationId(req));
-      return res.json({ success: true, message: 'Employee successfully terminated.' });
+export const createEmployee = async (req, res) => {
+  try {
+    const body = req.body || {};
+    const { id, name, email, department } = body;
+    if (!id || !name || !email || !department) {
+      return res.status(400).json({ success: false, message: 'Required fields: id, name, email, department.' });
     }
-  );
+
+    const orgId = getOrganizationId(req);
+    const newEmp = await employeeService.createEmployee({
+      ...body,
+      organizationId: orgId
+    });
+
+    logAudit(req.user.id, 'EMPLOYEE_CREATE', `Created employee profile for ${name} (${id})`, orgId);
+    return res.status(201).json({ success: true, data: newEmp });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
-/**
- * GET /api/teams
- * Lists all active teams mapped to the organization/department.
- */
-export const getTeams = (req, res) => {
-  db.all(
-    'SELECT DISTINCT team AS name, department FROM employees WHERE organizationId = ? AND team IS NOT NULL ORDER BY team',
-    [organizationId(req)],
-    (err, rows) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({ success: true, data: rows });
+export const updateEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orgId = getOrganizationId(req);
+
+    const updatedEmp = await employeeService.updateEmployee(id, orgId, req.body);
+    if (!updatedEmp) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
     }
-  );
+
+    logAudit(req.user.id, 'EMPLOYEE_UPDATE', `Updated employee profile: ${id}`, orgId);
+    return res.json({ success: true, data: updatedEmp });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
-/**
- * GET /api/teams/:id/members
- * Retrieves list of employee members in a specific team.
- */
-export const getTeamMembers = (req, res) => {
-  const { id } = req.params; // 'id' maps to team name in this flat structure
-  db.all(
-    'SELECT * FROM employees WHERE team = ? AND organizationId = ? ORDER BY CAST(SUBSTR(employeeCode, -4) AS INTEGER) ASC',
-    [id, organizationId(req)],
-    (err, rows) => {
-      if (err) return res.status(500).json({ success: false, message: err.message });
-      return res.json({ success: true, data: rows });
+export const updateEmployeeStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!['ACTIVE', 'PRESENT', 'REMOTE', 'ON_LEAVE', 'OFFLINE', 'TERMINATED'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid employee status.' });
     }
-  );
+
+    const orgId = getOrganizationId(req);
+    const updated = await employeeService.updateEmployeeStatus(id, orgId, status);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
+    }
+
+    return res.json({ success: true, data: updated });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orgId = getOrganizationId(req);
+
+    const updated = await employeeService.deleteEmployee(id, orgId);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
+    }
+
+    logAudit(req.user.id, 'EMPLOYEE_DELETE', `Soft deleted/terminated employee: ${id}`, orgId);
+    return res.json({ success: true, message: 'Employee successfully terminated.' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getTeams = async (req, res) => {
+  try {
+    const teams = await employeeService.getTeams(getOrganizationId(req));
+    return res.json({ success: true, data: teams });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getTeamMembers = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const members = await employeeService.getTeamMembers(id, getOrganizationId(req));
+    return res.json({ success: true, data: members });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getUsers = async (req, res) => {
+  try {
+    const users = await employeeService.getUsers(getOrganizationId(req));
+    return res.json({ success: true, data: users });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const updateUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+    if (!['ADMIN', 'HR', 'MANAGER', 'TEAM_LEAD', 'EMPLOYEE'].includes(role)) {
+      return res.status(400).json({ success: false, message: 'Invalid role.' });
+    }
+
+    const updated = await employeeService.updateUserRole(userId, role, getOrganizationId(req));
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    return res.json({ success: true, data: updated });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const deleted = await employeeService.deleteUser(userId, getOrganizationId(req));
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };

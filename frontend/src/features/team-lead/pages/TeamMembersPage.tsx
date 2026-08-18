@@ -1,36 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { employeeApi } from '../../../api/endpoints/employee.api';
-import { workforceApi, Task } from '../../../api/endpoints/workforce.api';
+import React from 'react';
+import { useEmployees } from '../../../hooks/useEmployees';
+import { useQuery } from '@tanstack/react-query';
+import { workforceApi } from '../../../api/endpoints/workforce.api';
 import { Employee } from '../../../shared/types/common.types';
 
-import mockEmployees from '../../../mocks/data/employees.json';
-
 export const TeamMembersPage: React.FC = () => {
-  const [members, setMembers] = useState<Array<{ name: string; role: string; status: string; task: string; velocity: string; avatar?: string }>>([]);
-  useEffect(() => {
-    Promise.all([employeeApi.getEmployees(), workforceApi.getTasks()]).then(([employees, tasks]) => {
-      if (!employees || (employees as Employee[]).length === 0) throw new Error('Empty employees');
-      setMembers((employees as Employee[]).map((employee) => ({
-        name: employee.name,
-        role: employee.designation || employee.role,
-        status: employee.status,
-        task: (tasks as Task[]).find((task) => task.assigneeId === employee.id)?.title || 'No active task',
-        velocity: `${Math.round(employee.performanceScore || 0)}%`,
-        avatar: employee.avatar
-      })));
-    }).catch(() => {
-      // Fallback to local mock employees
-      const rawList = Array.isArray(mockEmployees) ? mockEmployees : ((mockEmployees as any).default || []);
-      setMembers(rawList.map((employee: any) => ({
-        name: employee.name,
-        role: employee.designation || employee.role,
-        status: employee.status,
-        task: 'Active Sprint Assignment',
-        velocity: `${Math.round(employee.performanceScore || 0)}%`,
-        avatar: employee.avatar
-      })));
-    });
-  }, []);
+  const { employees, isLoading: employeesLoading } = useEmployees();
+
+  const { data: tasks, isLoading: tasksLoading } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: () => workforceApi.getTasks(),
+  });
+
+  const isLoading = employeesLoading || tasksLoading;
+
+  if (isLoading) {
+    return <div className="text-sm text-[var(--text-muted)]">Loading team members...</div>;
+  }
+
+  const members = employees.map((employee: Employee) => ({
+    name: employee.name,
+    role: employee.designation || employee.role,
+    status: employee.status,
+    task: (tasks || []).find((task: any) => task.assigneeId === employee.id)?.title || 'No active task',
+    velocity: `${Math.round(employee.performanceScore || 0)}%`,
+    avatar: employee.avatar
+  }));
 
   return (
     <div className="space-y-6 animate-fadeIn">

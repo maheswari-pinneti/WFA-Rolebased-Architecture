@@ -1,12 +1,9 @@
-import jwt from 'jsonwebtoken';
-import db from '../database/connection.js';
+import mongoose from 'mongoose';
 import { logAudit } from '../config/db.js';
-import * as mfaService from '../services/mfa.service.js';
+import * as authService from '../services/auth.service.js';
+import { userRepository } from '../repositories/user.repository.js';
 import bcrypt from 'bcryptjs';
-import { env } from '../config/env.js';
-import * as sessionService from '../services/session.service.js';
 
-const JWT_SECRET = env.JWT_SECRET;
 const ORGANIZATION_ID = 'org-stackly';
 
 const toUser = (user) => ({
@@ -24,7 +21,6 @@ const toUser = (user) => ({
   permissions: typeof user.permissions === 'string' ? JSON.parse(user.permissions || '[]') : user.permissions
 });
 
-// Controlled concurrency queue for bcrypt comparisons to prevent event loop starvation
 const maxConcurrentHashes = 4;
 let activeHashes = 0;
 const hashQueue = [];
@@ -55,35 +51,33 @@ const queueBcryptCompare = (password, hash) => {
   });
 };
 
-export const login = (req, res) => {
-  const rawEmail = req.body?.email;
-  const password = req.body?.password;
-  const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
-  if (!email) {
-    return res.status(400).json({ success: false, message: 'Email is required' });
-  }
-  if (!password) {
-    return res.status(400).json({ success: false, message: 'Password is required' });
-  }
+export const login = async (req, res) => {
+  try {
+    const rawEmail = req.body?.email;
+    const password = req.body?.password;
+    const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+    if (!password) {
+      return res.status(400).json({ success: false, message: 'Password is required' });
+    }
 
-  if (!email.endsWith('@thestackly.com') && !email.endsWith('@company.com')) {
-    logAudit('anonymous', 'FAILED_AUTHENTICATION', `Login domain rejected for ${email}`);
-    return res.status(403).json({ success: false, message: 'Domain access denied. Only corporate email domains permitted.' });
-  }
+    if (!email.endsWith('@thestackly.com') && !email.endsWith('@company.com')) {
+      logAudit('anonymous', 'FAILED_AUTHENTICATION', `Login domain rejected for ${email}`);
+      return res.status(403).json({ success: false, message: 'Domain access denied. Only corporate email domains permitted.' });
+    }
 
-  // Keep the older demo-domain aliases usable while persisting one canonical identity.
-  const lookupEmail = email.endsWith('@company.com')
-    ? email.replace('@company.com', '@thestackly.com')
-    : email;
+    const lookupEmail = email.endsWith('@company.com')
+      ? email.replace('@company.com', '@thestackly.com')
+      : email;
 
-  db.get("SELECT * FROM users WHERE email = ?", [lookupEmail], async (err, user) => {
-    if (err) return res.status(500).json({ success: false, message: 'Database error' });
+    const user = await userRepository.findByEmail(lookupEmail);
     if (!user) {
       logAudit('anonymous', 'FAILED_AUTHENTICATION', `User not found: ${email}`);
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    // Enforce BCrypt password hash check using controlled concurrency queue
     try {
       const isMatch = await queueBcryptCompare(password, user.password_hash);
       if (!isMatch) {
@@ -94,10 +88,9 @@ export const login = (req, res) => {
       return res.status(500).json({ success: false, message: 'Encryption verification failed' });
     }
 
-    // MFA Challenge if enabled
     if (user.mfa_enabled) {
       try {
-        const mfaRes = await mfaService.generateAndSendOtp(user);
+        const mfaRes = await authService.generateAndSendOtp(user);
         logAudit(user.id, 'MFA_CHALLENGE', `OTP challenge generated for ${email}`);
 
         return res.json({
@@ -115,9 +108,8 @@ export const login = (req, res) => {
       }
     }
 
-    // Direct Login if MFA not enabled: create a real session
     try {
-      const session = await sessionService.createSession(user, req.ip, req.headers['user-agent']);
+      const session = await authService.createSession(user, req.ip, req.headers['user-agent']);
       logAudit(user.id, 'LOGIN', `Logged in without MFA successfully`);
 
       return res.json({
@@ -131,13 +123,11 @@ export const login = (req, res) => {
     } catch (sessionErr) {
       return res.status(500).json({ success: false, message: sessionErr.message });
     }
-  });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
 
-/**
- * POST /api/auth/verify-mfa
- * Verify temporary token against OTP code.
- */
 export const verifyMfa = async (req, res) => {
   const challengeId = req.body.challengeId || req.body.tempToken;
   const code = req.body.otp || req.body.code;
@@ -147,48 +137,41 @@ export const verifyMfa = async (req, res) => {
   }
 
   try {
-    // Call persistent OTP verification service
-    const verifyResult = await mfaService.verifyOtp(challengeId, code);
+    const verifyResult = await authService.verifyOtp(challengeId, code);
     if (!verifyResult.success) {
       logAudit('anonymous', 'FAILED_MFA_VERIFICATION', `Failed MFA verification for challenge ${challengeId}: ${verifyResult.message}`);
       return res.status(400).json({ success: false, message: verifyResult.message });
     }
 
-    // Success, load full user profile
-    db.get("SELECT * FROM users WHERE id = ?", [verifyResult.userId], async (err, user) => {
-      if (err || !user) return res.status(404).json({ success: false, message: 'User not found' });
+    const user = await userRepository.findById(verifyResult.userId);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-      try {
-        const session = await sessionService.createSession(user, req.ip, req.headers['user-agent']);
-        logAudit(user.id, 'MFA_VERIFICATION', `Successfully authenticated user ${user.email} via MFA OTP`);
+    try {
+      const session = await authService.createSession(user, req.ip, req.headers['user-agent']);
+      logAudit(user.id, 'MFA_VERIFICATION', `Successfully authenticated user ${user.email} via MFA OTP`);
 
-        return res.json({
-          success: true,
-          data: {
-            token: session.accessToken,
-            refreshToken: session.refreshToken,
-            user: toUser(user)
-          }
-        });
-      } catch (sessionErr) {
-        return res.status(500).json({ success: false, message: sessionErr.message });
-      }
-    });
+      return res.json({
+        success: true,
+        data: {
+          token: session.accessToken,
+          refreshToken: session.refreshToken,
+          user: toUser(user)
+        }
+      });
+    } catch (sessionErr) {
+      return res.status(500).json({ success: false, message: sessionErr.message });
+    }
   } catch (err) {
     console.error("MFA VERIFICATION ERROR:", err);
     return res.status(403).json({ success: false, message: 'MFA session expired or invalid' });
   }
 };
 
-/**
- * POST /api/auth/logout
- * Terminates session. Revokes session and associated refresh tokens.
- */
 export const logout = async (req, res) => {
   const refreshToken = req.body?.refreshToken || req.headers['x-refresh-token'];
   if (refreshToken) {
     try {
-      await sessionService.revokeRefreshToken(refreshToken);
+      await authService.revokeRefreshToken(refreshToken);
     } catch (err) {
       console.error('Error during token revocation:', err);
     }
@@ -200,10 +183,6 @@ export const logout = async (req, res) => {
   return res.json({ success: true, message: 'Logout successful' });
 };
 
-/**
- * GET /api/auth/me
- * Retrieves current authenticated user profile matching the verified token.
- */
 export const getMe = (req, res) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: 'Unauthorized: User context missing' });
@@ -214,10 +193,6 @@ export const getMe = (req, res) => {
   });
 };
 
-/**
- * POST /api/auth/refresh
- * Renews the access token using a valid refresh token.
- */
 export const refresh = async (req, res) => {
   const refreshToken = req.body?.refreshToken || req.headers['x-refresh-token'];
   if (!refreshToken) {
@@ -225,7 +200,7 @@ export const refresh = async (req, res) => {
   }
 
   try {
-    const rotated = await sessionService.rotateRefreshToken(refreshToken, req.ip, req.headers['user-agent']);
+    const rotated = await authService.rotateRefreshToken(refreshToken, req.ip, req.headers['user-agent']);
     return res.json({
       success: true,
       data: {
@@ -245,7 +220,7 @@ export const resendMfa = async (req, res) => {
   }
 
   try {
-    const resendResult = await mfaService.resendOtp(challengeId);
+    const resendResult = await authService.resendOtp(challengeId);
     if (!resendResult.success) {
       return res.status(400).json({ success: false, message: resendResult.message });
     }
@@ -267,11 +242,29 @@ export const resendMfa = async (req, res) => {
   }
 };
 
-export const healthCheck = (req, res) => {
-  return res.json({
-    success: true,
-    service: "wfa-backend",
-    status: "healthy"
-  });
+export const healthCheck = async (req, res) => {
+  try {
+    let dbStatus = "disconnected";
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      await mongoose.connection.db.admin().ping();
+      dbStatus = "connected";
+    }
+    return res.json({
+      success: true,
+      status: "healthy",
+      api: "healthy",
+      database: dbStatus,
+      databaseType: "MongoDB Atlas",
+      environment: process.env.NODE_ENV || "development"
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      status: "healthy",
+      api: "healthy",
+      database: "error",
+      databaseType: "MongoDB Atlas",
+      environment: process.env.NODE_ENV || "development"
+    });
+  }
 };
-

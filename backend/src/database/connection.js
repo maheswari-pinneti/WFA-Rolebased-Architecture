@@ -112,13 +112,25 @@ const configureConnection = (conn) => {
   return conn;
 };
 
+import 'dotenv/config';
+
 export const createConnection = (customDbPath) => {
   const conn = new sqlite3.Database(customDbPath);
   return configureConnection(conn);
 };
 
-const dbName = process.env.DB_NAME || 'wfa.db';
-const dbPath = path.join(dbDir, dbName);
+const resolveDbPath = () => {
+  if (process.env.DATABASE_PATH) {
+    return path.resolve(process.cwd(), process.env.DATABASE_PATH);
+  }
+  const dbName = process.env.DB_NAME || 'wfa.db';
+  return path.join(dbDir, dbName);
+};
+
+const dbPath = resolveDbPath();
+console.log("\nSQLite database:");
+console.log(dbPath + "\n");
+
 const db = createConnection(dbPath);
 
 
