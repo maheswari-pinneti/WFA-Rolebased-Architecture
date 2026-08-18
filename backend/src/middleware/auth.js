@@ -14,7 +14,9 @@ export const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ success: false, message: 'Invalid or expired token' });
-    req.user = { ...user, organizationId: user.organizationId || ORGANIZATION_ID };
+    const orgId = user.organizationId || user.companyId || ORGANIZATION_ID;
+    req.user = { ...user, organizationId: orgId, companyId: orgId };
+    req.companyId = orgId;
     next();
   });
 };
@@ -43,8 +45,8 @@ export const enforceScope = async (req, res, next) => {
   try {
     const { role, department, team, id: userId, organizationId = ORGANIZATION_ID } = req.user;
     
-    const targetOrganization = (req.query && (req.query.organizationId || req.query.orgId))
-      || (req.body && (req.body.organizationId || req.body.orgId));
+    const targetOrganization = (req.query && (req.query.organizationId || req.query.orgId || req.query.companyId))
+      || (req.body && (req.body.organizationId || req.body.orgId || req.body.companyId));
 
     if (targetOrganization && targetOrganization !== organizationId) {
       return res.status(403).json({ success: false, message: 'Access Denied: Cross-organization access is forbidden.' });

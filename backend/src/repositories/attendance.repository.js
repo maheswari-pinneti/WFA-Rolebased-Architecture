@@ -6,17 +6,17 @@ export class AttendanceRepository {
   async findActiveSession(employeeId, orgId) {
     return Attendance.findOne({
       employeeId,
-      organizationId: orgId,
+      companyId: orgId,
       status: { $ne: 'Checked Out' }
     });
   }
 
   async findRecordById(id, orgId) {
-    return Attendance.findOne({ id, organizationId: orgId });
+    return Attendance.findOne({ id, companyId: orgId });
   }
 
   async findRecordByIdempotencyKey(idempotencyKey, orgId) {
-    return Attendance.findOne({ idempotencyKey, organizationId: orgId });
+    return Attendance.findOne({ idempotencyKey, companyId: orgId });
   }
 
   async createRecord(recordData) {
@@ -31,7 +31,7 @@ export class AttendanceRepository {
     return Attendance.findOne({
       employeeId,
       date: todayDate,
-      organizationId: orgId
+      companyId: orgId
     }).sort({ checkInTime: -1 });
   }
 
@@ -41,7 +41,7 @@ export class AttendanceRepository {
   }
 
   async findCorrectionById(id, orgId) {
-    return Correction.findOne({ id, organizationId: orgId });
+    return Correction.findOne({ id, companyId: orgId });
   }
 
   async findCorrections(query) {
@@ -50,7 +50,7 @@ export class AttendanceRepository {
 
   // Shifts
   async findShifts(orgId) {
-    return Shift.find({ organizationId: orgId }).sort({ name: 1 });
+    return Shift.find({ companyId: orgId }).sort({ name: 1 });
   }
 
   // Audit Logs

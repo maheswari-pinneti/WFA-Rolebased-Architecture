@@ -2,13 +2,16 @@ process.env.MONGODB_DB_NAME = 'workforce-test-e2e';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import axios from 'axios';
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { app } from '../../server.js';
 import { initDb } from '../../backend/src/config/db.js';
-import { Attendance, Correction } from '../../backend/src/models/Attendance.js';
+import { Attendance, Correction, BreakSession, AttendanceEvent, IdempotencyRecord } from '../../backend/src/models/Attendance.js';
+import { User } from '../../backend/src/models/User.js';
+import jwt from 'jsonwebtoken';
+import { env } from '../../backend/src/config/env.js';
 
 let server: any;
-let mongod: MongoMemoryServer;
+let mongod: MongoMemoryReplSet;
 const PORT = 5098;
 const client = axios.create({
   baseURL: `http://localhost:${PORT}`,
@@ -16,18 +19,21 @@ const client = axios.create({
 });
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
   process.env.MONGODB_URI = mongod.getUri();
   
   await initDb();
   await Attendance.deleteMany({});
   await Correction.deleteMany({});
+  await BreakSession.deleteMany({});
+  await AttendanceEvent.deleteMany({});
+  await IdempotencyRecord.deleteMany({});
   return new Promise<void>((resolve) => {
     server = app.listen(PORT, () => {
       resolve();
     });
   });
-});
+}, 30000);
 
 afterAll(async () => {
   await mongoose.disconnect();
@@ -43,7 +49,7 @@ afterAll(async () => {
       resolve();
     }
   });
-});
+}, 30000);
 
 describe('E2E User Flow Tests', () => {
   let token = '';
@@ -167,5 +173,145 @@ describe('E2E User Flow Tests', () => {
     });
     expect(checkOutRes2.status).toBe(400);
     expect(checkOutRes2.data.message).toContain('No active session found');
+  });
+
+  it('should verify Checkout before check-in rejects and writes nothing', async () => {
+    const loginRes = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'StacklyWFA2026!' });
+    const { challengeId, otpDevHint } = loginRes.data.data;
+    const verifyRes = await client.post('/v1/auth/mfa/verify', { challengeId, otp: otpDevHint });
+    const empToken = verifyRes.data.data.token;
+
+    // Verify event count before and after invalid checkout attempt
+    const countBefore = await AttendanceEvent.countDocuments({ employeeId: 'usr-emp-01', type: 'CHECK_OUT' });
+
+    const res = await client.post('/v1/attendance/check-out', { employeeId: 'usr-emp-01' }, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+    expect(res.status).toBe(400);
+
+    const countAfter = await AttendanceEvent.countDocuments({ employeeId: 'usr-emp-01', type: 'CHECK_OUT' });
+    expect(countAfter).toBe(countBefore);
+  });
+
+  it('should enforce Cross-company protection', async () => {
+    // 1. Create Company A and Company B user records
+    const userA = {
+      id: 'usr-comp-A',
+      name: 'User Company A',
+      email: 'usera@comp-a.com',
+      role: 'EMPLOYEE',
+      companyId: 'org-A',
+      organizationId: 'org-A'
+    };
+    const userB = {
+      id: 'usr-comp-B',
+      name: 'User Company B',
+      email: 'userb@comp-b.com',
+      role: 'EMPLOYEE',
+      companyId: 'org-B',
+      organizationId: 'org-B'
+    };
+
+    // Pre-populate an active Attendance record for User B in Company B
+    const recordB = await Attendance.create({
+      id: 'record-B',
+      employeeId: userB.id,
+      employeeName: userB.name,
+      date: '2026-08-18',
+      checkInTime: new Date().toISOString(),
+      status: 'Checked In',
+      companyId: 'org-B',
+      organizationId: 'org-B'
+    });
+
+    // Generate sign-in token for User A under Company A
+    const tokenA = jwt.sign(userA, env.JWT_SECRET);
+
+    // User A tries to check out User B
+    const res = await client.post('/v1/attendance/check-out', { employeeId: userB.id }, {
+      headers: { Authorization: `Bearer ${tokenA}` }
+    });
+    // Should fail (either 400 not found or 403 cross-org)
+    expect(res.status).toBeGreaterThanOrEqual(400);
+
+    // Verify User B attendance record remains intact and still Checked In
+    const updatedRecordB = await Attendance.findById(recordB._id);
+    expect(updatedRecordB.status).toBe('Checked In');
+  });
+
+  it('should support Concurrent Checkout with duplicate replay', async () => {
+    const loginRes = await client.post('/v1/auth/login', { email: 'employee@thestackly.com', password: 'StacklyWFA2026!' });
+    const { challengeId, otpDevHint } = loginRes.data.data;
+    const verifyRes = await client.post('/v1/auth/mfa/verify', { challengeId, otp: otpDevHint });
+    const empToken = verifyRes.data.data.token;
+
+    // Check in first
+    const key = `check-out-key-${Date.now()}`;
+    await client.post('/v1/attendance/check-in', {
+      employeeId: 'usr-emp-01',
+      shiftType: 'Regular',
+      workMode: 'Remote',
+      idempotencyKey: `check-in-key-${Date.now()}`
+    }, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+
+    // Send two checkout requests simultaneously
+    const p1 = client.post('/v1/attendance/check-out', { employeeId: 'usr-emp-01', idempotencyKey: key }, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+    const p2 = client.post('/v1/attendance/check-out', { employeeId: 'usr-emp-01', idempotencyKey: key }, {
+      headers: { Authorization: `Bearer ${empToken}` }
+    });
+
+    const [r1, r2] = await Promise.all([p1, p2]);
+    expect(r1.status).toBe(200);
+    expect(r2.status).toBe(200);
+
+    // Verify only 1 CHECK_OUT event is recorded
+    const eventCount = await AttendanceEvent.countDocuments({
+      employeeId: 'usr-emp-01',
+      type: 'CHECK_OUT'
+    });
+    // Total Check Out events for this employee should be exactly 3 (one from the first test, one from the second test, and one from this concurrent test)
+    expect(eventCount).toBe(3);
+  });
+
+  it('should verify Transaction Rollback on failure', async () => {
+    const orgId = 'org-stackly';
+    const employeeId = 'usr-emp-01';
+
+    // Verify starting session and manual rollback
+    const record = await Attendance.create({
+      id: 'rollback-record-id',
+      employeeId,
+      date: '2026-08-18',
+      checkInTime: new Date().toISOString(),
+      status: 'Checked In',
+      companyId: orgId,
+      organizationId: orgId
+    });
+
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+        // Perform modification
+        await Attendance.updateOne(
+          { _id: record._id },
+          { $set: { status: 'Checked Out' } }
+        ).session(session);
+
+        // Force throw an error to trigger rollback
+        throw new Error('FORCE_ROLLBACK');
+      });
+    } catch (err) {
+      expect(err.message).toBe('FORCE_ROLLBACK');
+    } finally {
+      await session.endSession();
+    }
+
+    // Verify record state rolled back and remains 'Checked In'
+    const fetchedRecord = await Attendance.findById(record._id);
+    expect(fetchedRecord.status).toBe('Checked In');
   });
 });

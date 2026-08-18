@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
   status: { type: String, default: 'ACTIVE' },
   permissions: { type: [String], default: [] },
   mfa_enabled: { type: Number, default: 1 },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, {
   timestamps: true,
   collection: 'users'
@@ -30,7 +31,9 @@ const mfaChallengeSchema = new mongoose.Schema({
   consumed_at: { type: String, default: null },
   resend_count: { type: Number, default: 0 },
   created_at: { type: String, default: () => new Date().toISOString() },
-  status: { type: String, default: 'Pending' }
+  status: { type: String, default: 'Pending' },
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, {
   timestamps: true,
   collection: 'mfachallenges'

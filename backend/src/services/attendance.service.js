@@ -1,7 +1,8 @@
+import mongoose from 'mongoose';
 import { attendanceRepository } from '../repositories/attendance.repository.js';
 import { employeeRepository } from '../repositories/employee.repository.js';
 import { userRepository } from '../repositories/user.repository.js';
-import { Attendance, Correction } from '../models/Attendance.js';
+import { Attendance, Correction, BreakSession, AttendanceEvent, IdempotencyRecord } from '../models/Attendance.js';
 import { Employee } from '../models/Employee.js';
 import { AuditLog } from '../models/AuditLog.js';
 import { logAudit } from '../config/db.js';
@@ -32,9 +33,8 @@ export class AttendanceService {
   }
 
   async checkIn(reqUser, punchData) {
-    const { role, id: userId, organizationId } = reqUser;
-    const orgId = organizationId || 'org-stackly';
-    const employeeId = role === 'EMPLOYEE' ? userId : punchData.employeeId;
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
+    const employeeId = reqUser.role === 'EMPLOYEE' ? reqUser.id : punchData.employeeId;
     const { shiftType, workMode, latitude, longitude, accuracy, idempotencyKey } = punchData;
 
     if (!employeeId || !shiftType || !workMode) {
@@ -63,122 +63,323 @@ export class AttendanceService {
       }
     }
 
+    // 🔐 Idempotency check FIRST
     if (idempotencyKey) {
-      const existing = await attendanceRepository.findRecordByIdempotencyKey(idempotencyKey, orgId);
+      const existing = await IdempotencyRecord.findOne({ companyId: orgId, key: idempotencyKey });
       if (existing) {
-        return { data: existing, idempotentReplay: true };
+        return { data: existing.response.data, idempotentReplay: true };
       }
     }
 
-    const activeSession = await attendanceRepository.findActiveSession(employeeId, orgId);
-    if (activeSession) {
-      notificationService.triggerAlarm(employeeId, identity.name, 'DUPLICATE_CHECKIN_ATTEMPT', 'Active session already exists.');
-      throw new Error('Active session already exists. Must check out first.');
+    const session = await mongoose.startSession();
+    try {
+      let result;
+      await session.withTransaction(async () => {
+        if (idempotencyKey) {
+          const existingTx = await IdempotencyRecord.findOne({ companyId: orgId, key: idempotencyKey }).session(session);
+          if (existingTx) {
+            result = existingTx.response;
+            return;
+          }
+        }
+
+        // Double check-in check
+        const activeSession = await Attendance.findOne({
+          employeeId,
+          companyId: orgId,
+          status: { $ne: 'Checked Out' }
+        }).session(session);
+
+        if (activeSession) {
+          notificationService.triggerAlarm(employeeId, identity.name, 'DUPLICATE_CHECKIN_ATTEMPT', 'Active session already exists.');
+          throw new Error('Active session already exists. Must check out first.');
+        }
+
+        const id = Math.random().toString(36).slice(2, 11);
+        const date = new Date().toISOString().split('T')[0];
+        const checkInTime = new Date().toISOString();
+
+        const record = await Attendance.create([{
+          id,
+          employeeId,
+          employeeName: identity.name,
+          department: identity.department,
+          date,
+          checkInTime,
+          checkOutTime: null,
+          breaks: [],
+          shiftType,
+          workMode,
+          status: 'Checked In',
+          latitude: latitude ?? null,
+          longitude: longitude ?? null,
+          accuracy: accuracy ?? null,
+          idempotencyKey: idempotencyKey || null,
+          team: identity.team,
+          organizationId: orgId,
+          companyId: orgId
+        }], { session });
+
+        // Create Check-In event
+        await AttendanceEvent.create([{
+          id: Math.random().toString(36).slice(2, 11),
+          companyId: orgId,
+          employeeId,
+          attendanceRecordId: record[0]._id,
+          type: 'CHECK_IN',
+          timestamp: checkInTime
+        }], { session });
+
+        result = { success: true, data: record[0] };
+
+        if (idempotencyKey) {
+          const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+          await IdempotencyRecord.create([{
+            companyId: orgId,
+            key: idempotencyKey,
+            statusCode: 200,
+            response: result,
+            expiresAt
+          }], { session });
+        }
+      });
+
+      logAudit(employeeId, 'CHECK_IN', `Checked in using ${workMode} mode on ${shiftType} shift`, orgId);
+      notificationService.triggerGoogleCalendarNotification(employeeId, identity.name, 'Office Login Check-In', new Date().toISOString().split('T')[0]);
+      
+      return { data: result.data, idempotentReplay: false };
+    } catch (err) {
+      if (idempotencyKey) {
+        const committedRecord = await IdempotencyRecord.findOne({ companyId: orgId, key: idempotencyKey });
+        if (committedRecord) {
+          return { data: committedRecord.response.data, idempotentReplay: true };
+        }
+      }
+      throw err;
+    } finally {
+      await session.endSession();
     }
-
-    const id = Math.random().toString(36).slice(2, 11);
-    const date = new Date().toISOString().split('T')[0];
-    const checkInTime = new Date().toISOString();
-
-    const record = await attendanceRepository.createRecord({
-      id,
-      employeeId,
-      employeeName: identity.name,
-      department: identity.department,
-      date,
-      checkInTime,
-      checkOutTime: null,
-      breaks: [],
-      shiftType,
-      workMode,
-      status: 'Checked In',
-      latitude: latitude ?? null,
-      longitude: longitude ?? null,
-      accuracy: accuracy ?? null,
-      idempotencyKey: idempotencyKey || null,
-      team: identity.team,
-      organizationId: orgId
-    });
-
-    logAudit(employeeId, 'CHECK_IN', `Checked in using ${workMode} mode on ${shiftType} shift`, orgId);
-    notificationService.triggerGoogleCalendarNotification(employeeId, identity.name, 'Office Login Check-In', date);
-    return { data: record, idempotentReplay: false };
   }
 
   async takeBreak(reqUser, bodyData) {
-    const orgId = reqUser.organizationId || 'org-stackly';
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
     const employeeId = reqUser.role === 'EMPLOYEE' ? reqUser.id : bodyData.employeeId;
 
-    const session = await attendanceRepository.findActiveSession(employeeId, orgId);
-    if (!session) {
-      throw new Error('No active check-in session found.');
+    const session = await mongoose.startSession();
+    try {
+      let record;
+      await session.withTransaction(async () => {
+        record = await Attendance.findOne({ employeeId, companyId: orgId, status: { $ne: 'Checked Out' } }).session(session);
+        if (!record) {
+          throw new Error('No active check-in session found.');
+        }
+        if (record.status === 'On Break') {
+          throw new Error('Already on break.');
+        }
+
+        const nowStr = new Date().toISOString();
+        const breakId = Math.random().toString(36).slice(2, 11);
+
+        // Create BreakSession record
+        await BreakSession.create([{
+          id: breakId,
+          companyId: orgId,
+          attendanceRecordId: record._id,
+          startTime: nowStr,
+          status: 'ACTIVE'
+        }], { session });
+
+        // Create Event
+        await AttendanceEvent.create([{
+          id: Math.random().toString(36).slice(2, 11),
+          companyId: orgId,
+          employeeId,
+          attendanceRecordId: record._id,
+          type: 'BREAK_START',
+          timestamp: nowStr
+        }], { session });
+
+        const breaksList = Array.isArray(record.breaks) ? [...record.breaks] : [];
+        breaksList.push({ start: nowStr, end: null });
+
+        record.status = 'On Break';
+        record.breaks = breaksList;
+        await record.save({ session });
+      });
+
+      logAudit(employeeId, 'BREAK_START', 'Started break', orgId);
+      return record;
+    } catch (err) {
+      throw err;
+    } finally {
+      await session.endSession();
     }
-    if (session.status === 'On Break') {
-      throw new Error('Already on break.');
-    }
-
-    const breaksList = Array.isArray(session.breaks) ? [...session.breaks] : [];
-    breaksList.push({ start: new Date().toISOString(), end: null });
-
-    session.status = 'On Break';
-    session.breaks = breaksList;
-    await session.save();
-
-    logAudit(employeeId, 'BREAK_START', 'Started break', orgId);
-    return session;
   }
 
   async resumeWork(reqUser, bodyData) {
-    const orgId = reqUser.organizationId || 'org-stackly';
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
     const employeeId = reqUser.role === 'EMPLOYEE' ? reqUser.id : bodyData.employeeId;
 
-    const session = await Attendance.findOne({ employeeId, organizationId: orgId, status: 'On Break' });
-    if (!session) {
-      throw new Error('Employee is not on an active break.');
+    const session = await mongoose.startSession();
+    try {
+      let record;
+      await session.withTransaction(async () => {
+        record = await Attendance.findOne({ employeeId, companyId: orgId, status: 'On Break' }).session(session);
+        if (!record) {
+          throw new Error('Employee is not on an active break.');
+        }
+
+        const nowStr = new Date().toISOString();
+
+        // Update BreakSession record
+        const activeBreak = await BreakSession.findOne({
+          attendanceRecordId: record._id,
+          companyId: orgId,
+          status: 'ACTIVE'
+        }).session(session);
+
+        if (activeBreak) {
+          activeBreak.endTime = nowStr;
+          activeBreak.status = 'COMPLETED';
+          await activeBreak.save({ session });
+        }
+
+        // Create Event
+        await AttendanceEvent.create([{
+          id: Math.random().toString(36).slice(2, 11),
+          companyId: orgId,
+          employeeId,
+          attendanceRecordId: record._id,
+          type: 'BREAK_END',
+          timestamp: nowStr
+        }], { session });
+
+        const breaksList = Array.isArray(record.breaks) ? [...record.breaks] : [];
+        const recordActiveBreak = breaksList.find((item) => item.end === null);
+        if (recordActiveBreak) {
+          recordActiveBreak.end = nowStr;
+        }
+
+        record.status = 'Working';
+        record.breaks = breaksList;
+        await record.save({ session });
+      });
+
+      logAudit(employeeId, 'BREAK_END', 'Resumed work', orgId);
+      return record;
+    } catch (err) {
+      throw err;
+    } finally {
+      await session.endSession();
     }
-
-    const breaksList = Array.isArray(session.breaks) ? [...session.breaks] : [];
-    const activeBreak = breaksList.find((item) => item.end === null);
-    if (activeBreak) {
-      activeBreak.end = new Date().toISOString();
-    }
-
-    session.status = 'Working';
-    session.breaks = breaksList;
-    await session.save();
-
-    logAudit(employeeId, 'BREAK_END', 'Resumed work', orgId);
-    return session;
   }
 
   async checkOut(reqUser, bodyData) {
-    const orgId = reqUser.organizationId || 'org-stackly';
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
     const employeeId = reqUser.role === 'EMPLOYEE' ? reqUser.id : bodyData.employeeId;
+    const { idempotencyKey } = bodyData;
 
-    const session = await attendanceRepository.findActiveSession(employeeId, orgId);
-    if (!session) {
-      throw new Error('Check-out-before-check-in rejection. No active session found.');
+    // 🔐 Idempotency check FIRST
+    if (idempotencyKey) {
+      const existing = await IdempotencyRecord.findOne({ companyId: orgId, key: idempotencyKey });
+      if (existing) {
+        return existing.response.data;
+      }
     }
 
-    const breaksList = Array.isArray(session.breaks) ? [...session.breaks] : [];
-    const activeBreak = breaksList.find((item) => item.end === null);
-    if (activeBreak) {
-      activeBreak.end = new Date().toISOString();
+    const session = await mongoose.startSession();
+    try {
+      let result;
+      await session.withTransaction(async () => {
+        if (idempotencyKey) {
+          const existingTx = await IdempotencyRecord.findOne({ companyId: orgId, key: idempotencyKey }).session(session);
+          if (existingTx) {
+            result = existingTx.response;
+            return;
+          }
+        }
+
+        // Enforce lock and find matching record atomically
+        const record = await Attendance.findOne({
+          employeeId,
+          companyId: orgId,
+          status: { $ne: 'Checked Out' }
+        }).session(session);
+
+        if (!record) {
+          throw new Error('Check-out-before-check-in rejection. No active session found.');
+        }
+
+        const checkOutTime = new Date().toISOString();
+
+        // Finalize any active BreakSession
+        const activeBreak = await BreakSession.findOne({
+          attendanceRecordId: record._id,
+          companyId: orgId,
+          status: 'ACTIVE'
+        }).session(session);
+
+        if (activeBreak) {
+          activeBreak.endTime = checkOutTime;
+          activeBreak.status = 'COMPLETED';
+          await activeBreak.save({ session });
+        }
+
+        // Finalize breaks array inside record
+        const breaksList = Array.isArray(record.breaks) ? [...record.breaks] : [];
+        const recordActiveBreak = breaksList.find((item) => item.end === null);
+        if (recordActiveBreak) {
+          recordActiveBreak.end = checkOutTime;
+        }
+
+        record.status = 'Checked Out';
+        record.checkOutTime = checkOutTime;
+        record.breaks = breaksList;
+        await record.save({ session });
+
+        // Create checkout event
+        await AttendanceEvent.create([{
+          id: Math.random().toString(36).slice(2, 11),
+          companyId: orgId,
+          employeeId,
+          attendanceRecordId: record._id,
+          type: 'CHECK_OUT',
+          timestamp: checkOutTime
+        }], { session });
+
+        result = { success: true, data: record };
+
+        if (idempotencyKey) {
+          const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+          await IdempotencyRecord.create([{
+            companyId: orgId,
+            key: idempotencyKey,
+            statusCode: 200,
+            response: result,
+            expiresAt
+          }], { session });
+        }
+      });
+
+      logAudit(employeeId, 'CHECK_OUT', 'Checked out from active session', orgId);
+      return result.data;
+    } catch (err) {
+      if (idempotencyKey) {
+        const committedRecord = await IdempotencyRecord.findOne({ companyId: orgId, key: idempotencyKey });
+        if (committedRecord) {
+          return committedRecord.response.data;
+        }
+      }
+      throw err;
+    } finally {
+      await session.endSession();
     }
-
-    const checkOutTime = new Date().toISOString();
-    session.status = 'Checked Out';
-    session.checkOutTime = checkOutTime;
-    session.breaks = breaksList;
-    await session.save();
-
-    logAudit(employeeId, 'CHECK_OUT', 'Checked out from active session', orgId);
-    return session;
   }
 
   async getRecords(reqUser) {
-    const { role, id: employeeId, department, team, organizationId } = reqUser;
-    const query = { organizationId: organizationId || 'org-stackly' };
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
+    const { role, id: employeeId, department, team } = reqUser;
+    const query = { companyId: orgId };
 
     if (role === 'EMPLOYEE') {
       query.employeeId = employeeId;
@@ -188,18 +389,18 @@ export class AttendanceService {
       query.department = department;
     }
 
-    return attendanceRepository.findRecords(query);
+    return Attendance.find(query);
   }
 
   async getTodayAttendance(userId, orgId) {
     const todayDate = new Date().toISOString().split('T')[0];
-    return attendanceRepository.findTodayRecord(userId, todayDate, orgId);
+    return Attendance.findOne({ employeeId: userId, date: todayDate, companyId: orgId });
   }
 
   // Corrections
   async submitCorrection(reqUser, bodyData) {
-    const { role, id: userId, organizationId } = reqUser;
-    const orgId = organizationId || 'org-stackly';
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
+    const { role, id: userId } = reqUser;
     const employeeId = role === 'EMPLOYEE' ? userId : bodyData.employeeId;
     const { date, requestedCheckIn, requestedCheckOut, reason } = bodyData;
 
@@ -215,7 +416,7 @@ export class AttendanceService {
     const id = Math.random().toString(36).slice(2, 11);
     const createdAt = new Date().toISOString();
 
-    const correction = await attendanceRepository.createCorrection({
+    const correction = await Correction.create({
       id,
       employeeId,
       employeeName: identity.name,
@@ -229,7 +430,8 @@ export class AttendanceService {
       reviewedBy: null,
       createdAt,
       team: identity.team,
-      organizationId: orgId
+      organizationId: orgId,
+      companyId: orgId
     });
 
     logAudit(employeeId, 'CORRECTION_REQUESTED', `Submitted correction request for ${date}`, orgId);
@@ -237,8 +439,8 @@ export class AttendanceService {
   }
 
   async reviewCorrection(reqUser, correctionId, status, managerComment) {
-    const orgId = reqUser.organizationId || 'org-stackly';
-    const correction = await attendanceRepository.findCorrectionById(correctionId, orgId);
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
+    const correction = await Correction.findOne({ id: correctionId, companyId: orgId });
     if (!correction) {
       throw new Error('Correction request not found.');
     }
@@ -266,7 +468,7 @@ export class AttendanceService {
       const existingRecord = await Attendance.findOne({
         employeeId: correction.employeeId,
         date: correction.date,
-        organizationId: orgId
+        companyId: orgId
       });
 
       if (existingRecord) {
@@ -276,7 +478,7 @@ export class AttendanceService {
         await existingRecord.save();
       } else {
         const recordId = Math.random().toString(36).slice(2, 11);
-        await attendanceRepository.createRecord({
+        await Attendance.create({
           id: recordId,
           employeeId: correction.employeeId,
           employeeName: correction.employeeName,
@@ -289,7 +491,8 @@ export class AttendanceService {
           workMode: 'Office',
           status: 'Checked Out',
           team: correction.team,
-          organizationId: orgId
+          organizationId: orgId,
+          companyId: orgId
         });
       }
     }
@@ -298,8 +501,9 @@ export class AttendanceService {
   }
 
   async getCorrections(reqUser) {
-    const { role, id: employeeId, department, team, organizationId } = reqUser;
-    const query = { organizationId: organizationId || 'org-stackly' };
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
+    const { role, id: employeeId, department, team } = reqUser;
+    const query = { companyId: orgId };
 
     if (role === 'EMPLOYEE') {
       query.employeeId = employeeId;
@@ -309,34 +513,34 @@ export class AttendanceService {
       query.department = department;
     }
 
-    return attendanceRepository.findCorrections(query);
+    return Correction.find(query);
   }
 
   async getShifts(orgId) {
-    return attendanceRepository.findShifts(orgId);
+    return mongoose.model('Shift').find({ companyId: orgId });
   }
 
   async getAuditLogs(reqUser) {
-    const { role, id: employeeId, department, team, organizationId } = reqUser;
-    const orgId = organizationId || 'org-stackly';
+    const orgId = reqUser.companyId || reqUser.organizationId || 'org-stackly';
+    const { role, id: employeeId, department, team } = reqUser;
 
     let employeeIds = null;
     if (role === 'TEAM_LEAD') {
-      const emps = await employeeRepository.findTeamMembers(team, orgId);
+      const emps = await Employee.find({ team, companyId: orgId }, { id: 1 });
       employeeIds = emps.map((e) => e.id);
     } else if (role === 'MANAGER') {
-      const emps = await Employee.find({ department, organizationId: orgId }, { id: 1 });
+      const emps = await Employee.find({ department, companyId: orgId }, { id: 1 });
       employeeIds = emps.map((e) => e.id);
     }
 
-    const query = { organizationId: orgId };
+    const query = { companyId: orgId };
     if (role === 'EMPLOYEE') {
       query.employeeId = employeeId;
     } else if (employeeIds) {
       query.employeeId = { $in: employeeIds };
     }
 
-    return attendanceRepository.findAuditLogs(query);
+    return AuditLog.find(query);
   }
 }
 

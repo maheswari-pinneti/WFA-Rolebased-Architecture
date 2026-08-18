@@ -7,7 +7,8 @@ const sessionSchema = new mongoose.Schema({
   ipAddress: { type: String, default: null },
   createdAt: { type: String, required: true },
   expiresAt: { type: String, required: true },
-  revokedAt: { type: String, default: null }
+  revokedAt: { type: String, default: null },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'sessions' });
 
 const refreshTokenSchema = new mongoose.Schema({
@@ -16,7 +17,8 @@ const refreshTokenSchema = new mongoose.Schema({
   tokenFamily: { type: String, required: true },
   parentHash: { type: String, default: null },
   expiresAt: { type: String, required: true },
-  revokedAt: { type: String, default: null }
+  revokedAt: { type: String, default: null },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'refreshtokens' });
 
 export const Session = mongoose.models.Session || mongoose.model('Session', sessionSchema);

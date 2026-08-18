@@ -6,7 +6,8 @@ const locationSchema = new mongoose.Schema({
   address: { type: String, default: null },
   city: { type: String, default: null },
   country: { type: String, default: null },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, {
   timestamps: true,
   collection: 'locations'

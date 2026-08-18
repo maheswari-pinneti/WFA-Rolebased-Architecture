@@ -2,13 +2,13 @@ process.env.MONGODB_DB_NAME = 'workforce-test-api';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import axios from 'axios';
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { app } from '../../server.js';
 import { initDb } from '../../backend/src/config/db.js';
 import { Attendance, Correction } from '../../backend/src/models/Attendance.js';
 
 let server: any;
-let mongod: MongoMemoryServer;
+let mongod: MongoMemoryReplSet;
 const PORT = 5099;
 const client = axios.create({
   baseURL: `http://localhost:${PORT}`,
@@ -16,7 +16,7 @@ const client = axios.create({
 });
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
   process.env.MONGODB_URI = mongod.getUri();
   
   await initDb();
@@ -27,7 +27,7 @@ beforeAll(async () => {
       resolve();
     });
   });
-});
+}, 30000);
 
 afterAll(async () => {
   await mongoose.disconnect();
@@ -43,7 +43,7 @@ afterAll(async () => {
       resolve();
     }
   });
-});
+}, 30000);
 
 describe('Workforce Analytics API Integration & Authorization Tests', () => {
   let adminToken = '';

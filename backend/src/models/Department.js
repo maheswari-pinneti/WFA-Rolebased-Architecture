@@ -5,14 +5,15 @@ const organizationSchema = new mongoose.Schema({
   name: { type: String, required: true },
   domain: { type: String, default: null },
   status: { type: String, default: 'ACTIVE' }
-}, { timestamps: true, collection: 'organizations' });
+}, { timestamps: true, collection: 'companies' });
 
 const departmentSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, index: true },
   name: { type: String, required: true },
   code: { type: String, unique: true, index: true },
   managerId: { type: String, default: null },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'departments' });
 
 const teamSchema = new mongoose.Schema({
@@ -20,7 +21,8 @@ const teamSchema = new mongoose.Schema({
   name: { type: String, required: true },
   departmentId: { type: String, default: null },
   leadId: { type: String, default: null },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'teams' });
 
 const shiftSchema = new mongoose.Schema({
@@ -29,7 +31,8 @@ const shiftSchema = new mongoose.Schema({
   startTime: { type: String, default: null },
   endTime: { type: String, default: null },
   gracePeriodMinutes: { type: Number, default: 0 },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'shifts' });
 
 const skillSchema = new mongoose.Schema({
@@ -41,7 +44,8 @@ const skillSchema = new mongoose.Schema({
   isMissingSkill: { type: Number, default: 0 },
   department: { type: String, default: null },
   team: { type: String, default: null },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'skills' });
 
 const performanceRecordSchema = new mongoose.Schema({
@@ -53,8 +57,9 @@ const performanceRecordSchema = new mongoose.Schema({
   productivityScore: { type: Number, default: 0 },
   department: { type: String, default: null },
   team: { type: String, default: null },
-  organizationId: { type: String, default: 'org-stackly' }
-}, { timestamps: true, collection: 'performance_records' });
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
+}, { timestamps: true, collection: 'performancerecords' });
 
 const taskSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, index: true },
@@ -67,7 +72,8 @@ const taskSchema = new mongoose.Schema({
   priority: { type: String, default: 'MEDIUM' },
   status: { type: String, default: 'TODO' },
   points: { type: Number, default: 0 },
-  updatedAt: { type: String, default: null }
+  updatedAt: { type: String, default: null },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'tasks' });
 
 const leaveRequestSchema = new mongoose.Schema({
@@ -77,6 +83,7 @@ const leaveRequestSchema = new mongoose.Schema({
   department: { type: String, default: null },
   team: { type: String, default: null },
   organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true },
   type: { type: String, default: null },
   startDate: { type: String, default: null },
   endDate: { type: String, default: null },
@@ -85,7 +92,7 @@ const leaveRequestSchema = new mongoose.Schema({
   reviewedBy: { type: String, default: null },
   reviewComment: { type: String, default: null },
   createdAt: { type: String, default: () => new Date().toISOString() }
-}, { timestamps: true, collection: 'leave_requests' });
+}, { timestamps: true, collection: 'leaverequests' });
 
 const notificationSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, index: true },
@@ -95,7 +102,8 @@ const notificationSchema = new mongoose.Schema({
   type: { type: String, default: null },
   read: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, { timestamps: true, collection: 'notifications' });
 
 export const Organization = mongoose.models.Organization || mongoose.model('Organization', organizationSchema);

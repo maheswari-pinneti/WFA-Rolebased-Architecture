@@ -40,7 +40,10 @@ export const checkOut = async (req, res) => {
     const data = await attendanceService.checkOut(req.user, req.body);
     return res.json({ success: true, data });
   } catch (err) {
-    return res.status(400).json({ success: false, message: err.message });
+    if (err.message.includes('rejection') || err.message.includes('session')) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 

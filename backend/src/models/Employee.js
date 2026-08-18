@@ -15,7 +15,8 @@ const employeeSchema = new mongoose.Schema({
   attendanceRate: { type: Number, default: 95 },
   team: { type: String, default: null },
   location: { type: String, index: true, default: null },
-  organizationId: { type: String, default: 'org-stackly' }
+  organizationId: { type: String, default: 'org-stackly' },
+  companyId: { type: String, default: 'org-stackly', index: true }
 }, {
   timestamps: true,
   collection: 'employees'
