@@ -19,7 +19,10 @@ const client = axios.create({
 });
 
 beforeAll(async () => {
-  mongod = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
+  mongod = await MongoMemoryReplSet.create({
+    replSet: { count: 1 },
+    instance: { startupTimeout: 40000 }
+  });
   process.env.MONGODB_URI = mongod.getUri();
   
   await initDb();

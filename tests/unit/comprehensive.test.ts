@@ -24,7 +24,10 @@ const client = axios.create({
 });
 
 beforeAll(async () => {
-  mongod = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
+  mongod = await MongoMemoryReplSet.create({
+    replSet: { count: 1 },
+    instance: { startupTimeout: 40000 }
+  });
   process.env.MONGODB_URI = mongod.getUri();
   
   await initDb();
@@ -315,11 +318,11 @@ describe('WFA Comprehensive Backend Unit and Integration Testing', () => {
   describe('Analytics Filtration Validation', () => {
     it('should filter department analytics correctly', async () => {
       await Employee.create([
-        { id: 'e1', employeeCode: 'STK-E1', name: 'E1', email: 'e1@st.com', organizationId: 'org-stackly', companyId: 'org-stackly', department: 'Engineering', status: 'ACTIVE' },
-        { id: 'e2', employeeCode: 'STK-E2', name: 'E2', email: 'e2@st.com', organizationId: 'org-stackly', companyId: 'org-stackly', department: 'Human Resources', status: 'ACTIVE' }
+        { id: 'e1', employeeCode: 'STK-E1', name: 'E1', email: 'e1@st.com', organizationId: 'org-stackly', companyId: 'org-stackly', department: 'ENG-UNIQUE-TEST', status: 'ACTIVE' },
+        { id: 'e2', employeeCode: 'STK-E2', name: 'E2', email: 'e2@st.com', organizationId: 'org-stackly', companyId: 'org-stackly', department: 'HR-UNIQUE-TEST', status: 'ACTIVE' }
       ]);
 
-      const analytics = await analyticsService.getAnalytics({ role: 'MANAGER', department: 'Engineering', organizationId: 'org-stackly' });
+      const analytics = await analyticsService.getAnalytics({ role: 'MANAGER', department: 'ENG-UNIQUE-TEST', organizationId: 'org-stackly' });
       expect(analytics.metrics.totalWorkforce).toBe(1);
     });
 
