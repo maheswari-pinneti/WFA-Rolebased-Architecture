@@ -15,10 +15,15 @@ export default defineConfig({
     port: 3000,
     open: false,
     proxy: {
+      '/v1': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: false,
       },
     },
   },
