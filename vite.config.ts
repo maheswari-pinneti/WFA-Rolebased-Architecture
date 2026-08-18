@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./frontend', import.meta.url)),
+      '@': fileURLToPath(new URL('./frontend/src', import.meta.url)),
     },
   },
   server: {
