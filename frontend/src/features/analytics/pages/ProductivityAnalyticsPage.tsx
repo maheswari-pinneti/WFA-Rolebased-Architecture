@@ -17,7 +17,7 @@ export const ProductivityAnalyticsPage: React.FC = () => {
 
   const teamProductivity = analytics?.teamProductivity || [];
   const velocity = analytics?.metrics?.productivityVelocity || "92%";
-  const totalEmployees = analytics?.metrics?.totalWorkforce || 0;
+  const totalEmployees = Number(analytics?.metrics?.totalWorkforce) || 0;
 
   const employeeProductivity = (employees || [])
     .slice(0, 10)
