@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROLE_HOME_PATHS } from '../../security/roles/roles';
 import { authService } from '../services/auth.service';
+import { useTheme } from '../../design-system/theme/theme';
 import { StacklyLogo } from '../../components/common/StacklyLogo';
 import {
   Mail,
@@ -64,6 +65,8 @@ const ROLE_DETAILS = {
 export const LoginPage: React.FC = () => {
   const { login, verifyMfa, resendMfa, isAuthenticated, role } = useAuth();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
+  const [mfaChannel, setMfaChannel] = useState<'email' | 'sms'>('email');
 
   // Active form tab: 'login' | 'otp' | 'signup'
   const [activeTab, setActiveTab] = useState<'login' | 'otp' | 'signup'>(() => {
@@ -346,447 +349,300 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 font-sans overflow-y-auto lg:overflow-hidden bg-[#050B18]">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center font-sans bg-[#050B18] text-slate-100 p-4 transition-colors duration-300 relative overflow-y-auto">
       
-      {/* LEFT SECTION: Branding & Product Info (Order-2 on mobile, Order-1 on desktop) */}
-      <div className="order-2 lg:order-1 bg-[#050B18] p-8 md:p-12 lg:p-16 flex flex-col justify-between text-white relative overflow-hidden min-h-[50vh] lg:min-h-screen border-t lg:border-t-0 lg:border-r border-slate-800/80">
+      {/* Glow behind login elements */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Centered Panel/Card */}
+      <div className="w-full max-w-[460px] p-6 sm:p-8 rounded-[20px] bg-[#0B1224]/85 backdrop-blur-xl border border-slate-800/80 shadow-2xl relative z-10 space-y-6">
         
-        {/* Subtle Background glow */}
-        <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="space-y-8 relative z-10 my-auto">
-          {/* Logo & Company Branding */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <StacklyLogo size={36} showText={false} />
-            </div>
-            <span className="text-xl font-black tracking-widest text-white leading-none">STACKLY</span>
+        {/* Logo and Welcome Header */}
+        <div className="flex flex-col items-center text-center space-y-2">
+          {/* Logo with Wave shape */}
+          <div className="flex items-center gap-2 mb-1">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#38BDF8]"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span className="text-lg font-black tracking-widest text-[#38BDF8]">STACKLY</span>
           </div>
-
-          {/* Heading Description */}
-          <div className="space-y-3">
-            <h1 className="text-2xl lg:text-3xl font-black text-white leading-tight tracking-tight">
-              Workforce Analytics & Intelligence Platform
-            </h1>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-lg font-medium">
-              Empowering organizations with AI-driven workforce intelligence, analytics, and employee insights.
-            </p>
-          </div>
-
-          {/* Feature List Cards */}
-          <div className="space-y-3.5 max-w-lg">
-            {[
-              { title: 'Workforce Analytics', desc: 'Real-time daily punch logs & office hours calculations' },
-              { title: 'Role-Based Access', desc: 'Secure authorization structures for multiple org roles' },
-              { title: 'Secure OTP Authentication', desc: 'Seamless single sign-on security via quick email OTP' },
-              { title: 'Enterprise Dashboard', desc: 'Complete high-level department analytics feed' }
-            ].map((feat, idx) => (
-              <div key={idx} className="flex items-start gap-3.5 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.04] hover:bg-white/[0.05] hover:border-blue-500/30 transition-all duration-300">
-                <span className="w-5.5 h-5.5 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center text-xs font-black shrink-0 mt-0.5 border border-blue-500/30">✓</span>
-                <div>
-                  <h4 className="text-xs font-bold text-white tracking-wide">{feat.title}</h4>
-                  <p className="text-[11px] text-slate-450 mt-0.5 leading-relaxed font-medium">{feat.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <h2 className="text-xl font-extrabold tracking-tight text-white">Welcome Back</h2>
+          <p className="text-xs text-slate-400 font-medium">Sign in to access your dashboard</p>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-6 border-t border-slate-800/80 text-[10px] text-slate-500 font-mono relative z-10">
-          <span>Version 2.0</span>
-          <span>© Stackly Technologies</span>
-        </div>
-      </div>
-
-      {/* RIGHT SECTION: Centered Glassmorphism Authentication Panel (Order-1 on mobile, Order-2 on desktop) */}
-      <div className="order-1 lg:order-2 bg-slate-50 dark:bg-[#0B1120] p-6 sm:p-12 lg:p-16 flex items-center justify-center min-h-[50vh] lg:min-h-screen text-slate-900 dark:text-slate-100 transition-colors duration-300 relative overflow-hidden">
-        
-        {/* Glow behind login elements */}
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-500/5 dark:bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Glassmorphism Card */}
-        <div className="w-full max-w-[440px] p-6 sm:p-8 rounded-[20px] bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl relative z-10 space-y-6">
-          
-          {/* Header */}
-          <div className="space-y-1">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Welcome Back</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sign in to continue to your workforce dashboard.</p>
-          </div>
-
-          {/* Form states alert messaging */}
-          <div className="space-y-4">
+        {/* Alerts / Error messages */}
+        {(error || successMsg) && (
+          <div className="space-y-2">
             {error && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs flex items-center gap-2 animate-fadeIn">
                 <AlertCircle size={14} className="shrink-0" />
-                <span className="font-semibold">{error}</span>
+                <span className="font-semibold" id="errorMessage">{error}</span>
               </div>
             )}
             {successMsg && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs flex items-center gap-2 animate-fadeIn">
                 <ShieldCheck size={14} className="shrink-0" />
                 <span className="font-semibold">{successMsg}</span>
               </div>
             )}
+          </div>
+        )}
 
-            {/* TAB 1: PASSWORD LOGIN */}
-            {activeTab === 'login' && (
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                {/* Role selection dropdown */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Role Selection</label>
-                  <div className="relative">
-                    <select
-                      value={selectedRole}
-                      onChange={(e) => handleRoleSelect(e.target.value as any)}
-                      className="w-full appearance-none bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer shadow-sm"
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="hr">HR Manager</option>
-                      <option value="manager">Team Manager</option>
-                      <option value="lead">Team Lead</option>
-                      <option value="employee">Employee</option>
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-450 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Email input */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-slate-700 dark:text-slate-350">Email Address</label>
-                  <div className="relative">
-                    <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-450 pointer-events-none" />
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="name@thestackly.com"
-                      className="w-full rounded-xl pl-9 pr-4 py-2.5 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold"
-                    />
-                  </div>
-                </div>
-
-                {/* Password input */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-slate-700 dark:text-slate-350">Password</label>
-                  <div className="relative">
-                    <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-450 pointer-events-none" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password"
-                      className="w-full rounded-xl pl-9 pr-10 py-2.5 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-0 bg-transparent border-none cursor-pointer"
-                    >
-                      {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember / Forgot */}
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <label className="flex items-center gap-2 text-slate-600 dark:text-slate-300 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={rememberDevice}
-                      onChange={(e) => setRememberDevice(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="font-semibold">Remember Me</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => alert('Demo Reset: Verification code is always 849201.')}
-                    className="text-blue-500 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-
-                <div className="space-y-4 pt-2">
-                  {/* Primary Sign In Button */}
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', color: '#ffffff' }}
-                    className="w-full py-3 rounded-xl hover:scale-[1.01] font-extrabold text-xs shadow-lg shadow-blue-500/20 transition-all border-none cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    {isLoading ? 'Authenticating...' : 'Sign In'}
-                    <ArrowRight size={14} />
-                  </button>
-
-                  {/* OR Divider */}
-                  <div className="flex items-center my-4">
-                    <div className="flex-1 border-t border-slate-200 dark:border-slate-800" />
-                    <span className="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">OR</span>
-                    <div className="flex-1 border-t border-slate-200 dark:border-slate-800" />
-                  </div>
-
-                  {/* Secondary Login with OTP toggle */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('otp');
-                      setError('');
-                      setSuccessMsg('');
-                    }}
-                    className="w-full py-2.5 rounded-xl bg-transparent border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/30 text-xs font-bold transition-all cursor-pointer"
-                  >
-                    Login with OTP
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* TAB 2: OTP LOGIN */}
-            {activeTab === 'otp' && (
-              <form onSubmit={handleOtpLoginSubmit} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-slate-700 dark:text-slate-350">Corporate Email</label>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-450 pointer-events-none" />
-                      <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="name@thestackly.com"
-                        className="w-full rounded-xl pl-9 pr-4 py-2.5 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleResendOtp}
-                      disabled={timer > 0 || isLoading}
-                      className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 border-none cursor-pointer"
-                    >
-                      {timer > 0 ? `Resend (${timer}s)` : 'Resend'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-extrabold text-slate-700 dark:text-slate-350">6-Digit OTP Code</label>
-                    <span className="text-[10px] text-slate-500 font-bold font-mono">Resend OTP in 00:{timer.toString().padStart(2, '0')}</span>
-                  </div>
-
-                  <div className="flex justify-between gap-2 py-1">
-                    {otpValues.map((val, idx) => (
-                      <input
-                        key={idx}
-                        ref={otpRefs[idx]}
-                        type="text"
-                        required
-                        maxLength={1}
-                        value={val}
-                        disabled={timer === 0 || isLoading}
-                        onChange={(e) => handleOtpChange(idx, e.target.value)}
-                        onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                        onPaste={handleOtpPaste}
-                        className="w-12 h-12 rounded-xl text-center text-sm font-black font-mono bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-inner disabled:opacity-50"
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <button
-                    type="button"
-                    onClick={handleResendOtp}
-                    disabled={timer > 0 || isLoading}
-                    className="text-blue-500 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer disabled:opacity-50 disabled:no-underline"
-                  >
-                    Resend OTP code
-                  </button>
-                  <span className="text-[10px] text-slate-500 font-mono flex items-center gap-1">
-                    <ShieldCheck size={12} className="text-emerald-500 animate-pulse" /> Auto Verify Enabled
-                  </span>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading || timer === 0}
-                  style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', color: '#ffffff' }}
-                  className="w-full py-3 rounded-xl hover:scale-[1.01] font-extrabold text-xs shadow-lg shadow-blue-500/20 transition-all border-none cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:scale-100"
+        {/* Form elements */}
+        {activeTab === 'login' && (
+          <form onSubmit={handleLoginSubmit} className="space-y-4" id="loginForm">
+            {/* Roles Selection */}
+            <div className="space-y-1.5">
+              <label htmlFor="role" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Roles</label>
+              <div className="relative">
+                <select
+                  id="role"
+                  value={selectedRole}
+                  onChange={(e) => handleRoleSelect(e.target.value as any)}
+                  className="w-full appearance-none bg-[#050B18] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#10B981] transition-colors cursor-pointer shadow-sm font-semibold"
                 >
-                  {isLoading ? 'Verifying...' : 'Sign In with OTP'}
-                  <ArrowRight size={14} />
-                </button>
+                  <option value="admin">Admin — Sarah Connor</option>
+                  <option value="hr">HR Manager — Elena Rostova</option>
+                  <option value="manager">Team Manager — David Sterling</option>
+                  <option value="lead">Team Lead — Marcus Vance</option>
+                  <option value="employee">Employee — Alex Mercer</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
 
-                <div className="flex items-center my-4">
-                  <div className="flex-1 border-t border-slate-200 dark:border-slate-800" />
-                  <span className="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">OR</span>
-                  <div className="flex-1 border-t border-slate-200 dark:border-slate-800" />
-                </div>
+            {/* Email Input */}
+            <div className="space-y-1.5">
+              <label htmlFor="username" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email / Employee ID</label>
+              <input
+                type="email"
+                id="username"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@thestackly.com"
+                className="w-full bg-[#050B18] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#10B981] transition-colors font-semibold"
+              />
+            </div>
 
+            {/* MFA Delivery Channel Dropdown/Radios */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">MFA Delivery Channel</label>
+              <div className="flex items-center gap-6 py-1 text-xs">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-350">
+                  <input
+                    type="radio"
+                    name="mfaChannel"
+                    value="email"
+                    checked={mfaChannel === 'email'}
+                    onChange={() => setMfaChannel('email')}
+                    className="w-4 h-4 text-emerald-500 focus:ring-emerald-500 bg-[#050B18] border-slate-800"
+                  />
+                  Email
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-350">
+                  <input
+                    type="radio"
+                    name="mfaChannel"
+                    value="sms"
+                    checked={mfaChannel === 'sms'}
+                    onChange={() => setMfaChannel('sms')}
+                    className="w-4 h-4 text-emerald-500 focus:ring-emerald-500 bg-[#050B18] border-slate-800"
+                  />
+                  SMS
+                </label>
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full bg-[#050B18] border border-slate-800 rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#10B981] transition-colors font-semibold"
+                />
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTab('login');
-                    setError('');
-                    setSuccessMsg('');
-                  }}
-                  className="w-full py-2.5 rounded-xl bg-transparent border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/30 text-xs font-bold transition-all cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-0 bg-transparent border-none cursor-pointer"
                 >
-                  Back to Password Login
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
-              </form>
-            )}
+              </div>
+            </div>
 
-            {/* TAB 3: SIGN UP */}
-            {activeTab === 'signup' && (
-              <form onSubmit={handleSignUpSubmit} className="space-y-3.5 max-h-[350px] overflow-y-auto pr-1">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Full Name</label>
-                  <div className="relative">
-                    <User size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="John Doe"
-                      className="w-full rounded-xl pl-9 pr-4 py-2 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    />
-                  </div>
-                </div>
+            {/* Remember me & Forgot password */}
+            <div className="flex items-center justify-between text-[11px] pt-1">
+              <label className="flex items-center gap-2 text-slate-300 cursor-pointer font-semibold">
+                <input
+                  type="checkbox"
+                  checked={rememberDevice}
+                  onChange={(e) => setRememberDevice(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded border-slate-800 bg-[#050B18] text-emerald-500 focus:ring-emerald-500"
+                />
+                Remember me
+              </label>
+              <button
+                type="button"
+                onClick={() => alert('Demo Reset: Verification code is always 849201.')}
+                className="text-[#10B981] hover:underline font-bold bg-transparent border-none p-0 cursor-pointer"
+              >
+                Forgot password?
+              </button>
+            </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Employee ID</label>
-                    <div className="relative">
-                      <Hash size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                      <input
-                        type="text"
-                        required
-                        value={employeeId}
-                        onChange={(e) => setEmployeeId(e.target.value)}
-                        placeholder="EMP-1002"
-                        className="w-full rounded-xl pl-9 pr-4 py-2 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Department</label>
-                    <div className="relative">
-                      <Briefcase size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                      <input
-                        type="text"
-                        required
-                        value={department}
-                        onChange={(e) => setDepartment(e.target.value)}
-                        placeholder="Engineering"
-                        className="w-full rounded-xl pl-9 pr-4 py-2 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
+            <div className="space-y-3 pt-2">
+              <button
+                type="submit"
+                id="loginBtn"
+                disabled={isLoading}
+                className="w-full py-3 rounded-xl bg-[#10B981] hover:bg-[#059669] active:scale-[0.99] transition-all text-white font-black text-xs tracking-wider cursor-pointer border-none shadow-md shadow-emerald-500/10"
+              >
+                {isLoading ? 'Authenticating...' : 'Sign In'}
+              </button>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Corporate Email</label>
-                  <div className="relative">
-                    <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-450 pointer-events-none" />
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="name@thestackly.com"
-                      className="w-full rounded-xl pl-9 pr-4 py-2 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    />
-                  </div>
-                </div>
+              <div className="flex items-center my-3">
+                <div className="flex-1 border-t border-slate-800" />
+                <span className="px-3 text-[9px] font-black text-slate-500 uppercase tracking-widest">OR</span>
+                <div className="flex-1 border-t border-slate-800" />
+              </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password"
-                      className="w-full rounded-xl px-3 py-2 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Confirm Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Password"
-                      className="w-full rounded-xl px-3 py-2 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    />
-                  </div>
-                </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('otp');
+                  setError('');
+                  setSuccessMsg('');
+                }}
+                className="w-full py-2.5 rounded-xl bg-transparent border border-slate-800 text-slate-300 hover:bg-slate-800/40 text-xs font-bold transition-all cursor-pointer"
+              >
+                Login with OTP
+              </button>
+            </div>
+          </form>
+        )}
 
-                <label className="flex items-center gap-2 text-[10px] text-slate-500 cursor-pointer pt-1">
-                  <input
-                    type="checkbox"
-                    checked={agreeTerms}
-                    onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span>I agree to Terms & Privacy Policy</span>
-                </label>
-
+        {/* OTP tab */}
+        {activeTab === 'otp' && (
+          <form onSubmit={handleOtpLoginSubmit} className="space-y-4">
+            {/* Email input */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Corporate Email</label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@thestackly.com"
+                  className="flex-1 bg-[#050B18] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#10B981] transition-colors font-semibold"
+                />
                 <button
-                  type="submit"
-                  disabled={isLoading}
-                  style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', color: '#ffffff' }}
-                  className="w-full py-2.5 rounded-xl hover:scale-[1.01] font-extrabold text-xs shadow-lg shadow-blue-500/20 transition-all border-none cursor-pointer flex items-center justify-center gap-2 mt-2"
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={timer > 0 || isLoading}
+                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 border-none cursor-pointer"
                 >
-                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                  {timer > 0 ? `Resend (${timer}s)` : 'Resend'}
                 </button>
-              </form>
-            )}
+              </div>
+            </div>
+
+            {/* OTP input fields */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">6-Digit OTP Code</label>
+                <span className="text-[9px] text-slate-500 font-bold font-mono">Resend OTP in 00:{timer.toString().padStart(2, '0')}</span>
+              </div>
+              <div className="flex justify-between gap-2 py-1">
+                {otpValues.map((val, idx) => (
+                  <input
+                    key={idx}
+                    ref={otpRefs[idx]}
+                    type="text"
+                    required
+                    maxLength={1}
+                    value={val}
+                    disabled={timer === 0 || isLoading}
+                    onChange={(e) => handleOtpChange(idx, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    onPaste={handleOtpPaste}
+                    className="w-12 h-12 rounded-xl text-center text-sm font-black font-mono bg-[#050B18] border border-slate-800 text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all shadow-inner disabled:opacity-50"
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs pt-1">
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={timer > 0 || isLoading}
+                className="text-blue-500 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer disabled:opacity-50 disabled:no-underline"
+              >
+                Resend OTP code
+              </button>
+              <span className="text-[9px] text-slate-500 font-mono flex items-center gap-1">
+                <ShieldCheck size={12} className="text-[#10B981] animate-pulse" /> Auto Verify Enabled
+              </span>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || timer === 0}
+              className="w-full py-3 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-extrabold text-xs shadow-md shadow-emerald-500/10 border-none cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:scale-100"
+            >
+              {isLoading ? 'Verifying...' : 'Sign In with OTP'}
+            </button>
+
+            <div className="flex items-center my-3">
+              <div className="flex-1 border-t border-slate-800" />
+              <span className="px-3 text-[9px] font-black text-slate-500 uppercase tracking-widest">OR</span>
+              <div className="flex-1 border-t border-slate-800" />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('login');
+                setError('');
+                setSuccessMsg('');
+              }}
+              className="w-full py-2.5 rounded-xl bg-transparent border border-slate-800 text-slate-300 hover:bg-slate-800/40 text-xs font-bold transition-all cursor-pointer"
+            >
+              Back to Password Login
+            </button>
+          </form>
+        )}
+
+        {/* Bottom controls: Privacy Policy | Terms, Light/Dark Toggle */}
+        <div className="flex items-center justify-between pt-4 border-t border-slate-800/80 text-[10px] text-slate-400 font-mono">
+          <div className="flex items-center gap-3">
+            <a href="#" className="hover:underline text-[#10B981]">Privacy Policy</a>
+            <a href="#" className="hover:underline text-[#10B981]">Terms</a>
           </div>
-
-          {/* Bottom text */}
-          {activeTab !== 'signup' ? (
-            <div className="text-center text-xs text-slate-500">
-              Don't have an account?{' '}
-              <button
-                onClick={() => {
-                  setActiveTab('signup');
-                  setError('');
-                  setSuccessMsg('');
-                }}
-                className="text-blue-600 dark:text-blue-400 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer"
-              >
-                Create Account
-              </button>
-            </div>
-          ) : (
-            <div className="text-center text-xs text-slate-500">
-              Already have an account?{' '}
-              <button
-                onClick={() => {
-                  setActiveTab('login');
-                  setError('');
-                  setSuccessMsg('');
-                }}
-                className="text-blue-600 dark:text-blue-400 hover:underline font-bold bg-transparent border-none p-0 cursor-pointer"
-              >
-                Login
-              </button>
-            </div>
-          )}
-
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#050B18] border border-slate-800 text-[10px] text-slate-200 hover:bg-slate-800 font-bold transition-colors cursor-pointer"
+          >
+            <span className="text-amber-500 font-black">●</span> {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
         </div>
+
+        {/* Footer link to sign up */}
+        <div className="text-center text-xs text-slate-400 pt-1">
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-[#10B981] hover:underline font-bold">
+            Create account
+          </Link>
+        </div>
+
       </div>
-      
     </div>
   );
 };
