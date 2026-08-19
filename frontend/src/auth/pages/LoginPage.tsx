@@ -217,14 +217,18 @@ export const LoginPage: React.FC = () => {
       setChallengeId(res.challengeId);
       setExpiresAt(res.expiresAt);
       setOtpValues(['', '', '', '', '', '']);
+      let otpStr = '';
       if (res.otpDevHint) {
-        const otpStr = res.otpDevHint.toString();
+        otpStr = res.otpDevHint.toString();
         setOtpValues(otpStr.split(''));
         sessionStorage.setItem('mfa_otp_dev_hint', otpStr);
       } else {
         sessionStorage.removeItem('mfa_otp_dev_hint');
       }
       setSuccessMsg('MFA verification code has been resent.');
+      if (otpStr) {
+        verifyMfaAction(otpStr, res.challengeId);
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to resend code.');
     } finally {
@@ -250,8 +254,9 @@ export const LoginPage: React.FC = () => {
         setChallengeId(res.challengeId);
         setExpiresAt(res.expiresAt);
         setOtpValues(['', '', '', '', '', '']);
+        let otpStr = '';
         if (res.otpDevHint) {
-          const otpStr = res.otpDevHint.toString();
+          otpStr = res.otpDevHint.toString();
           setOtpValues(otpStr.split(''));
           sessionStorage.setItem('mfa_otp_dev_hint', otpStr);
         } else {
@@ -259,6 +264,9 @@ export const LoginPage: React.FC = () => {
         }
         setActiveTab('otp');
         setSuccessMsg('OTP Code has been generated.');
+        if (otpStr) {
+          verifyMfaAction(otpStr, res.challengeId);
+        }
       } else {
         await login(email, password);
       }
@@ -269,8 +277,8 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const verifyMfaAction = async (otpCode: string) => {
-    if (!challengeId) {
+  const verifyMfaAction = async (otpCode: string, currentChallengeId: string | null = challengeId) => {
+    if (!currentChallengeId) {
       setError('MFA session expired or invalid. Please request a new code.');
       return;
     }
@@ -278,7 +286,7 @@ export const LoginPage: React.FC = () => {
     setSuccessMsg('');
     setIsLoading(true);
     try {
-      await verifyMfa(challengeId, otpCode);
+      await verifyMfa(currentChallengeId, otpCode);
     } catch (err: any) {
       setError(err.message || 'Verification failed. Please try again.');
       setOtpValues(['', '', '', '', '', '']);
@@ -298,7 +306,7 @@ export const LoginPage: React.FC = () => {
     await verifyMfaAction(otpCode);
   };
 
-  const handleSignUpSubmit = (e: React.FormEvent) => {
+  const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
@@ -314,11 +322,27 @@ export const LoginPage: React.FC = () => {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setSuccessMsg('Account request submitted successfully! Try logging in.');
-      setIsLoading(false);
+    try {
+      await authService.signup({
+        name: fullName,
+        email: email,
+        password: password,
+        department: department,
+        role: 'EMPLOYEE'
+      });
+      setSuccessMsg('Account registered successfully! Try logging in.');
+      setFullName('');
+      setEmployeeId('');
+      setDepartment('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
       setActiveTab('login');
-    }, 1000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to register account.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -3,6 +3,8 @@ import { logAudit } from '../config/db.js';
 import * as authService from '../services/auth.service.js';
 import { userRepository } from '../repositories/user.repository.js';
 import bcrypt from 'bcryptjs';
+import { Employee } from '../models/Employee.js';
+import crypto from 'crypto';
 
 const ORGANIZATION_ID = 'org-stackly';
 
@@ -266,5 +268,91 @@ export const healthCheck = async (req, res) => {
       databaseType: "MongoDB Atlas",
       environment: process.env.NODE_ENV || "development"
     });
+  }
+};
+
+export const signup = async (req, res) => {
+  try {
+    const { name, email, password, department, role, location, designation } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ success: false, message: 'Name, email, and password are required.' });
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail.endsWith('@thestackly.com') && !trimmedEmail.endsWith('@company.com')) {
+      return res.status(403).json({ success: false, message: 'Only official @thestackly.com or @company.com corporate email domains permitted.' });
+    }
+
+    const lookupEmail = trimmedEmail.endsWith('@company.com')
+      ? trimmedEmail.replace('@company.com', '@thestackly.com')
+      : trimmedEmail;
+
+    const existingUser = await userRepository.findByEmail(lookupEmail);
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'An account with this email address already exists.' });
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const passwordHash = bcrypt.hashSync(password, salt);
+
+    const uuid = crypto.randomUUID();
+    const employeeId = `emp-${uuid.substring(0, 8)}`;
+    const randomYear = new Date().getFullYear();
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const employeeCode = `STK-${randomYear}-${randomNum}`;
+
+    const newRole = role || 'EMPLOYEE';
+    const newDept = department || 'Engineering';
+    const newLoc = location || 'Hyderabad';
+    const newDesign = designation || 'Associate';
+
+    const permissions = ['PROFILE_VIEW', 'PROFILE_UPDATE', 'ATTENDANCE_VIEW_SELF', 'LEAVE_REQUEST', 'PERFORMANCE_VIEW_SELF', 'GOAL_UPDATE', 'DOCUMENT_UPLOAD'];
+    if (newRole === 'MANAGER') {
+      permissions.push('TEAM_VIEW', 'TEAM_ANALYTICS_VIEW', 'EMPLOYEE_VIEW_TEAM', 'ATTENDANCE_VIEW_TEAM', 'LEAVE_APPROVE', 'PERFORMANCE_REVIEW', 'TASK_ASSIGN', 'REPORT_VIEW_TEAM');
+    }
+
+    await userRepository.create({
+      id: employeeId,
+      name,
+      email: lookupEmail,
+      password_hash: passwordHash,
+      role: newRole,
+      department: newDept,
+      location: newLoc,
+      title: newDesign,
+      clearanceLevel: newRole === 'MANAGER' ? 3 : 1,
+      status: 'ACTIVE',
+      permissions,
+      mfa_enabled: 1,
+      organizationId: ORGANIZATION_ID
+    });
+
+    await Employee.create({
+      id: employeeId,
+      employeeCode,
+      name,
+      email: lookupEmail,
+      role: newRole,
+      department: newDept,
+      designation: newDesign,
+      status: 'ACTIVE',
+      joinDate: new Date().toISOString().substring(0, 10),
+      performanceScore: 90,
+      attendanceRate: 95,
+      location: newLoc,
+      organizationId: ORGANIZATION_ID,
+      companyId: ORGANIZATION_ID
+    });
+
+    logAudit(employeeId, 'SIGNUP', `Registered new user account: ${lookupEmail}`);
+
+    return res.status(201).json({
+      success: true,
+      message: 'Account registered successfully.'
+    });
+  } catch (err) {
+    console.error('Signup failed:', err);
+    return res.status(500).json({ success: false, message: err.message || 'Signup failed' });
   }
 };

@@ -6,9 +6,9 @@ import { Clock, ShieldCheck, Activity, Users } from 'lucide-react';
 
 export const ShiftsPage: React.FC = () => {
   const corporateShifts = [
-    { name: 'Standard Day Shift', schedule: '09:00 AM - 05:00 PM', compliance: '100% compliant', allocated: 215 },
-    { name: 'US Core Business Hours', schedule: '06:30 PM - 02:30 AM', compliance: '98.5% compliant', allocated: 58 },
-    { name: 'UK Support Hours', schedule: '01:30 PM - 09:30 PM', compliance: '100% compliant', allocated: 28 }
+    { name: 'Standard Day Shift', schedule: '09:00 AM - 05:00 PM', compliance: '100% compliant', allocated: 170 },
+    { name: 'US Core Business Hours', schedule: '06:30 PM - 02:30 AM', compliance: '98.5% compliant', allocated: 50 },
+    { name: 'UK Support Hours', schedule: '01:30 PM - 09:30 PM', compliance: '100% compliant', allocated: 30 }
   ];
 
   return (
@@ -30,7 +30,7 @@ export const ShiftsPage: React.FC = () => {
         {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <MinimalKpiCard title="Configured Shifts" value="3 Core Shifts" icon={<Clock size={26} />} iconBgColor="blue" trend="Day, Late, Night shifts" trendType="positive" />
-          <MinimalKpiCard title="Allocated Headcount" value="301 Employees" icon={<Users size={26} />} iconBgColor="emerald" trend="100% rostered" trendType="positive" />
+          <MinimalKpiCard title="Allocated Headcount" value="250 Employees" icon={<Users size={26} />} iconBgColor="emerald" trend="100% rostered" trendType="positive" />
           <MinimalKpiCard title="Roster Adherence" value="98.5%" icon={<ShieldCheck size={26} />} iconBgColor="purple" trend="Zero missing allocations" trendType="positive" />
           <MinimalKpiCard title="Schedule Variance" value="Low" icon={<Activity size={26} />} iconBgColor="amber" trend="Consistent timeline" trendType="positive" />
         </div>

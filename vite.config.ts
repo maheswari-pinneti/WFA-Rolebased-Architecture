@@ -3,6 +3,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
+const PORT = process.env.PORT || 5000;
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -16,12 +21,12 @@ export default defineConfig({
     open: false,
     proxy: {
       '/v1': {
-        target: 'http://localhost:5002',
+        target: `http://localhost:${PORT}`,
         changeOrigin: true,
         secure: false,
       },
       '/api': {
-        target: 'http://localhost:5002',
+        target: `http://localhost:${PORT}`,
         changeOrigin: true,
         secure: false,
       },

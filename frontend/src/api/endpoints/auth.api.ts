@@ -35,5 +35,13 @@ export const authApi = {
 
   logout: async (refreshToken?: string): Promise<void> => {
     await apiClient.post('/v1/auth/logout', { refreshToken });
+  },
+  
+  signup: async (userData: any): Promise<any> => {
+    const response = await apiClient.post('/v1/auth/signup', userData);
+    if (response.data && response.data.success) {
+      return response.data;
+    }
+    throw new Error(response.data?.message || 'Registration failed');
   }
 };

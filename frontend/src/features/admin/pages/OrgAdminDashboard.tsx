@@ -38,7 +38,7 @@ export const OrgAdminDashboard: React.FC = () => {
             <span>Total Headcount</span>
             <Users size={18} className="text-blue-500" />
           </div>
-          <p className="text-2xl font-black text-[var(--text-primary)]">301 Employees</p>
+          <p className="text-2xl font-black text-[var(--text-primary)]">250 Employees</p>
           <p className="text-[11px] text-emerald-400 font-bold">+12% Growth Q2</p>
         </div>
 
@@ -56,8 +56,8 @@ export const OrgAdminDashboard: React.FC = () => {
             <span>Global Locations</span>
             <MapPin size={18} className="text-cyan-400" />
           </div>
-          <p className="text-2xl font-black text-[var(--text-primary)]">4 Offices</p>
-          <p className="text-[11px] text-purple-400 font-bold">SF, NY, London, Tokyo</p>
+          <p className="text-2xl font-black text-[var(--text-primary)]">5 Offices</p>
+          <p className="text-[11px] text-purple-400 font-bold">HYD, VTZ, MAA, BLR, COK</p>
         </div>
 
         <div className="glass-panel p-5 rounded-2xl border-[var(--border-color)] space-y-2">

@@ -5,19 +5,31 @@
   --sidebar-width-expanded: 280px;
   --sidebar-width-collapsed: 76px;
 
+  /* Layout Backgrounds */
+  --dashboard-bg: #f8fafc; /* Off-white for the main area */
+  --sidebar-bg: #ffffff;   /* Pure white for the sidebar */
+  --border-color: #cbd5e1; /* Light border to separate them */
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  /* Role Colors */
+  --role-admin: #4f46e5;
+  --role-developer: #059669;
+  --role-editor: #d97706;
+  --role-viewer: #e11d48;
+  --role-guest: #475569;
+
   /* Stackly Enterprise Light Theme */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
+  --bg-primary: var(--dashboard-bg);
+  --bg-secondary: var(--sidebar-bg);
   --bg-tertiary: #f1f5f9;
   --bg-card: #ffffff;
   --bg-hover: #e2e8f0;
   
-  --border-color: #cbd5e1;
   --border-subtle: #e2e8f0;
   
-  --text-primary: #0f172a;
+  --text-primary: var(--text-main);
   --text-secondary: #334155;
-  --text-muted: #64748b;
   
   --stackly-blue: #059669;
   --stackly-blue-hover: #047857;
@@ -31,19 +43,31 @@
 }
 
 [data-theme='dark'] {
+  /* Layout Backgrounds */
+  --dashboard-bg: #0f172a; /* Deep dark background */
+  --sidebar-bg: #1e293b;   /* Slightly lighter to elevate the sidebar */
+  --border-color: #334155; /* Dark subtle border */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+
+  /* Role Colors */
+  --role-admin: #818cf8;
+  --role-developer: #34d399;
+  --role-editor: #fbbf24;
+  --role-viewer: #fb7185;
+  --role-guest: #94a3b8;
+
   /* Stackly Enterprise Dark Navy Theme */
-  --bg-primary: #0b1120;
-  --bg-secondary: #0f172a;
+  --bg-primary: var(--dashboard-bg);
+  --bg-secondary: var(--sidebar-bg);
   --bg-tertiary: #1e293b;
-  --bg-card: #0f172a;
+  --bg-card: var(--sidebar-bg);
   --bg-hover: #334155;
   
-  --border-color: #1e293b;
-  --border-subtle: #1e293b;
+  --border-subtle: var(--border-color);
   
-  --text-primary: #f8fafc;
+  --text-primary: var(--text-main);
   --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
   
   --stackly-blue: #34d399;
   --stackly-blue-hover: #10b981;
@@ -467,8 +491,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .app-sidebar {
   top: var(--header-height) !important; /* Flush with bottom of header on mobile */
   height: calc(100vh - var(--header-height)) !important; /* Height minus header height */
-  background: linear-gradient(180deg, #0b1424 0%, #07101d 100%) !important;
-  border-color: rgba(148, 163, 184, 0.12) !important;
+  background: var(--sidebar-bg) !important;
+  border-color: var(--border-color) !important;
   box-shadow: 14px 0 40px rgba(2, 8, 23, 0.18) !important;
   margin: 0 !important;
   margin-top: 0 !important;
@@ -1059,8 +1083,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   --sidebar-accent-soft: rgba(96, 165, 250, 0.14);
   --sidebar-ink: #dbeafe;
   overflow: hidden;
-  background: var(--surface) !important;
-  border-right: 1px solid var(--line) !important;
+  background: var(--sidebar-bg) !important;
+  border-right: 1px solid var(--border-color) !important;
   box-shadow: 18px 0 48px rgba(2, 8, 23, 0.12) !important;
   margin: 0 !important;
   margin-top: 0 !important;
@@ -1068,6 +1092,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   padding-right: 0 !important;
   box-sizing: border-box !important;
   flex-shrink: 0;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 .app-sidebar * {
   box-sizing: border-box;
@@ -1079,6 +1104,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .app-main {
   flex-grow: 1;
   box-sizing: border-box;
+  background-color: var(--dashboard-bg);
+  transition: background-color 0.3s;
 }
 .app-sidebar::before {
   content: '';
@@ -1096,13 +1123,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .app-sidebar.sidebar-accent-team-lead { --sidebar-accent: #2dd4bf; --sidebar-accent-strong: #0f766e; --sidebar-accent-soft: rgba(45, 212, 191, 0.15); --sidebar-ink: #ccfbf1; }
 .app-sidebar.sidebar-accent-employee { --sidebar-accent: #34d399; --sidebar-accent-strong: #059669; --sidebar-accent-soft: rgba(52, 211, 153, 0.15); --sidebar-ink: #d1fae5; }
 .app-sidebar.sidebar-accent-emerald { --sidebar-accent: #34d399; --sidebar-accent-strong: #059669; --sidebar-accent-soft: rgba(52, 211, 153, 0.15); --sidebar-ink: #d1fae5; }
-
+ 
 [data-theme='light'] .app-sidebar {
-  background: linear-gradient(180deg, #ffffff 0%, #f7faff 58%, #f3f7fc 100%) !important;
+  background: var(--sidebar-bg) !important;
   box-shadow: 14px 0 35px rgba(15, 23, 42, 0.08) !important;
 }
 [data-theme='dark'] .app-sidebar {
-  background: linear-gradient(180deg, #0e192a 0%, #091321 52%, #07101d 100%) !important;
+  background: var(--sidebar-bg) !important;
 }
 
 .sidebar-brand {
