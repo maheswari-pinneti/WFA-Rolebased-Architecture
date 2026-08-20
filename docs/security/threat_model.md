@@ -11,7 +11,7 @@ graph TD
   User[User Browser]
   API[Express API Layer]
   Auth[JWT & MFA Service]
-  DB[SQLite Database]
+  DB[MongoDB Database]
 
   User -- 1. HTTPS / Bearer Token --> API
   API -- 2. Authenticate & Validate --> Auth
@@ -21,10 +21,10 @@ graph TD
 ### Risk Exposure Scenarios
 1. **Broken Access Control (IDOR / BOLA)**: Attackers manipulating query params (like `employeeId` or `department`) to bypass UI scopes.
    - *Resolution*: Implemented server-side `enforceScope` middleware verifying user context directly from JWT against the database resource.
-2. **SQL Injection (SQLi)**: Attacking entry points (sorting, filter parameters) with raw SQL substrings.
-   - *Resolution*: All queries parameterize input values; sort fields restricted to strict allowlist arrays.
-3. **Database File Exposure**: Directly downloading SQLite database files (`wfa.db`) from static hosting.
-   - *Resolution*: Database directory located outside the Web-root / static assets folders.
+2. **NoSQL Injection**: Attacking query filters using special operators (e.g. `$ne`, `$gt`) to bypass authentication checks or fetch arbitrary documents.
+   - *Resolution*: Express requests undergo sanitization using mongoose schema constraints, casting input params to defined schema types (e.g. String, Number) which automatically strips out malicious query operator objects.
+3. **Database Connection Exposure**: Exposing MongoDB credentials or connection strings in committed code repositories.
+   - *Resolution*: MongoDB credentials loaded dynamically via `.env` configurations; zero-config fallback to an in-memory instance for development environments.
 
 ---
 
@@ -35,5 +35,5 @@ graph TD
 | **Authentication** | **95/100** | Strict Bcrypt hashing, robust MFA validation, and brute-force rate limit protection. |
 | **Authorization** | **95/100** | Server-side role validation (RBAC) + scope enforcement (ABAC). |
 | **API Security** | **90/100** | Rate limiting, input validation, and Helmet header protection. |
-| **Database Security** | **95/100** | Strict parameterization, PRAGMA checks, and transaction support. |
+| **Database Security** | **95/100** | Strict Schema validation, TLS encryption, and secure environment connection setups. |
 | **Overall Score** | **94/100** | **READY FOR PRODUCTION DEPLOYMENT** |

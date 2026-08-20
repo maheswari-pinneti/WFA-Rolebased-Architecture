@@ -7,16 +7,13 @@ WFA-Rolebased-Architecture-main/
 ├── backend/                       # Backend Express API Service
 │   ├── scripts/                   # Simulator and seed execution scripts
 │   └── src/                       # Main source code
-│       ├── config/                # Environment variables, DB initialization, Redis and logging configs
+│       ├── config/                # Environment variables, MongoDB/Mongoose initialization, and logging configs
 │       ├── controllers/           # HTTP Request controllers (handling API logic)
-│       ├── database/              # SQLite and PostgreSQL connection abstractions and migration scripts
 │       ├── middleware/            # JWT validation, Role checks, ABAC limits, and Rate limiters
 │       ├── routes/                # API route definitions (/v1/...)
-│       ├── services/              # Business logic services (MFA delivery, Session tracking)
+│       ├── services/              # Business logic services (MFA delivery, Session tracking, employee updates)
 │       └── app.js                 # Express application instantiation
-├── database/                      # Database templates and migrations
-│   ├── migrations/                # SQL Schema migration files
-│   └── seeds/                     # SQL Seed data files
+├── database/                      # Database design specifications and documentation
 ├── docs/                          # Architecture and design documentation
 │   ├── security/                  # Threat models and security assessments
 │   └── architecture/              # Folder structures and design patterns

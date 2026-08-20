@@ -44,8 +44,8 @@ export const HRDashboard: React.FC = () => {
   ];
 
   // Map values dynamically from active database state if loaded
-  const rawCount = analytics?.metrics?.totalWorkforce ?? 254;
-  const headCount = typeof rawCount === 'number' ? rawCount : Number(rawCount) || 254;
+  const rawCount = analytics?.metrics?.totalWorkforce ?? 250;
+  const headCount = typeof rawCount === 'number' ? rawCount : Number(rawCount) || 250;
   const attendanceRate = analytics?.metrics?.attendanceRate ?? '96.5%';
   const riskCount = analytics?.metrics?.retentionRiskCount ?? 0;
   const lateCount = analytics?.metrics?.lateArrivals ?? 0;

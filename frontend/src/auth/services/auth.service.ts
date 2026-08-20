@@ -52,6 +52,10 @@ export const authService = {
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER_DATA);
   },
+  
+  signup: async (userData: any) => {
+    return await authApi.signup(userData);
+  },
 
   getStoredSession: () => {
     const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);

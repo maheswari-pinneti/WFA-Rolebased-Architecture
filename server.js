@@ -1,11 +1,12 @@
+import 'dotenv/config';
 import http from 'http';
 import { Server } from 'socket.io';
 import { app } from './backend/src/app.js';
 import { initSockets } from './backend/src/sockets/index.js';
-import { closeDb } from './backend/src/database/connection.js';
+import { disconnectMongoDB } from './backend/src/config/mongodb.js';
 import logger from './backend/src/config/logger.js';
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 let server;
 let io;
@@ -38,8 +39,8 @@ const handleGracefulShutdown = (signal) => {
         await new Promise((resolve) => io.close(resolve));
         logger.info('server.shutdown.sockets_closed', 'Socket.IO connections closed.');
       }
-      await closeDb();
-      logger.info('server.shutdown.db_closed', 'SQLite connection closed.');
+      await disconnectMongoDB();
+      logger.info('server.shutdown.db_closed', 'MongoDB connection closed.');
       process.exit(0);
     } catch (err) {
       logger.error('server.shutdown.error', 'Error during graceful shutdown', { error: err.message });

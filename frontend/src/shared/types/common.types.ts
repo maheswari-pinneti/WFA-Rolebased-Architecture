@@ -37,6 +37,7 @@ export interface Employee {
   manager_id?: string;
   manager_name?: string;
   attendance_status?: 'Present' | 'Absent' | 'Late' | 'Remote' | 'Leave' | string;
+  team?: string;
 }
 
 export interface ModalProps {

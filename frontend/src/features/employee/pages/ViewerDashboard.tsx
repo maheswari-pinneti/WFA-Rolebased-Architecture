@@ -39,8 +39,8 @@ export const ViewerDashboard: React.FC = () => {
             <span>Total Staff</span>
             <BarChart3 size={18} className="text-blue-400" />
           </div>
-          <p className="text-2xl font-black text-[var(--text-primary)]">301 Employees</p>
-          <p className="text-[11px] text-slate-400">4 Active Global Hubs</p>
+          <p className="text-2xl font-black text-[var(--text-primary)]">250 Employees</p>
+          <p className="text-[11px] text-slate-400">5 Active Global Hubs</p>
         </div>
 
         <div className="glass-panel p-5 rounded-2xl border-[var(--border-color)] space-y-2">

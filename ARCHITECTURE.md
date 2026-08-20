@@ -2,7 +2,7 @@
 
 This index guides you through the official, enterprise-grade architecture and operational flow of the **Workforce Analytics Platform**. 
 
-Instead of general or generic designs, these diagrams are mapped specifically to the actual structures implemented inside the repository (React frontend, Node/Express backend, and SQLite database).
+Instead of general or generic designs, these diagrams are mapped specifically to the actual structures implemented inside the repository (React frontend, Node/Express backend, and MongoDB database).
 
 ---
 

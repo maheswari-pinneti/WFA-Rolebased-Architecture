@@ -1,10 +1,14 @@
-process.env.DB_NAME = 'wfa-test-api.db';
+process.env.MONGODB_DB_NAME = 'workforce-test-api';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import axios from 'axios';
+import mongoose from 'mongoose';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { app } from '../../server.js';
-import db, { initDb } from '../../db.js';
+import { initDb } from '../../backend/src/config/db.js';
+import { Attendance, Correction } from '../../backend/src/models/Attendance.js';
 
 let server: any;
+let mongod: MongoMemoryReplSet;
 const PORT = 5099;
 const client = axios.create({
   baseURL: `http://localhost:${PORT}`,
@@ -12,28 +16,37 @@ const client = axios.create({
 });
 
 beforeAll(async () => {
-  await initDb();
-  await new Promise((resolve) => {
-    db.run("DELETE FROM attendance_records", () => {
-      db.run("DELETE FROM corrections", () => {
-        resolve();
-      });
-    });
+  mongod = await MongoMemoryReplSet.create({
+    replSet: { count: 1 },
+    instance: { startupTimeout: 40000 }
   });
-  return new Promise((resolve) => {
+  process.env.MONGODB_URI = mongod.getUri();
+  
+  await initDb();
+  await Attendance.deleteMany({});
+  await Correction.deleteMany({});
+  return new Promise<void>((resolve) => {
     server = app.listen(PORT, () => {
       resolve();
     });
   });
-});
+}, 30000);
 
 afterAll(async () => {
-  return new Promise((resolve) => {
-    server.close(() => {
+  await mongoose.disconnect();
+  if (mongod) {
+    await mongod.stop();
+  }
+  return new Promise<void>((resolve) => {
+    if (server) {
+      server.close(() => {
+        resolve();
+      });
+    } else {
       resolve();
-    });
+    }
   });
-});
+}, 30000);
 
 describe('Workforce Analytics API Integration & Authorization Tests', () => {
   let adminToken = '';
@@ -401,46 +414,37 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
   });
 
   describe('Database Schema, FK, and Seeding integrity', () => {
-    it('should verify schema constraints and table existences', async () => {
-      return new Promise<void>((resolve, reject) => {
-        db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, tables) => {
-          if (err) return reject(err);
-          const tableNames = tables.map((t: any) => t.name);
-          expect(tableNames).toContain('users');
-          expect(tableNames).toContain('employees');
-          expect(tableNames).toContain('mfa_challenges');
-          expect(tableNames).toContain('sessions');
-          expect(tableNames).toContain('refresh_tokens');
-          resolve();
-        });
-      });
+    it('should verify schema collections exist', async () => {
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      const collectionNames = collections.map((c: any) => c.name);
+      expect(collectionNames).toContain('users');
+      expect(collectionNames).toContain('employees');
+      expect(collectionNames).toContain('mfachallenges');
+      expect(collectionNames).toContain('sessions');
+      expect(collectionNames).toContain('refreshtokens');
     });
 
     it('should verify seeder loaded the deterministic admin and employee structures', async () => {
-      return new Promise<void>((resolve, reject) => {
-        db.get("SELECT count(*) as count FROM users", [], (err, row: any) => {
-          if (err) return reject(err);
-          expect(row.count).toBeGreaterThanOrEqual(5); // Admin, HR, Manager, Lead, Employee
-          resolve();
-        });
-      });
+      const { User } = await import('../../backend/src/models/User.js');
+      const count = await User.countDocuments({});
+      expect(count).toBeGreaterThanOrEqual(5); // Admin, HR, Manager, Lead, Employee
     });
 
-    it('should enforce Foreign Key constraint checks', async () => {
-      return new Promise<void>((resolve, reject) => {
-        db.run("PRAGMA foreign_keys = ON", [], (err) => {
-          if (err) return reject(err);
-          db.run(
-            "INSERT INTO employees (id, name, email, department, designation, status, location, joinDate, organizationId) VALUES ('bad-emp', 'Jane', 'j@c.com', 'D', 'Designation', 'ACTIVE', 'Loc', '2026-08-01', 'invalid-org')",
-            [],
-            function (insertErr) {
-              expect(insertErr).toBeDefined();
-              expect(insertErr?.message).toMatch(/FOREIGN KEY constraint failed/);
-              resolve();
-            }
-          );
+    it('should enforce Unique constraint checks (validation)', async () => {
+      const { User } = await import('../../backend/src/models/User.js');
+      try {
+        await User.create({
+          id: 'duplicate-user-id',
+          name: 'Arthur Pendelton',
+          email: 'admin@thestackly.com',
+          password_hash: 'hash',
+          role: 'ADMIN'
         });
-      });
+        throw new Error('Should have thrown unique constraint error');
+      } catch (insertErr: any) {
+        expect(insertErr).toBeDefined();
+        expect(insertErr.code).toBe(11000); // Duplicate key code
+      }
     });
   });
 });

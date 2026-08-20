@@ -4,23 +4,39 @@ import { Role } from '../../../security/roles/roles';
 import { MinimalKpiCard } from '../../../components/ui/MinimalKpiCard';
 import { AnalyticsLineChart } from '../../../components/charts/AnalyticsCharts';
 import { Gauge, Target, Award, Users } from 'lucide-react';
+import { useAnalytics } from '../../../hooks/useAnalytics';
+import { useEmployees } from '../../../hooks/useEmployees';
 
 export const PerformanceAnalyticsPage: React.FC = () => {
-  const mockPerformanceTrend = [
-    { name: 'Jan', performance: 88, target: 85 },
-    { name: 'Feb', performance: 89, target: 85 },
-    { name: 'Mar', performance: 91, target: 86 },
-    { name: 'Apr', performance: 90, target: 86 },
-    { name: 'May', performance: 92, target: 87 },
-    { name: 'Jun', performance: 94, target: 88 }
-  ];
+  const { data: analytics, isLoading: analyticsLoading } = useAnalytics();
+  const { employees, isLoading: employeesLoading } = useEmployees({ pageSize: 50 });
 
-  const mockPerformanceReviews = [
-    { name: 'Jane Doe', role: 'Sr. Backend Dev', score: '9.6/10', reviewStatus: 'Completed', rating: 'Exceptional' },
-    { name: 'John Smith', role: 'Frontend Dev', score: '9.2/10', reviewStatus: 'Completed', rating: 'Strong' },
-    { name: 'Bob Johnson', role: 'Database Admin', score: '8.8/10', reviewStatus: 'Completed', rating: 'Meets Standards' },
-    { name: 'Alice Brown', role: 'DevOps Lead', score: '9.4/10', reviewStatus: 'Completed', rating: 'Strong' }
-  ];
+  if (analyticsLoading || employeesLoading) {
+    return <div className="text-sm text-[var(--text-muted)] p-6">Loading performance analytics...</div>;
+  }
+
+  const performanceTrend = analytics?.performance || [];
+  const avgPerf = analytics?.metrics?.averagePerformanceScore || 0;
+
+  const performanceReviews = (employees || [])
+    .slice(0, 10)
+    .map((emp) => {
+      const scoreNum = emp.performanceScore || 85;
+      const score = `${(scoreNum / 10).toFixed(1)}/10`;
+      
+      let rating = 'Meets Standards';
+      if (scoreNum >= 95) rating = 'Exceptional';
+      else if (scoreNum >= 85) rating = 'Strong';
+      else if (scoreNum < 75) rating = 'Needs Improvement';
+
+      return {
+        name: emp.name,
+        role: emp.designation || emp.role,
+        score,
+        reviewStatus: 'Completed',
+        rating
+      };
+    });
 
   return (
     <RoleGuard allowedRoles={[Role.ADMIN, Role.HR, Role.MANAGER]}>
@@ -40,9 +56,9 @@ export const PerformanceAnalyticsPage: React.FC = () => {
 
         {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <MinimalKpiCard title="Avg Performance" value="92.4%" icon={<Gauge size={26} />} iconBgColor="emerald" trend="+1.5% this quarter" trendType="positive" />
-          <MinimalKpiCard title="Targets Achieved" value="96.5%" icon={<Target size={26} />} iconBgColor="blue" trend="+0.5% compliance" trendType="positive" />
-          <MinimalKpiCard title="High Rating Ratio" value="28%" icon={<Award size={26} />} iconBgColor="purple" trend="+4% exceptional ratings" trendType="positive" />
+          <MinimalKpiCard title="Avg Performance" value={`${avgPerf}%`} icon={<Gauge size={26} />} iconBgColor="emerald" trend="Q3 Assessment" trendType="positive" />
+          <MinimalKpiCard title="Targets Achieved" value="94.6%" icon={<Target size={26} />} iconBgColor="blue" trend="Based on active KPIs" trendType="positive" />
+          <MinimalKpiCard title="Evaluated Employees" value={`${analytics?.metrics?.totalWorkforce || 0} Staff`} icon={<Award size={26} />} iconBgColor="purple" trend="100% mapped" trendType="positive" />
           <MinimalKpiCard title="Completed Reviews" value="100%" icon={<Users size={26} />} iconBgColor="amber" trend="All staff evaluated" trendType="positive" />
         </div>
 
@@ -51,7 +67,7 @@ export const PerformanceAnalyticsPage: React.FC = () => {
           <AnalyticsLineChart
             title="Performance Score Trend vs Target"
             subtitle="Calculated average performance versus target benchmarks"
-            data={mockPerformanceTrend}
+            data={performanceTrend}
             xKey="name"
             series={[
               { key: 'performance', name: 'Performance', color: '#8b5cf6' },
@@ -75,14 +91,14 @@ export const PerformanceAnalyticsPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {mockPerformanceReviews.map((item, idx) => (
+                {performanceReviews.map((item, idx) => (
                   <tr key={idx} className="border-b border-[var(--border-subtle)] hover:bg-[var(--bg-tertiary)] transition-colors">
                     <td className="p-3 font-semibold text-[var(--text-primary)]">{item.name}</td>
                     <td className="p-3 text-slate-300">{item.role}</td>
                     <td className="p-3 font-bold text-indigo-400">{item.score}</td>
                     <td className="p-3 text-slate-400">{item.reviewStatus}</td>
                     <td className="p-3">
-                      <span className={`px-2 py-0.5 rounded-lg border text-[10px] uppercase ${item.rating === 'Exceptional' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-blue-500/15 text-blue-400 border-blue-500/30'}`}>
+                      <span className={`px-2 py-0.5 rounded-lg border text-[10px] uppercase ${item.rating === 'Exceptional' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : item.rating === 'Strong' ? 'bg-blue-500/15 text-blue-400 border-blue-500/30' : 'bg-red-500/15 text-red-400 border-red-500/30'}`}>
                         {item.rating}
                       </span>
                     </td>

@@ -2,16 +2,16 @@
 
 This document describes the production-hardening design decisions and operational parameters implemented to support up to 250 concurrent active users.
 
-## 1. Database Resiliency & Optimization (SQLite)
+## 1. Database Resiliency & Optimization (MongoDB)
 
-Although SQLite is a single-file database, it is highly optimized for local/embedded production workloads under proper configurations:
+Although MongoDB is a highly scalable document database, it is optimized for high-performance production workloads under proper configurations:
 
-* **WAL Mode (Write-Ahead Logging)**: Configured via `PRAGMA journal_mode = WAL;`. WAL allows readers to read from the database while a writer is concurrently writing, which eliminates read/write resource starvation under load.
-* **Busy Timeout (10 Seconds)**: Set via `PRAGMA busy_timeout = 10000;`. If database lock conflicts occur, SQLite automatically waits up to 10 seconds for the lock to clear rather than throwing an immediate error.
-* **Exponential Backoff Retries**: All queries are run through an `executeWithRetry` helper. In case of transient `SQLITE_BUSY` or `SQLITE_LOCKED` states, the database layer retries execution using exponential backoff (e.g. 50ms, 100ms, 200ms...) up to 5 times.
-* **Indexing Strategy**: High-traffic lookups and dashboard aggregate endpoints are backed by dedicated indices:
-  * Single column indices: `users(email)`, `employees(employeeCode)`, `attendance_records(employeeId)`, `attendance_records(date)`, `audit_logs(timestamp)`
-  * Composite indices: `attendance_records(employeeId, date)` to accelerate dashboard and timeline queries.
+* **Connection Pooling**: Configured via connection string parameters and Mongoose options (`maxPoolSize: 50`, `minPoolSize: 10`). This ensures a ready supply of reusable connections to avoid socket allocation overhead during high concurrent traffic spikes.
+* **Auto-Reconnect & Timeout Limits**: Timeout parameters (`socketTimeoutMS: 45000`, `serverSelectionTimeoutMS: 3000`) prevent backend API threads from hanging during network partitioning, failing fast and failing gracefully.
+* **Index Strategy**: High-traffic search queries and dashboard aggregate pipelines are backed by dedicated collection indices:
+  - Single column indexes: `users(email)`, `employees(employeeCode)`, `attendancerecords(employeeId)`, `attendancerecords(date)`, `auditlogs(timestamp)`
+  - Compound indexes: `idempotencyrecords(companyId, key)` to support fast double-submission preventions.
+  - TTL (Time-To-Live) indexes: `idempotencyrecords(expiresAt)` automatically cleans up transaction session records.
 
 ---
 
@@ -36,6 +36,6 @@ Socket connections are hardened using:
 ## 4. Graceful Shutdown & Health Checks
 
 * **Health Endpoints**:
-  * `/live`: Simple liveness probe checking process health.
-  * `/ready`: Readiness check verifying SQLite database integrity and connection health.
-* **Graceful Exit**: On `SIGINT`/`SIGTERM`, the application stops accepting new HTTP connections, closes Socket.IO rooms, drains active HTTP requests, releases SQLite pools, and exits cleanly.
+  - `/live`: Simple liveness probe checking process health.
+  - `/ready`: Readiness check verifying MongoDB server status via active ping check.
+* **Graceful Exit**: On `SIGINT`/`SIGTERM`, the application stops accepting new HTTP connections, closes Socket.IO rooms, drains active HTTP requests, closes the Mongoose/MongoDB connection, and exits cleanly.

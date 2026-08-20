@@ -33,7 +33,7 @@ flowchart TD
     IDEMPOTENCY -->|YES| DUPLICATE["Reject Duplicate"]
     IDEMPOTENCY -->|NO| SAVE["Save Attendance"]
     
-    SAVE --> DB["SQLite"]
+    SAVE --> DB["MongoDB"]
     DB --> AUDIT2["Audit Log"]
     DB --> NOTIFICATION["Notification"]
     DB --> SOCKET["Socket.IO Event"]
