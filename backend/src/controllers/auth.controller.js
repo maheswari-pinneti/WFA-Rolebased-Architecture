@@ -290,7 +290,11 @@ export const signup = async (req, res) => {
 
     const existingUser = await userRepository.findByEmail(lookupEmail);
     if (existingUser) {
-      return res.status(400).json({ success: false, message: 'An account with this email address already exists.' });
+      logAudit('anonymous', 'SIGNUP_DUPLICATE', `Duplicate registration attempt for existing email: ${lookupEmail}`);
+      return res.status(201).json({
+        success: true,
+        message: 'Account registered successfully.'
+      });
     }
 
     const salt = bcrypt.genSaltSync(10);

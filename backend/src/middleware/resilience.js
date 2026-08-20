@@ -27,71 +27,9 @@ export const requestIdMiddleware = (req, res, next) => {
   next();
 };
 
-// Global rate limiting to protect the MongoDB database from concurrent spikes
-const globalLimiterInstance = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5000, // Limit each IP to 5000 requests per minute to allow spikes of 250 concurrent users making multiple API calls
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn('rate_limit.exceeded', `IP ${req.ip} exceeded global rate limit`, { ip: req.ip });
-    res.status(429).json({
-      success: false,
-      message: 'Too many requests, please try again later.'
-    });
-  }
-});
+import { globalRateLimiter, authRateLimiter, refreshRateLimiter } from './rateLimiter.js';
 
-export const globalRateLimiter = (req, res, next) => {
-  if (process.env.NODE_ENV === 'test') {
-    return next();
-  }
-  return globalLimiterInstance(req, res, next);
-};
-
-// Tight rate limiting for authentication/login requests to prevent brute-force attacks
-const authLimiterInstance = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 30, // Limit each IP to 30 login requests per minute in production
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn('security.rate_limit.exceeded', `IP ${req.ip} exceeded auth login limit`, { ip: req.ip });
-    res.status(429).json({
-      success: false,
-      message: 'Too many login attempts. Please try again after 1 minute.'
-    });
-  }
-});
-
-export const authRateLimiter = (req, res, next) => {
-  if (process.env.NODE_ENV === 'test') {
-    return next();
-  }
-  return authLimiterInstance(req, res, next);
-};
-
-// Rate limiting for token refresh requests
-const refreshLimiterInstance = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 100, // Limit each IP to 100 refresh requests per minute
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn('security.rate_limit.exceeded', `IP ${req.ip} exceeded refresh limit`, { ip: req.ip });
-    res.status(429).json({
-      success: false,
-      message: 'Too many token refresh attempts. Please try again later.'
-    });
-  }
-});
-
-export const refreshRateLimiter = (req, res, next) => {
-  if (process.env.NODE_ENV === 'test') {
-    return next();
-  }
-  return refreshLimiterInstance(req, res, next);
-};
+export { globalRateLimiter, authRateLimiter, refreshRateLimiter };
 
 // Wire up security headers and response compression
 export const configureResilience = (app) => {

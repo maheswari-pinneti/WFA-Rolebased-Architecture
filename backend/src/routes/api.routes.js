@@ -8,6 +8,14 @@ import * as organizationController from '../controllers/organization.controller.
 import * as auditController from '../controllers/audit.controller.js';
 import { authenticateToken, authorizeRoles, authorizePermissions, enforceScope } from '../middleware/auth.js';
 import { authRateLimiter } from '../middleware/resilience.js';
+import {
+  validateLogin,
+  validateSignup,
+  validateEmployeeCreate,
+  validateEmployeeUpdate,
+  validateCheckIn,
+  validateCorrection
+} from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -15,8 +23,8 @@ const router = express.Router();
 router.get('/health', authController.healthCheck);
 
 // Auth Routes
-router.post('/auth/login', authRateLimiter, authController.login);
-router.post('/auth/signup', authRateLimiter, authController.signup);
+router.post('/auth/login', authRateLimiter, validateLogin, authController.login);
+router.post('/auth/signup', authRateLimiter, validateSignup, authController.signup);
 router.post('/auth/mfa/verify', authRateLimiter, authController.verifyMfa);
 router.post('/auth/mfa-verify', authRateLimiter, authController.verifyMfa);
 router.post('/auth/mfa/resend', authRateLimiter, authController.resendMfa);
@@ -29,8 +37,8 @@ router.post('/auth/refresh', authRateLimiter, authController.refresh);
 router.get('/employees', authenticateToken, enforceScope, employeeController.getEmployees);
 router.put('/employees/:id/status', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_UPDATE', 'EMPLOYEE_MANAGE']), employeeController.updateEmployeeStatus);
 router.get('/employees/:id', authenticateToken, enforceScope, employeeController.getEmployeeById);
-router.post('/employees', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_CREATE', 'EMPLOYEE_MANAGE']), employeeController.createEmployee);
-router.put('/employees/:id', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_UPDATE', 'EMPLOYEE_MANAGE']), employeeController.updateEmployee);
+router.post('/employees', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_CREATE', 'EMPLOYEE_MANAGE']), validateEmployeeCreate, employeeController.createEmployee);
+router.put('/employees/:id', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_UPDATE', 'EMPLOYEE_MANAGE']), validateEmployeeUpdate, employeeController.updateEmployee);
 router.delete('/employees/:id', authenticateToken, enforceScope, authorizePermissions(['EMPLOYEE_DELETE', 'EMPLOYEE_MANAGE']), employeeController.deleteEmployee);
 
 // Team CRUD Route mappings
@@ -46,7 +54,7 @@ router.get('/permissions', authenticateToken, organizationController.getPermissi
 
 // Attendance Punch & Session Routes
 router.get('/attendance/today', authenticateToken, attendanceController.getTodayAttendance);
-router.post('/attendance/check-in', authenticateToken, enforceScope, attendanceController.checkIn);
+router.post('/attendance/check-in', authenticateToken, enforceScope, validateCheckIn, attendanceController.checkIn);
 router.post('/attendance/break', authenticateToken, enforceScope, attendanceController.takeBreak);
 router.post('/attendance/resume', authenticateToken, enforceScope, attendanceController.resumeWork);
 router.post('/attendance/check-out', authenticateToken, enforceScope, attendanceController.checkOut);
@@ -62,7 +70,7 @@ router.get('/tasks', authenticateToken, enforceScope, workforceController.getTas
 router.put('/tasks/:id', authenticateToken, workforceController.updateTask);
 
 // Corrections Requests
-router.post('/attendance/corrections', authenticateToken, enforceScope, attendanceController.submitCorrection);
+router.post('/attendance/corrections', authenticateToken, enforceScope, validateCorrection, attendanceController.submitCorrection);
 router.get('/attendance/corrections', authenticateToken, enforceScope, attendanceController.getCorrections);
 router.put('/attendance/corrections/:id', authenticateToken, authorizeRoles(['ADMIN', 'HR', 'MANAGER', 'TEAM_LEAD']), attendanceController.reviewCorrection);
 
