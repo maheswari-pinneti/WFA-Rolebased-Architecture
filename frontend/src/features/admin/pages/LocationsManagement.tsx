@@ -6,11 +6,9 @@ import { Button } from '../../../shared/components/Button';
 
 export const LocationsManagement: React.FC = () => {
   const [locations] = useState([
-    { id: 'loc-1', city: 'Hyderabad', country: 'India', code: 'HYD-IN', timezone: 'UTC+5:30 (IST)', headcount: 70, status: 'OPERATIONAL' },
-    { id: 'loc-2', city: 'Bengaluru', country: 'India', code: 'BLR-IN', timezone: 'UTC+5:30 (IST)', headcount: 60, status: 'OPERATIONAL' },
-    { id: 'loc-3', city: 'Chennai', country: 'India', code: 'MAA-IN', timezone: 'UTC+5:30 (IST)', headcount: 50, status: 'OPERATIONAL' },
-    { id: 'loc-4', city: 'Visakhapatnam', country: 'India', code: 'VTZ-IN', timezone: 'UTC+5:30 (IST)', headcount: 40, status: 'OPERATIONAL' },
-    { id: 'loc-5', city: 'Kochi', country: 'India', code: 'COK-IN', timezone: 'UTC+5:30 (IST)', headcount: 30, status: 'OPERATIONAL' },
+    { id: 'loc-1', city: 'Bengaluru', country: 'India', code: 'BLR-IN', timezone: 'UTC+5:30 (IST)', headcount: 250, status: 'OPERATIONAL' },
+    { id: 'loc-2', city: 'Hyderabad', country: 'India', code: 'HYD-IN', timezone: 'UTC+5:30 (IST)', headcount: 150, status: 'OPERATIONAL' },
+    { id: 'loc-3', city: 'Salem', country: 'India', code: 'SLM-IN', timezone: 'UTC+5:30 (IST)', headcount: 100, status: 'OPERATIONAL' },
   ]);
 
   return (

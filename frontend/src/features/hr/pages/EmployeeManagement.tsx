@@ -184,7 +184,7 @@ export const EmployeeManagement: React.FC = () => {
   const departments = ['ALL', 'Engineering', 'Product Management', 'Sales & Marketing', 'Human Resources', 'Customer Success', 'Finance & Operations'];
   const designations = ['ALL', 'Senior Software Engineer', 'Product Manager', 'Account Executive', 'HR Operations Manager', 'Customer Success Director', 'Financial Analyst', 'Full Stack Developer', 'Specialist'];
   const statuses = ['ALL', 'ACTIVE', 'REMOTE', 'ON_LEAVE', 'OFFLINE'];
-  const locations = ['ALL', 'Hyderabad', 'Visakhapatnam', 'Chennai', 'Bengaluru', 'Kochi'];
+  const locations = ['ALL', 'Bengaluru', 'Hyderabad', 'Salem'];
   const joiningYears = ['ALL', '2020', '2021', '2022', '2023', '2024', '2025', '2026'];
 
   return (

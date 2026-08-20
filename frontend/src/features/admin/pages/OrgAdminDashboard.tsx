@@ -3,12 +3,12 @@ import { Building2, MapPin, Users, GitBranch } from 'lucide-react';
 
 export const OrgAdminDashboard: React.FC = () => {
   const departments = [
-    { name: 'Engineering', head: 'Marcus Vance', headcount: 42, location: 'Hyderabad, Bengaluru' },
-    { name: 'Product Management', head: 'Sarah Connor', headcount: 42, location: 'Hyderabad, Visakhapatnam' },
-    { name: 'Sales & Marketing', head: 'David Sterling', headcount: 42, location: 'Chennai, Kochi' },
-    { name: 'Human Resources', head: 'Elena Rostova', headcount: 42, location: 'Bengaluru, Chennai' },
-    { name: 'Customer Success', head: 'Alex Mercer', headcount: 41, location: 'Kochi, Hyderabad' },
-    { name: 'Finance & Operations', head: 'Finance Manager', headcount: 41, location: 'Visakhapatnam, Bengaluru' }
+    { name: 'Engineering', head: 'Marcus Vance', headcount: 85, location: 'Bengaluru, Hyderabad' },
+    { name: 'Product Management', head: 'Sarah Connor', headcount: 85, location: 'Hyderabad, Salem' },
+    { name: 'Sales & Marketing', head: 'David Sterling', headcount: 85, location: 'Salem, Bengaluru' },
+    { name: 'Human Resources', head: 'Elena Rostova', headcount: 85, location: 'Bengaluru, Hyderabad' },
+    { name: 'Customer Success', head: 'Alex Mercer', headcount: 80, location: 'Hyderabad, Salem' },
+    { name: 'Finance & Operations', head: 'Finance Manager', headcount: 80, location: 'Salem, Bengaluru' }
   ];
 
   return (
@@ -38,7 +38,7 @@ export const OrgAdminDashboard: React.FC = () => {
             <span>Total Headcount</span>
             <Users size={18} className="text-blue-500" />
           </div>
-          <p className="text-2xl font-black text-[var(--text-primary)]">250 Employees</p>
+          <p className="text-2xl font-black text-[var(--text-primary)]">500 Employees</p>
           <p className="text-[11px] text-emerald-400 font-bold">+12% Growth Q2</p>
         </div>
 
@@ -56,8 +56,8 @@ export const OrgAdminDashboard: React.FC = () => {
             <span>Global Locations</span>
             <MapPin size={18} className="text-cyan-400" />
           </div>
-          <p className="text-2xl font-black text-[var(--text-primary)]">5 Offices</p>
-          <p className="text-[11px] text-purple-400 font-bold">HYD, VTZ, MAA, BLR, COK</p>
+          <p className="text-2xl font-black text-[var(--text-primary)]">3 Offices</p>
+          <p className="text-[11px] text-purple-400 font-bold">BLR, HYD, SLM</p>
         </div>
 
         <div className="glass-panel p-5 rounded-2xl border-[var(--border-color)] space-y-2">

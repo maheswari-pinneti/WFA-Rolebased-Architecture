@@ -6,12 +6,12 @@ import { Building2, Users, MapPin, GitBranch } from 'lucide-react';
 
 export const OrganizationPage: React.FC = () => {
   const departments = [
-    { name: 'Engineering', head: 'Marcus Vance', headcount: 42, location: 'Hyderabad, Bengaluru' },
-    { name: 'Product Management', head: 'Sarah Connor', headcount: 42, location: 'Hyderabad, Visakhapatnam' },
-    { name: 'Sales & Marketing', head: 'David Sterling', headcount: 42, location: 'Chennai, Kochi' },
-    { name: 'Human Resources', head: 'Elena Rostova', headcount: 42, location: 'Bengaluru, Chennai' },
-    { name: 'Customer Success', head: 'Alex Mercer', headcount: 41, location: 'Kochi, Hyderabad' },
-    { name: 'Finance & Operations', head: 'Finance Manager', headcount: 41, location: 'Visakhapatnam, Bengaluru' }
+    { name: 'Engineering', head: 'Marcus Vance', headcount: 85, location: 'Bengaluru, Hyderabad' },
+    { name: 'Product Management', head: 'Sarah Connor', headcount: 85, location: 'Hyderabad, Salem' },
+    { name: 'Sales & Marketing', head: 'David Sterling', headcount: 85, location: 'Salem, Bengaluru' },
+    { name: 'Human Resources', head: 'Elena Rostova', headcount: 85, location: 'Bengaluru, Hyderabad' },
+    { name: 'Customer Success', head: 'Alex Mercer', headcount: 80, location: 'Hyderabad, Salem' },
+    { name: 'Finance & Operations', head: 'Finance Manager', headcount: 80, location: 'Salem, Bengaluru' }
   ];
 
   return (
@@ -32,9 +32,9 @@ export const OrganizationPage: React.FC = () => {
 
         {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MinimalKpiCard title="Total Headcount" value="250 Employees" icon={<Users size={18} />} iconBgColor="blue" trend="+12% Growth Q2" trendType="positive" />
+          <MinimalKpiCard title="Total Headcount" value="500 Employees" icon={<Users size={18} />} iconBgColor="blue" trend="+12% Growth Q2" trendType="positive" />
           <MinimalKpiCard title="Departments" value="6 Active" icon={<Building2 size={18} />} iconBgColor="indigo" trend="Full Structural Coverage" trendType="positive" />
-          <MinimalKpiCard title="Global Locations" value="5 Offices" icon={<MapPin size={18} />} iconBgColor="cyan" trend="HYD, VTZ, MAA, BLR, COK" trendType="positive" />
+          <MinimalKpiCard title="Global Locations" value="3 Offices" icon={<MapPin size={18} />} iconBgColor="cyan" trend="BLR, HYD, SLM" trendType="positive" />
           <MinimalKpiCard title="Reporting Line" value="100% Mapped" icon={<GitBranch size={18} />} iconBgColor="emerald" trend="Zero Unassigned Staff" trendType="positive" />
         </div>
 

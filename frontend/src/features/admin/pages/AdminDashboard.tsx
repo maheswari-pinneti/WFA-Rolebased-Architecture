@@ -111,17 +111,15 @@ export const AdminDashboard: React.FC = () => {
             {/* KPI 1 */}
             <MinimalKpiCard
               title="Total Headcount"
-              value="250"
+              value="500"
               icon={<Users size={26} />}
               iconBgColor="emerald"
               trend="+12.4% than last month"
               trendType="positive"
-              onClick={() => openDrillDown('Total Employee Headcount', '250 Active Records', 'Global workforce roster by location', [
-                { label: 'Hyderabad', value: 70 },
-                { label: 'Bengaluru', value: 60 },
-                { label: 'Chennai', value: 50 },
-                { label: 'Visakhapatnam', value: 40 },
-                { label: 'Kochi', value: 30 }
+              onClick={() => openDrillDown('Total Employee Headcount', '500 Active Records', 'Global workforce roster by location', [
+                { label: 'Bengaluru', value: 250 },
+                { label: 'Hyderabad', value: 150 },
+                { label: 'Salem', value: 100 }
               ])}
             />
 
