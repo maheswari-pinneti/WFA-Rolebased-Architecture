@@ -367,8 +367,8 @@ describe('Workforce Analytics API Integration & Authorization Tests', () => {
     expect(page1.data.data.employees.length).toBe(25);
     expect(page1.data.data.pagination.page).toBe(1);
     expect(page1.data.data.pagination.pageSize).toBe(25);
-    expect(page1.data.data.pagination.totalItems).toBe(250);
-    expect(page1.data.data.pagination.totalPages).toBe(10);
+    expect(page1.data.data.pagination.totalItems).toBe(500);
+    expect(page1.data.data.pagination.totalPages).toBe(20);
     
     // Default order should be numerical sequence STK-YYYY-0001 to STK-YYYY-0025
     expect(page1.data.data.employees[0].employeeCode).toContain('-0001');

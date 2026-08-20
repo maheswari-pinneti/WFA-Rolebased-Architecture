@@ -64,3 +64,26 @@ This document outlines the core database verification guidelines and checklist f
 ## 7. Data Integrity Rules
 - **Schema Validation:** Enforces strict validation at both the Express validation middleware layer and Mongoose schema level.
 - **Transactions:** Multi-collection operations should use Mongoose transactions where session state is active.
+
+---
+
+## 8. MongoDB 500 MB Capacity Gate
+- [ ] Storage usage monitored
+- [ ] Collection sizes measured
+- [ ] Index sizes measured
+- [ ] Largest collections identified
+- [ ] Attendance growth calculated
+- [ ] Audit-log growth calculated
+- [ ] Temporary data has TTL
+- [ ] File storage separated from MongoDB
+- [ ] Data-retention policy defined
+- [ ] Archive strategy defined
+- [ ] Backup configured
+- [ ] Restore tested
+- [ ] Storage alerts configured
+- [ ] Database capacity expansion procedure documented
+- [ ] Load testing performed on staging
+- [ ] Database performance measured at 250 concurrent users
+- [ ] Database performance measured at 500 concurrent users
+- [ ] No uncontrolled data generation during load tests
+

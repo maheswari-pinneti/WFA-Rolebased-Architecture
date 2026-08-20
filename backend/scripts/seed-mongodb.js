@@ -79,17 +79,13 @@ export const seedMongo = async (forceReset = false) => {
   if (userCount > 0) {
     const empTotalCount = await Employee.countDocuments({});
     const hyd = await Employee.countDocuments({ location: 'Hyderabad' });
-    const vsp = await Employee.countDocuments({ location: 'Visakhapatnam' });
-    const chn = await Employee.countDocuments({ location: 'Chennai' });
     const blr = await Employee.countDocuments({ location: 'Bengaluru' });
-    const koc = await Employee.countDocuments({ location: 'Kochi' });
+    const slm = await Employee.countDocuments({ location: 'Salem' });
 
     console.log(`\nExisting employees detected: ${empTotalCount}`);
-    console.log(`Hyderabad:      ${hyd}`);
-    console.log(`Visakhapatnam:  ${vsp}`);
-    console.log(`Chennai:        ${chn}`);
     console.log(`Bengaluru:      ${blr}`);
-    console.log(`Kochi:          ${koc}`);
+    console.log(`Hyderabad:      ${hyd}`);
+    console.log(`Salem:          ${slm}`);
     console.log("Employee creation skipped.");
     console.log("Existing employee records preserved.\n");
   }
@@ -105,18 +101,11 @@ export const seedMongo = async (forceReset = false) => {
       { id: 'usr-lead-01', name: 'Marcus Vance', email: 'lead@thestackly.com', password_hash: passHash, role: 'TEAM_LEAD', department: 'Engineering', team: 'Frontend Team', clearanceLevel: 2, status: 'ACTIVE', permissions: ['TEAM_MEMBER_VIEW', 'TEAM_VIEW', 'TASK_ASSIGN', 'TASK_TRACK', 'ATTENDANCE_VIEW_TEAM', 'PRODUCTIVITY_VIEW', 'FEEDBACK_CREATE', 'PERFORMANCE_FEEDBACK'], mfa_enabled: 1, organizationId: ORGANIZATION_ID }
     ]);
 
-    // Bulk Seed 250 Employees (and their user logins)
+    // Bulk Seed 500 Employees (and their user logins)
     const departments = ['Engineering', 'Product Management', 'Sales & Marketing', 'Human Resources', 'Customer Success', 'Finance & Operations'];
     const teamsList = ['Frontend Team', 'Product Strategy', 'Growth Team', 'People Operations', 'Customer Success', 'Finance Operations'];
     const designations = ['Senior Software Engineer', 'Product Manager', 'Account Executive', 'HR Operations Manager', 'Customer Success Director', 'Financial Analyst'];
     const statuses = ['ACTIVE', 'REMOTE', 'ON_LEAVE', 'ACTIVE'];
-
-    const locations = [];
-    for (let i = 0; i < 70; i++) locations.push('Hyderabad');
-    for (let i = 0; i < 40; i++) locations.push('Visakhapatnam');
-    for (let i = 0; i < 50; i++) locations.push('Chennai');
-    for (let i = 0; i < 60; i++) locations.push('Bengaluru');
-    for (let i = 0; i < 30; i++) locations.push('Kochi');
 
     const firstNames = [
       'Aarav', 'Vihaan', 'Vivaan', 'Ananya', 'Diya', 'Advik', 'Siddharth', 'Ishaan', 'Aanya', 'Aditi',
@@ -136,7 +125,7 @@ export const seedMongo = async (forceReset = false) => {
     const bulkUsers = [];
     const bulkEmployees = [];
 
-    for (let i = 1; i <= 250; i++) {
+    for (let i = 1; i <= 500; i++) {
       const id = i === 250 ? 'usr-emp-01' : `emp-${i}`;
       const paddedNum = String(i).padStart(4, '0');
       const joiningYear = 2020 + (i % 7);
@@ -153,7 +142,13 @@ export const seedMongo = async (forceReset = false) => {
       const design = i === 250 ? 'Full Stack Developer' : designations[deptIdx];
       const status = statuses[i % statuses.length];
       const team = i === 250 ? 'Frontend Team' : teamsList[deptIdx];
-      const location = locations[i - 1];
+      
+      let location = 'Bengaluru';
+      if (i > 250 && i <= 400) {
+        location = 'Hyderabad';
+      } else if (i > 400) {
+        location = 'Salem';
+      }
 
       bulkEmployees.push({
         id, employeeCode: code, name, email, role, department: dept, designation: design, status,
@@ -173,7 +168,7 @@ export const seedMongo = async (forceReset = false) => {
 
     await User.insertMany(bulkUsers);
     await Employee.insertMany(bulkEmployees);
-    console.log("Seeded 250 Users & Employees.");
+    console.log("Seeded 500 Users & Employees.");
   }
 
   // 6. Seed skills if empty
