@@ -359,9 +359,9 @@ export const LoginPage: React.FC = () => {
         
         {/* Logo and Welcome Header */}
         <div className="flex flex-col items-center text-center space-y-2">
-          {/* Logo with Wave shape */}
-          <div className="flex items-center gap-2 mb-1">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#38BDF8]"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          {/* Logo image and brand name */}
+          <div className="flex items-center gap-2.5 mb-1 select-none">
+            <img src="/assets/images/logo.png" alt="Stackly Logo" style={{ height: '36px', width: 'auto' }} className="shrink-0 object-contain" />
             <span className="text-lg font-black tracking-widest text-[#38BDF8]">STACKLY</span>
           </div>
           <h2 className="text-xl font-extrabold tracking-tight text-white">Welcome Back</h2>

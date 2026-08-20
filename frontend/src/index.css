@@ -1717,3 +1717,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sunset-theme [class*="bg-purple-600"] {
   background-color: var(--dashboard-accent-strong) !important;
 }
+
+/* Auth Page Utilities to support Tailwind-like classes */
+.bg-transparent { background-color: transparent !important; }
+.border-none { border: none !important; }
+.p-0 { padding: 0 !important; }
+.cursor-pointer { cursor: pointer !important; }
+.bg-\[\#050B18\] { background-color: #050b18 !important; }
+.bg-\[\#0B1224\]\/85 { background-color: rgba(11, 18, 36, 0.85) !important; }
+.bg-\[\#10B981\] { background-color: #10b981 !important; }
+.hover\:bg-\[\#059669\]:hover { background-color: #059669 !important; }
+.text-\[\#10B981\] { color: #10b981 !important; }
+.text-\[\#38BDF8\] { color: #38bdf8 !important; }
+.text-slate-350 { color: #cbd5e1 !important; }
+.border-slate-800 { border-color: #1e293b !important; }
+.border-slate-800\/80 { border-color: rgba(30, 41, 59, 0.8) !important; }
+.shadow-emerald-500\/10 { box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1), 0 2px 4px -1px rgba(16, 185, 129, 0.06) !important; }
+

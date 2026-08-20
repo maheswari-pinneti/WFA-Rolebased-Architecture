@@ -103,8 +103,8 @@ export const SignUpPage: React.FC = () => {
 
         <div className="space-y-8 relative z-10 my-auto">
           {/* Logo & Company Branding */}
-          <div className="flex items-center gap-2.5">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-blue-500"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <div className="flex items-center gap-2.5 select-none">
+            <img src="/assets/images/logo.png" alt="Stackly Logo" style={{ height: '36px', width: 'auto' }} className="shrink-0 object-contain" />
             <span className="text-xl font-black tracking-widest text-white leading-none">STACKLY</span>
           </div>
 
