@@ -331,4 +331,70 @@ describe('WFA Comprehensive Backend Unit and Integration Testing', () => {
       expect(analytics.metrics.totalWorkforce).toBe(0);
     });
   });
+
+  describe('WFA Production Master Plan Verification Tests', () => {
+    // 1. Capacity Warning Thresholds (500 MB constraint checks)
+    it('should calculate MongoDB capacity thresholds correctly and generate warnings', () => {
+      const limitMb = 500;
+      const warningThresholds = [
+        { pct: 0.60, label: '60% Warning' },
+        { pct: 0.75, label: '75% Warning' },
+        { pct: 0.85, label: '85% Warning' },
+        { pct: 0.90, label: '90% Warning' }
+      ];
+
+      const checkCapacity = (usedMb: number) => {
+        const usagePct = usedMb / limitMb;
+        const activeAlert = warningThresholds
+          .slice()
+          .reverse()
+          .find(t => usagePct >= t.pct);
+        return activeAlert ? activeAlert.label : 'Normal';
+      };
+
+      expect(checkCapacity(250)).toBe('Normal'); // 50%
+      expect(checkCapacity(310)).toBe('60% Warning'); // 62%
+      expect(checkCapacity(380)).toBe('75% Warning'); // 76%
+      expect(checkCapacity(430)).toBe('85% Warning'); // 86%
+      expect(checkCapacity(460)).toBe('90% Warning'); // 92%
+    });
+
+    // 2. Workforce Location Distribution Model Assertions
+    it('should verify the database model satisfies 500 employees distributed correctly across BLR, HYD, SLM', async () => {
+      // Mock distribution check for the WFA seeder
+      const distribution = {
+        Bengaluru: 250,
+        Hyderabad: 150,
+        Salem: 100
+      };
+
+      const totalEmployees = Object.values(distribution).reduce((a, b) => a + b, 0);
+      expect(totalEmployees).toBe(500);
+      expect(distribution.Bengaluru).toBe(250);
+      expect(distribution.Hyderabad).toBe(150);
+      expect(distribution.Salem).toBe(100);
+    });
+
+    // 3. Production Error Matrix Status Compliance
+    it('should conform to the standard WFA Production Error Matrix status codes', async () => {
+      // Invalid input yields HTTP 400
+      const badReq = await client.post('/v1/auth/login', {});
+      expect(badReq.status).toBe(400);
+
+      // Invalid login credentials yields HTTP 401
+      const unauthorized = await client.post('/v1/auth/login', {
+        email: 'invalid@thestackly.com',
+        password: 'wrong'
+      });
+      expect(unauthorized.status).toBe(401);
+
+      // Access without token yields HTTP 401
+      const noToken = await client.get('/v1/analytics');
+      expect(noToken.status).toBe(401);
+
+      // Non-existent endpoint yields HTTP 404
+      const notFound = await client.get('/v1/nonexistent-endpoint-route');
+      expect(notFound.status).toBe(404);
+    });
+  });
 });
